@@ -403,10 +403,10 @@
 "Deactivate Pod" = "Deactiveer Pod";
 
 /* */
-"Slide to Insert Cannula" = "Slide to Insert Cannula";
+"Slide to Insert Cannula" = "Slide om canule in te brengen";
 
 /* */
-"Slide to Deactivate Pod" = "Slide to Deactivate Pod";
+"Slide to Deactivate Pod" = "Veeg om Pod te deactiveren";
 
 /* Deactivate pod action button accessibility label while deactivating */
 "Deactivating." = "Deactiveren.";
@@ -491,6 +491,9 @@
 
 /* Label text for step two of insert cannula instructions */
 "Wait until insertion is completed." = "Wacht tot het inbrengen is voltooid.";
+
+/* Label text for step one of insert cannula instructions */
+"Slide the switch below to start cannula insertion." = "Schuif om canule te starten.";
 
 /* Label text indicating insertion finished. */
 "Inserted" = "Ingebracht";

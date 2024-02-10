@@ -48,7 +48,7 @@ extension Dynamic {
                                 .onTapGesture {
                                     info(
                                         header: "Activate Dynamic Sensitivity (ISF)",
-                                        body: "Calculate a new Insulin Sensitivity Setting (ISF) upon every loop cycle. The new ISF will be based on your current Glucose, total daily dose of insulin (TDD, past 24 hours of all delivered insulin) and an individual Adjustment Factor (recommendation to start with is 0.5 if using Sigmoid Function and 1 if not).\n\nAll of the Dynamic ISF and CR adjustments will be limited by your autosens.min/max limits.",
+                                        body: "Calculate a new Insulin Sensitivity Setting (ISF) upon every loop cycle. The new ISF will be based on your current Glucose, total daily dose of insulin (TDD, past 24 hours of all delivered insulin) and an individual Adjustment Factor (recommendation to start with is 0.5 if using Sigmoid Function and 0.8 if not).\n\nAll of the Dynamic ISF and CR adjustments will be limited by your autosens.min/max limits.",
                                         useGraphics: nil
                                     )
                                 }
@@ -58,7 +58,7 @@ extension Dynamic {
                     if state.useNewFormula {
                         HStack {
                             Toggle(isOn: $state.enableDynamicCR) {
-                                Text("Activate Dynamic Carb Ratio (CR")
+                                Text("Activate Dynamic Carb Ratio (CR)")
                                     .onTapGesture {
                                         scrollView = fontSize >= .extraLarge ? true : false
                                         info(
@@ -144,7 +144,7 @@ extension Dynamic {
                                 info(
                                     header: "Minimum Threshold Setting",
                                     body: NSLocalizedString(
-                                        "This setting lets you choose a level below which no insulin will be given.\n\nThe threshold is using the largest amount of your threshold setting and the computed threshold:\n\nTarget Glucose - (Target Glucose - 40) * 5\nhere using mg/dl as glucose unit.\n\nFor example, if your Target Glucose is ",
+                                        "This setting lets you choose a level below which no insulin will be given.\n\nThe threshold is using the largest amount of your threshold setting and the computed threshold:\n\nTarget Glucose - (Target Glucose - 40) / 2\n, here using mg/dl as glucose unit.\n\nFor example, if your Target Glucose is ",
                                         comment: "Threshold string part 1"
                                     ) + "\(glucoseString(100)) \(unitString) , " +
                                         NSLocalizedString("the threshold will be ", comment: "Threshold string part 2") +

@@ -21,12 +21,43 @@ extension LiveActivityAttributes.ContentState {
             .string(from: mmol ? value.asMmolL as NSNumber : NSNumber(value: value))!
     }
 
-    init?(new bg: BloodGlucose, prev: BloodGlucose?, mmol: Bool) {
+    init?(
+        new bg: BloodGlucose,
+        prev: BloodGlucose?,
+        mmol: Bool,
+        chart: [Readings],
+        settings: FreeAPSSettings,
+        suggestion: Suggestion
+    ) {
         guard let glucose = bg.glucose else {
             return nil
         }
 
         let formattedBG = Self.formatGlucose(glucose, mmol: mmol, forceSign: false)
+
+        var rotationDegrees: Double = 0.0
+
+        switch bg.direction {
+        case .doubleUp,
+             .singleUp,
+             .tripleUp:
+            rotationDegrees = -90
+        case .fortyFiveUp:
+            rotationDegrees = -45
+        case .flat:
+            rotationDegrees = 0
+        case .fortyFiveDown:
+            rotationDegrees = 45
+        case .doubleDown,
+             .singleDown,
+             .tripleDown:
+            rotationDegrees = 90
+        case .notComputable,
+             Optional.none,
+             .rateOutOfRange,
+             .some(.none):
+            rotationDegrees = 0
+        }
 
         let trendString = bg.direction?.symbol
 
@@ -34,7 +65,36 @@ extension LiveActivityAttributes.ContentState {
             Self.formatGlucose(glucose - $0, mmol: mmol, forceSign: true)
         }) ?? ""
 
-        self.init(bg: formattedBG, direction: trendString, change: change, date: bg.dateString)
+        let chartBG = chart.map(\.glucose)
+
+        let conversionFactor: Double = settings.units == .mmolL ? 18.0 : 1.0
+        let convertedChartBG = chartBG.map { Double($0) / conversionFactor }
+
+        let chartDate = chart.map(\.date)
+
+        /// glucose limits from settings
+        let highGlucose = settings.highGlucose / Decimal(conversionFactor)
+        let lowGlucose = settings.lowGlucose / Decimal(conversionFactor)
+
+        let cob = suggestion.cob ?? 0
+        let iob = suggestion.iob ?? 0
+
+        let lockScreenView = settings.lockScreenView.displayName
+
+        self.init(
+            bg: formattedBG,
+            direction: trendString,
+            change: change,
+            date: bg.dateString,
+            chart: convertedChartBG,
+            chartDate: chartDate,
+            rotationDegrees: rotationDegrees,
+            highGlucose: Double(highGlucose),
+            lowGlucose: Double(lowGlucose),
+            cob: cob,
+            iob: iob,
+            lockScreenView: lockScreenView
+        )
     }
 }
 
@@ -62,6 +122,7 @@ extension LiveActivityAttributes.ContentState {
     @Injected() private var settingsManager: SettingsManager!
     @Injected() private var glucoseStorage: GlucoseStorage!
     @Injected() private var broadcaster: Broadcaster!
+    @Injected() private var storage: FileStorage!
 
     private let activityAuthorizationInfo = ActivityAuthorizationInfo()
     @Published private(set) var systemEnabled: Bool
@@ -70,12 +131,15 @@ extension LiveActivityAttributes.ContentState {
         settingsManager.settings
     }
 
+    var suggestion: Suggestion? {
+        storage.retrieve(OpenAPS.Enact.suggested, as: Suggestion.self)
+    }
+
     private var currentActivity: ActiveActivity?
     private var latestGlucose: BloodGlucose?
 
     init(resolver: Resolver) {
         systemEnabled = activityAuthorizationInfo.areActivitiesEnabled
-
         injectServices(resolver)
         broadcaster.register(GlucoseObserver.self, observer: self)
 
@@ -146,7 +210,6 @@ extension LiveActivityAttributes.ContentState {
                     state: state,
                     staleDate: min(state.date, Date.now).addingTimeInterval(TimeInterval(6 * 60))
                 )
-
                 await currentActivity.activity.update(content)
             }
         } else {
@@ -155,7 +218,20 @@ extension LiveActivityAttributes.ContentState {
                 // pushing a stale content as the frst content results in the activity not being shown at all
                 // we want it shown though even if it is iniially stale, as we expect new BG readings to become available soon, which should then be displayed
                 let nonStale = ActivityContent(
-                    state: LiveActivityAttributes.ContentState(bg: "--", direction: nil, change: "--", date: Date.now),
+                    state: LiveActivityAttributes.ContentState(
+                        bg: "--",
+                        direction: nil,
+                        change: "--",
+                        date: Date.now,
+                        chart: [],
+                        chartDate: [],
+                        rotationDegrees: 0,
+                        highGlucose: Double(180),
+                        lowGlucose: Double(70),
+                        cob: 0,
+                        iob: 0,
+                        lockScreenView: "Simple"
+                    ),
                     staleDate: Date.now.addingTimeInterval(60)
                 )
 
@@ -164,7 +240,6 @@ extension LiveActivityAttributes.ContentState {
                     content: nonStale,
                     pushType: nil
                 )
-
                 currentActivity = ActiveActivity(activity: activity, startDate: Date.now)
 
                 // then show the actual content
@@ -209,17 +284,30 @@ extension LiveActivityBridge: GlucoseObserver {
             self.latestGlucose = glucose.last
         }
 
-        guard let bg = glucose.last, let content = LiveActivityAttributes.ContentState(
-            new: bg,
-            prev: latestGlucose,
-            mmol: settings.units == .mmolL
-        ) else {
-            // no bg or value, can't update the live activity
+        // fetch glucose for chart from Core Data
+        let coreDataStorage = CoreDataStorage()
+        let sixHoursAgo = Calendar.current.date(byAdding: .hour, value: -6, to: Date()) ?? Date()
+        let fetchGlucose = coreDataStorage.fetchGlucose(interval: sixHoursAgo as NSDate)
+
+        guard let bg = glucose.last else {
             return
         }
 
-        Task {
-            await self.pushUpdate(content)
+        if let suggestion = suggestion {
+            let content = LiveActivityAttributes.ContentState(
+                new: bg,
+                prev: latestGlucose,
+                mmol: settings.units == .mmolL,
+                chart: fetchGlucose,
+                settings: settings,
+                suggestion: suggestion
+            )
+
+            if let content = content {
+                Task {
+                    await self.pushUpdate(content)
+                }
+            }
         }
     }
 }

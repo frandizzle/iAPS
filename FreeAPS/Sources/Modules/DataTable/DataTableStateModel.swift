@@ -14,19 +14,19 @@ extension DataTable {
         @Published var mode: Mode = .treatments
         @Published var treatments: [Treatment] = []
         @Published var glucose: [Glucose] = []
+        @Published var meals: [Treatment] = []
         @Published var manualGlucose: Decimal = 0
         @Published var maxBolus: Decimal = 0
         @Published var externalInsulinAmount: Decimal = 0
         @Published var externalInsulinDate = Date()
-        @Published var tdd: (Decimal, Decimal, Double) = (0, 0, 0)
-        @Published var insulinToday: (Decimal, Decimal, Double) = (0, 0, 0)
-        @Published var basalInsulin: Decimal = 0
 
         var units: GlucoseUnits = .mmolL
+        var historyLayout: HistoryLayout = .twoTabs
 
         override func subscribe() {
             units = settingsManager.settings.units
             maxBolus = provider.pumpSettings().maxBolus
+            historyLayout = settingsManager.settings.historyLayout
             setupTreatments()
             setupGlucose()
             broadcaster.register(SettingsObserver.self, observer: self)
@@ -143,15 +143,18 @@ extension DataTable {
                     }
 
                 DispatchQueue.main.async {
-                    self.treatments = [carbs, boluses, tempBasals, tempTargets, suspend, resume, fpus]
-                        .flatMap { $0 }
-                        .sorted { $0.date > $1.date }
-                }
-
-                DispatchQueue.main.async {
-                    let increments = self.settingsManager.preferences.bolusIncrement
-                    self.tdd = TotalDailyDose().totalDailyDose(self.provider.pumpHistory(), increment: Double(increments))
-                    self.insulinToday = TotalDailyDose().insulinToday(self.provider.pumpHistory(), increment: Double(increments))
+                    if self.historyLayout == .threeTabs {
+                        self.treatments = [boluses, tempBasals, tempTargets, suspend, resume]
+                            .flatMap { $0 }
+                            .sorted { $0.date > $1.date }
+                        self.meals = [carbs, fpus]
+                            .flatMap { $0 }
+                            .sorted { $0.date > $1.date }
+                    } else {
+                        self.treatments = [carbs, fpus, boluses, tempBasals, tempTargets, suspend, resume]
+                            .flatMap { $0 }
+                            .sorted { $0.date > $1.date }
+                    }
                 }
             }
         }

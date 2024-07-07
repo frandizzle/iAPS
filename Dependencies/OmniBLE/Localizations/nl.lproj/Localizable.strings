@@ -24,7 +24,7 @@
 "Resume Insulin" = "Insuline hervatten";
 
 /* Alert content title for finishSetupReminder pod alert */
-"Pod Pairing Incomplete" = "Pod koppeling onvolledig";
+"Pod Pairing Incomplete" = "Koppeling Pod onvolledig";
 
 /* Alert content title for timeOffsetChangeDetected pod alert */
 "Time Change Detected" = "Wijziging in tijd gedetecteerd";
@@ -79,24 +79,6 @@
 
 /* */
 "Confidence Reminders" = "Bevestigingsmeldingen met piepjes vanuit de Pod";
-
-/* Help text for BeepPreferenceSelectionView */
-"Confidence reminders are beeps from the Pod which can be used to acknowledge selected commands when the Pod is not silenced." = "Dit zijn meldingen die met piepjes uit de Pod komen en kunnen worden gebruikt ter bevestiging van geselecteerde opdrachten.";
-
-/* Title for pod reminders section */
-"Pod Reminders" = "Pod herinneringen";
-
-/* Footer text for pod reminders section */
-"The app configures a reminder on the Pod to notify you in advance of Pod expiration. Set the number of hours advance notice you would like to configure by default when pairing a new Pod." = "iAPS configureert melding op de Pod om je op de hoogte te stellen wanneer de Pod verloopt. Stel het aantal uren vooraf in dat je standaard wilt instellen als je een nieuwe Pod koppelt.";
-
-/* Footer text for scheduled reminder area */
-"The expiration reminder time for the current Pod." = "De verloopherinneringstijd voor de huidige Pod.";
-
-/* Footer text for low reservoir value row */
-"The app notifies you when the amount of insulin in the Pod reaches this level." = "iAPS geeft een melding als de hoeveelheid insuline in de Pod dit niveau bereikt.";
-
-/* Description text for critical alerts */
-"The above reminders will not sound in the app if your device is in Silent or Do Not Disturb mode. There are other critical Pod alerts that will sound in the app even if your device is set to Silent or Do Not Disturb mode.\n\nThe Pod will also use audible beeps for all Pod reminders and alerts except when the Pod is Silenced." = "Als je apparaat stil is of in de Niet storen-modus staat, hoor je de bovenstaande herinneringen niet in de app. Er zijn echter andere belangrijke waarschuwingen voor de Pod die nog steeds in de app verschijnen, zelfs als je apparaat stil is of in de Niet storen-modus staat.\n\nDe Pod maakt ook geluid met piepjes voor alle herinneringen en waarschuwingen, behalve als de Pod is uitgeschakeld.";
 
 /* Text for suspend resume button when insulin delivery active */
 "Suspend Insulin Delivery" = "Onderbreken van insulinetoediening";
@@ -338,9 +320,6 @@
 /* Button title to set temporary basal rate */
 "Set Temporary Basal Rate" = "Stel tijdelijke basaal in";
 
-/* Description text on manual temp basal action sheet */
-"Your insulin delivery will not be automatically adjusted until the temporary basal rate finishes or is canceled." = "Je insuline levering zal niet automatisch worden aangepast totdat de tijdelijke basaalstand is beëindigd of is geannuleerd.";
-
 /* Section header for activity section */
 "Activity" = "Activiteit";
 
@@ -424,10 +403,10 @@
 "Deactivate Pod" = "Deactiveer Pod";
 
 /* */
-"Slide to Insert Cannula" = "Schuif om canule in te brengen";
+"Slide to Insert Cannula" = "Slide om canule in te brengen";
 
 /* */
-"Slide to Deactivate Pod" = "Schuif om de Pod te deactiveren";
+"Slide to Deactivate Pod" = "Veeg om Pod te deactiveren";
 
 /* Deactivate pod action button accessibility label while deactivating */
 "Deactivating." = "Deactiveren.";
@@ -514,7 +493,7 @@
 "Wait until insertion is completed." = "Wacht tot het inbrengen is voltooid.";
 
 /* Label text for step one of insert cannula instructions */
-"Slide the switch below to start cannula insertion." = "Schuif om de canule te starten.";
+"Slide the switch below to start cannula insertion." = "Schuif om canule te starten.";
 
 /* Label text indicating insertion finished. */
 "Inserted" = "Ingebracht";
@@ -547,10 +526,10 @@
 "Deactivated" = "Uitgeschakeld";
 
 /* Format string for instructions for setup complete view. (1: app name) */
-"Your Pod is ready for use.\n\n%1$@ will remind you to change your pod before it expires. You can change this to a time convenient for you." = "Je Pod is klaar voor gebruik.\n\niAPS (%1$@) zal je eraan herinneren om je Pod te vervangen voordat deze verloopt. Je kunt dit veranderen in een tijdstip dat je beter uitkomt.";
+"Your Pod is ready for use.\n\n%1$@ will remind you to change your pod before it expires. You can change this to a time convenient for you." = "Je Pod is klaar voor gebruik.\n\n%1$@ zal je eraan herinneren om je Pod te vervangen voordat deze verloopt. Je kunt dit veranderen in een tijdstip dat je beter uitkomt.";
 
 /* */
-"Scheduled Reminder" = "Geplande melding";
+"Scheduled Reminder" = "Geplande herinnering";
 
 /* Label for expiration reminder row */
 "Time" = "Tijd";
@@ -592,7 +571,7 @@
 "This is a reminder that you scheduled when you paired your current Pod." = "Dit is een herinnering die je hebt gepland toen je je huidige Pod koppelde.";
 
 /* */
-"Scheduled Reminder" = "Geplande melding";
+"Scheduled Reminder" = "Geplande herinnering";
 
 /* Footer text for low reservoir value row */
 "The App notifies you when the amount of insulin in the Pod reaches this level." = "iAPS geeft een melding als de hoeveelheid insuline in de Pod dit niveau bereikt.";
@@ -703,7 +682,7 @@
 "Pod Activated" = "Pod geactiveerd";
 
 /* description label for active time pod details row */
-"Active Time" = "Activatie tijd";
+"Active Time" = "Actieve duur";
 
 /* description label for last status date pod details row */
 "Last Status" = "Laatste status";
@@ -751,7 +730,7 @@
 "Cancel Manual Basal" = "Annuleer handmatige basaal";
 
 /* Text shown in insulin delivery space when insulin suspended */
-"Insulin\nSuspended" = "Insuline\nopgeschort";
+"Insulin\nSuspended" = "Insuline\nOnderbroken";
 
 /* Text for suspend resume button when insulin delivery is suspended */
 "Resume Insulin Delivery" = "Insulinetoediening hervatten";

@@ -2,10 +2,10 @@
 "A bolus is already in progress" = "Un bolo ya está en progreso";
 
 /* The description of AlarmClockReminderPumpEvent */
-"AlarmClockReminder" = "Recordatorio de alarma";
+"AlarmClockReminder" = "AlarmClockReminder";
 
 /* The description of AlarmSensorPumpEvent */
-"AlarmSensor" = "Sensor de alarma";
+"AlarmSensor" = "AlarmSensor";
 
 /* Describing the battery chemistry as Alkaline */
 "Alkaline" = "Alcalina";

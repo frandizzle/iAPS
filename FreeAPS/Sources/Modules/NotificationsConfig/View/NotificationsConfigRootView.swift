@@ -34,6 +34,57 @@ extension NotificationsConfig {
             return formatter
         }
 
+        @Environment(\.colorScheme) var colorScheme
+
+        var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
+
+        @ViewBuilder private func liveActivitySection() -> some View {
+            if #available(iOS 16.2, *) {
+                Section(
+                    header: Text("Live Activity"),
+                    footer: Text(
+                        liveActivityFooterText()
+                    ),
+                    content: {
+                        if !systemLiveActivitySetting {
+                            Button("Open Settings App") {
+                                UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                            }
+                        } else {
+                            Toggle("Show Live Activity", isOn: $state.useLiveActivity) }
+
+                        if state.useLiveActivity {
+                            Picker(
+                                selection: $state.lockScreenView,
+                                label: Text("Lock screen widget")
+                            ) {
+                                ForEach(LockScreenView.allCases) { selection in
+                                    Text(selection.displayName).tag(selection)
+                                }
+                            }
+                        }
+                    }
+                )
+                .onReceive(resolver.resolve(LiveActivityBridge.self)!.$systemEnabled, perform: {
+                    self.systemLiveActivitySetting = $0 })
+            }
+        }
+
         private func liveActivityFooterText() -> String {
             var footer =
                 "Live activity displays blood glucose live on the lock screen and on the dynamic island (if available)"
@@ -79,30 +130,11 @@ extension NotificationsConfig {
                     }
                 }
 
-                if #available(iOS 16.2, *) {
-                    Section(
-                        header: Text("Live Activity"),
-                        footer: Text(
-                            liveActivityFooterText()
-                        ),
-                        content: {
-                            if !systemLiveActivitySetting {
-                                Button("Open Settings App") {
-                                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-                                }
-                            } else {
-                                Toggle("Show Live Activity", isOn: $state.useLiveActivity) }
-                        }
-                    )
-                    .onReceive(resolver.resolve(LiveActivityBridge.self)!.$systemEnabled, perform: {
-                        self.systemLiveActivitySetting = $0
-                    })
-                }
-            }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-            .onAppear(perform: configureView)
-            .navigationBarTitle("Notifications")
-            .navigationBarTitleDisplayMode(.automatic)
+                liveActivitySection()
+            }.scrollContentBackground(.hidden).background(color)
+                .onAppear(perform: configureView)
+                .navigationBarTitle("Notifications")
+                .navigationBarTitleDisplayMode(.automatic)
         }
     }
 }

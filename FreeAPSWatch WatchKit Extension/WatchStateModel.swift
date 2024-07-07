@@ -27,6 +27,9 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var carbsRequired: Decimal?
     @Published var iob: Decimal?
     @Published var cob: Decimal?
+    @Published var tdd: Decimal?
+    @Published var lowGlucose: Decimal?
+    @Published var highGlucose: Decimal?
     @Published var tempTargets: [TempTargetWatchPreset] = []
     @Published var overrides: [OverridePresets_] = []
     @Published var bolusAfterCarbs = true
@@ -60,12 +63,10 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var timerDate = Date()
     @Published var pendingBolus: Double?
     @Published var isf: Decimal?
-    @Published var override: String?
+    @Published var isfString: String?
     @Published var target: Decimal?
-    @Published var carbRatio: Decimal?
-    @Published var eventualGlucose: Decimal?
-    @Published var deltaBG: Decimal?
-    @Published var minPredBG: Decimal?
+    @Published var targetString: String?
+    @Published var override: String?
 
     private var lifetime = Set<AnyCancellable>()
     private var confirmationTimeout: AnyCancellable?
@@ -190,6 +191,9 @@ class WatchStateModel: NSObject, ObservableObject {
         carbsRequired = state.carbsRequired
         iob = state.iob
         cob = state.cob
+        tdd = state.tdd
+        lowGlucose = state.lowGlucose
+        highGlucose = state.highGlucose
         tempTargets = state.tempTargets
         overrides = state.overrides
         bolusAfterCarbs = state.bolusAfterCarbs ?? true
@@ -201,11 +205,9 @@ class WatchStateModel: NSObject, ObservableObject {
         profilesOrTempTargets = state.profilesOrTempTargets ?? true
         useNewCalc = state.useNewCalc ?? false
         isf = state.isf
-        target = state.target
-        carbRatio = state.carbRatio
-        deltaBG = state.deltaBG
-        minPredBG = state.minPredBG
-
+        isfString = state.isfString
+        target = state.isf
+        targetString = state.targetString
         override = state.override
     }
 }

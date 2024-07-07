@@ -7,6 +7,24 @@ extension AutotuneConfig {
         @StateObject var state = StateModel()
         @State var replaceAlert = false
 
+        @Environment(\.colorScheme) var colorScheme
+        var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
+
         private var isfFormatter: NumberFormatter {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
@@ -96,18 +114,17 @@ extension AutotuneConfig {
                             .foregroundColor(.red)
                     }
 
-                    /*
-                     Section {
-                         Button {
-                             replaceAlert = true
-                         }
-                         label: { Text("Save as your Normal Basal Rates") }
-                     } header: {
-                         Text("Save on Pump")
-                     }*/
+                    Section {
+                        Button {
+                            replaceAlert = true
+                        }
+                        label: { Text("Save as your Normal Basal Rates") }
+                    } header: {
+                        Text("Save on Pump")
+                    }
                 }
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            .scrollContentBackground(.hidden).background(color)
             .onAppear(perform: configureView)
             .navigationTitle("Autotune")
             .navigationBarTitleDisplayMode(.automatic)

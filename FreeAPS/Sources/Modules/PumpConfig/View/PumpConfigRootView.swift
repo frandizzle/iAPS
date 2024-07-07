@@ -6,6 +6,24 @@ extension PumpConfig {
         let resolver: Resolver
         @StateObject var state = StateModel()
 
+        @Environment(\.colorScheme) var colorScheme
+        var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
+
         var body: some View {
             NavigationView {
                 Form {
@@ -27,14 +45,15 @@ extension PumpConfig {
                             Button("Add Medtronic") { state.addPump(.minimed) }
                             Button("Add Omnipod") { state.addPump(.omnipod) }
                             Button("Add Omnipod Dash") { state.addPump(.omnipodBLE) }
+                            Button("Add Dana-i/RS") { state.addPump(.dana) }
                             Button("Add Simulator") { state.addPump(.simulator) }
                         }
                     }
                 }
-                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                .scrollContentBackground(.hidden).background(color)
                 .onAppear(perform: configureView)
                 .navigationTitle("Pump config")
-                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.automatic)
                 .sheet(isPresented: $state.setupPump) {
                     if let pumpManager = state.provider.apsManager.pumpManager {
                         PumpSettingsView(

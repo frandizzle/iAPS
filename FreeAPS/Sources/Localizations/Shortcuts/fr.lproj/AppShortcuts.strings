@@ -1,35 +1,33 @@
-/* iAPS Temporary Target shortcut*/
-"Activate ${applicationName} temporary target" = "Activate ${applicationName} temporary target";
+/*
+  AppShortcuts.strings
+*/
+/* -------------------------------- */
+/* oiAPS Temporary Target shortcut*/
+"Activate ${applicationName} temporary target" = "Activer une cible temporaire à ${applicationName}";
 
-/* iAPS Temporary Target shortcut Description */
-"${applicationName} apply a temporary target" = "${applicationName} apply a temporary target";
+/* oiAPS Temporary Target shortcut Description */
+"${applicationName} apply a temporary target" = "${applicationName} permet d'appliquer une cible temporaire";
 
-/* iAPS Status shortcut */
-"List ${applicationName} state" = "List ${applicationName} state";
+/* oiAPS Status shortcut */
+"List ${applicationName} state" = "Lister les états de ${applicationName}";
 
-/* iAPS Status shortcut Description*/
-"${applicationName} state" = "${applicationName} state";
+/* oiAPS Status shortcut Description*/
+"${applicationName} state" = "Etat de ${applicationName}";
 
-/* iAPS Add carbs shortcut */
-"Add carbs in ${applicationName}" = "Add carbs in ${applicationName}";
+/* oiAPS Add carbs shortcut */
+"Add carbs in ${applicationName}" = "Ajouter des glucides à ${applicationName}";
 
-/* iAPS Add carbs shortcut description */
-"${applicationName} allows to add carbs" = "${applicationName} allows to add carbs";
+/* oiAPS Add carbs shortcut description */
+"${applicationName} allows to add carbs" = "${applicationName} permet d'ajouter des glucides";
 
-/* iAPS Override shortcut */
-"Activate an ${applicationName} Override Preset" = "Activate an ${applicationName} Override Preset";
+/* oiAPS Create and apply Temporary Target shortcut*/
+"Create and apply a temporary target in ${applicationName}" = "Définir et appliquer une cible temporaire à ${applicationName}";
 
-/* iAPS Override shortcut description */
-"Activates an ${applicationName} Override Preset" = "Activates an ${applicationName} Override Preset";
+/* oiAPS Create and apply Temporary Target description*/
+"${applicationName} allows to create and apply a temporary target" = "${applicationName} permet de définir et appliquer une cible temporaire";
 
-/* iAPS Cancel Override shortcut */
-"Cancel ${applicationName} Overide" =  "Cancel ${applicationName} Overide";
+/* oiAPS Temporary override shortcut*/
+"Activate ${applicationName} temporary override" = "Activer une surcharge temporaire à ${applicationName}";
 
-/* iAPS Cancel Override shortcut description */
-"Cancels an active ${applicationName} override" = "Cancels an active ${applicationName} override";
-
-/* iAPS Bolus shortcut */
-"${applicationName} Bolus" = "${applicationName} Bolus";
-
-/* iAPS Bolus shortcut description */
-"${applicationName} Enacts a bolus" = "${applicationName} Enacts a bolus";
+/* oiAPS Temporary override shortcut Description */
+"${applicationName} apply a temporary override" = "${applicationName} permet d'appliquer une surcharge temporaire";

@@ -1,0 +1,33 @@
+oref0 branch: dev-autoISF - git version: 1d09f72
+
+Last commits:
+1d09f72 fix insulinForManualBolus
+9b95411 rT.variables in mg/dL
+264e46d faster glucose_get_last
+d041dae introduce absolute keto safety TBR
+260b0c2 more rT's into check  setTempBasal
+f8419a4 KetoProtect
+24dada3 fix avgDelta data mgmt.
+98c4aff fix errors
+8962bf3 populate avgDelta towards suggestion OiAPS
+ec10989 separate InsReq. tags
+9ede939 autosens result in popup
+3e601be fix errors date and glucose
+9981d97 disable maxDelta_bg_threshold setting completely
+27de11b middleware popup a la Jon
+0440fa3 fullLoop condition
+128f4a1 cp script
+4d65354 fix pp-isf within the specified hours
+7946b0b fix minAgo and single glucose value -> dont loop
+4c7e048 limitation of B30 notification
+c0be150 typo
+b04ac3b Merge branch 'dev-autoISF_newUI' into dev-autoISF
+ea262e8 TDD popup
+7103fc9 fix iobTH and log messages
+5e6970e follow Gerhards logic
+2734d92 take out old absolute IOB Threshold check
+b858dd9 take out old absolute IOB Threshold check
+0961dc0 show TDD in popup
+67038fc fix IOB Threshold logic
+fa4a448 middleware into popup
+01b1d6c iobTH fixes and autosens toggle

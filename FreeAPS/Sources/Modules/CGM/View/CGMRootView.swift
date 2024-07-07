@@ -8,6 +8,24 @@ extension CGM {
         @StateObject var state = StateModel()
         @State private var setupCGM = false
 
+        @Environment(\.colorScheme) var colorScheme
+        var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
+
         // @AppStorage(UserDefaults.BTKey.cgmTransmitterDeviceAddress.rawValue) private var cgmTransmitterDeviceAddress: String? = nil
 
         var body: some View {
@@ -83,16 +101,14 @@ extension CGM {
                         Toggle("Smooth Glucose Value", isOn: $state.smoothGlucose)
                     }
                 }
-                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                .scrollContentBackground(.hidden).background(color)
                 .onAppear(perform: configureView)
                 .navigationTitle("CGM")
-                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.automatic)
                 .sheet(isPresented: $setupCGM) {
-                    if let cgmFetchManager = state.cgmManager, cgmFetchManager.glucoseSource.cgmType == state.cgm,
-                       let cmgManager = cgmFetchManager.glucoseSource.cgmManager
-                    {
+                    if let cgmFetchManager = state.cgmManager, cgmFetchManager.glucoseSource.cgmType == state.cgm {
                         CGMSettingsView(
-                            cgmManager: cmgManager,
+                            cgmManager: cgmFetchManager.glucoseSource.cgmManager!,
                             bluetoothManager: state.provider.apsManager.bluetoothManager!,
                             unit: state.settingsManager.settings.units,
                             completionDelegate: state

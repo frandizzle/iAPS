@@ -270,10 +270,7 @@ struct OmnipodSettingsView: View  {
                 VStack(alignment: .trailing) {
                     Button(action: {
                         sendingTestBeepsCommand = true
-                        Task { @MainActor in
-                            do {
-                                try await viewModel.playTestBeeps()
-                            }
+                        viewModel.playTestBeeps { _ in
                             sendingTestBeepsCommand = false
                         }
                     }) {
@@ -519,9 +516,7 @@ struct OmnipodSettingsView: View  {
             Section() {
                 NavigationLink(destination: PodDiagnosticsView(
                     title: LocalizedString("Pod Diagnostics", comment: "Title for the pod diagnostic view"),
-                    diagnosticCommands: viewModel.diagnosticCommands,
-                    podOk: viewModel.podOk,
-                    noPod: viewModel.noPod))
+                    viewModel: viewModel))
                 {
                     FrameworkLocalText("Pod Diagnostics", comment: "Text for pod diagnostics row")
                         .foregroundColor(Color.primary)
@@ -569,7 +564,7 @@ struct OmnipodSettingsView: View  {
     var suspendOptionsActionSheet: ActionSheet {
         ActionSheet(
             title: FrameworkLocalText("Suspend Delivery", comment: "Title for suspend duration selection action sheet"),
-            message: FrameworkLocalText("Insulin delivery will be stopped until you resume manually. Select when you want to be reminded to resume delivery?", comment: "Message for suspend duration selection action sheet"),
+            message: FrameworkLocalText("Insulin delivery will be stopped until you resume manually. When would you like Loop to remind you to resume delivery?", comment: "Message for suspend duration selection action sheet"),
             buttons: [
                 .default(FrameworkLocalText("30 minutes", comment: "Button text for 30 minute suspend duration"), action: { self.viewModel.suspendDelivery(duration: .minutes(30)) }),
                 .default(FrameworkLocalText("1 hour", comment: "Button text for 1 hour suspend duration"), action: { self.viewModel.suspendDelivery(duration: .hours(1)) }),

@@ -3,7 +3,7 @@ import Foundation
 import Intents
 
 @available(iOS 16.0,*) struct BolusIntent: AppIntent {
-    static var title: LocalizedStringResource = "Bolus"
+    static var title: LocalizedStringResource = "Enact Bolus"
     static var description = IntentDescription("Allow to send a bolus command to iAPS.")
 
     @Parameter(
@@ -22,11 +22,11 @@ import Intents
 
     static var parameterSummary: some ParameterSummary {
         When(\.$confirmBeforeApplying, .equalTo, true, {
-            Summary("Applying \(\.$bolusQuantity)") {
+            Summary("Enacting \(\.$bolusQuantity)") {
                 \.$confirmBeforeApplying
             }
         }, otherwise: {
-            Summary("Immediately applying \(\.$bolusQuantity)") {
+            Summary("Immediately enacting \(\.$bolusQuantity)") {
                 \.$confirmBeforeApplying
             }
         })
@@ -41,7 +41,6 @@ import Intents
                 amount = try await $bolusQuantity.requestValue("Enter a Bolus Amount")
             }
             let bolusAmountString = amount.formatted()
-
             if confirmBeforeApplying {
                 let glucoseString = BolusIntentRequest().currentGlucose() // Fetch current glucose
                 try await requestConfirmation(

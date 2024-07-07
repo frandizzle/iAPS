@@ -12,6 +12,24 @@ extension PreferencesEditor {
         let resolver: Resolver
         @StateObject var state = StateModel()
 
+        @Environment(\.colorScheme) var colorScheme
+        var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
+
         private var formatter: NumberFormatter {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
@@ -22,14 +40,15 @@ extension PreferencesEditor {
 
         var body: some View {
             Form {
-                Section {
+                Section(header: Text("iAPS").textCase(nil)) {
                     Picker("Glucose units", selection: $state.unitsIndex) {
                         Text("mg/dL").tag(0)
                         Text("mmol/L").tag(1)
                     }
-                } header: { Text("iAPS").textCase(nil) }
+                }
+
                 ForEach(state.sections.indexed(), id: \.1.id) { sectionIndex, section in
-                    Section(header: Text(section.displayName)) {
+                    Section(header: Text(section.displayName).textCase(nil)) {
                         ForEach(section.fields.indexed(), id: \.1.id) { fieldIndex, field in
                             HStack {
                                 switch field.type {
@@ -74,16 +93,15 @@ extension PreferencesEditor {
                         }
                     }
                 }
-                Section {} footer: { Text("").padding(.bottom, 300) }
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            .scrollContentBackground(.hidden).background(color)
             .onAppear(perform: configureView)
             .navigationTitle("Preferences")
             .navigationBarTitleDisplayMode(.automatic)
             .navigationBarItems(
                 trailing:
                 Button {
-                    let lang = Locale.current.language.languageCode?.identifier ?? "en"
+                    let lang = Locale.current.languageCode ?? "en"
                     if lang == "en" {
                         UIApplication.shared.open(
                             URL(

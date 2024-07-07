@@ -50,6 +50,6 @@ struct NightscoutProfileStore: JSON {
     let startDate: Date
     let mills: Int
     let units: String
-    var enteredBy: String
+    let enteredBy: String
     let store: [String: ScheduledNightscoutProfile]
 }

@@ -74,9 +74,6 @@ extension PodCommsError: LocalizedError {
             let faultDescription = String(describing: fault.faultEventCode)
             return String(format: LocalizedString("Pod Fault: %1$@", comment: "Format string for pod fault code"), faultDescription)
         case .commsError(let error):
-            if isVerboseBluetoothCommsError(error) {
-                return LocalizedString("Possible Bluetooth issue", comment: "Error description for possible bluetooth issue")
-            }
             return error.localizedDescription
         case .unacknowledgedMessage(_, let error):
             return error.localizedDescription
@@ -139,10 +136,7 @@ extension PodCommsError: LocalizedError {
             return LocalizedString("Resume delivery", comment: "Recovery suggestion when pod is suspended")
         case .podFault:
             return nil
-        case .commsError(let error):
-            if isVerboseBluetoothCommsError(error) {
-                return LocalizedString("Try adjusting pod position or toggle Bluetooth off and then on in iPhone Settings.", comment: "Recovery suggestion for possible bluetooth issue")
-            }
+        case .commsError:
             return nil
         case .unacknowledgedMessage:
             return nil
@@ -178,28 +172,6 @@ extension PodCommsError: LocalizedError {
         default:
             return false
         }
-    }
-
-    public func isVerboseBluetoothCommsError(_ error: Error) -> Bool {
-        if let peripheralManagerError = error as? PeripheralManagerError {
-            switch peripheralManagerError {
-            case .cbPeripheralError:
-                print("### Verbose Bluetooth comms error: \(peripheralManagerError.localizedDescription)")
-                return true
-            default:
-                break
-            }
-        }
-        if let podProtocolError = error as? PodProtocolError {
-            switch podProtocolError {
-            case .invalidLTKKey, .pairingException, .messageIOException, .couldNotParseMessageException:
-                print("### Verbose Bluetooth comms error: \(podProtocolError.localizedDescription)")
-                return true
-            default:
-                break
-            }
-        }
-        return false
     }
 }
 
@@ -275,9 +247,7 @@ public class PodCommsSession {
     ///     - PodCommsError.unexpectedResponse
     ///     - PodCommsError.rejectedMessage
     ///     - PodCommsError.nonceResyncFailed
-    ///     - PodCommsError.commsError.MessageError
-    ///     - PodCommsError.commsError.PeripheralManagerError
-    ///     - PodCommsError.commsError.PodProtocolError
+    ///     - MessageError
     func send<T: MessageBlock>(_ messageBlocks: [MessageBlock], beepBlock: MessageBlock? = nil, expectFollowOnMessage: Bool = false) throws -> T {
         
         var triesRemaining = 2  // Retries only happen for nonce resync
@@ -802,9 +772,7 @@ public class PodCommsSession {
                     let _: StatusResponse = try send([CancelDeliveryCommand(nonce: podState.currentNonce, deliveryType: .all, beepType: .noBeepCancel)])
                 }
             }
-            podState.unacknowledgedCommand = PendingCommand.program(.basalProgram(schedule: schedule), transport.messageNumber, currentDate)
             var status: StatusResponse = try send([basalScheduleCommand, basalExtraCommand])
-            podState.unacknowledgedCommand = nil
             let now = currentDate
             podState.suspendState = .resumed(now)
             podState.unfinalizedResume = UnfinalizedDose(resumeStartTime: now, scheduledCertainty: .certain, insulinType: podState.insulinType)
@@ -815,12 +783,12 @@ public class PodCommsSession {
             }
             podState.updateFromStatusResponse(status, at: currentDate)
             return status
-        } catch PodCommsError.unacknowledgedMessage(let seq, let error) {
-            podState.unacknowledgedCommand = podState.unacknowledgedCommand?.commsFinished
-            log.error("Unacknowledged resume: command seq = %d, error = %{public}@", seq, String(describing: error))
-            throw error
+        } catch PodCommsError.nonceResyncFailed {
+            throw PodCommsError.nonceResyncFailed
+        } catch PodCommsError.rejectedMessage(let errorCode) {
+            throw PodCommsError.rejectedMessage(errorCode: errorCode)
         } catch let error {
-            podState.unacknowledgedCommand = nil
+            podState.unfinalizedResume = UnfinalizedDose(resumeStartTime: currentDate, scheduledCertainty: .uncertain, insulinType: podState.insulinType)
             throw error
         }
     }

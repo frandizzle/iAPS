@@ -15,10 +15,6 @@ extension Home {
             storage.retrieve(OpenAPS.Enact.suggested, as: Suggestion.self)
         }
 
-        var dynamicVariables: DynamicVariables? {
-            storage.retrieve(OpenAPS.Monitor.dynamicVariables, as: DynamicVariables.self)
-        }
-
         let overrideStorage = OverrideStorage()
 
         func overrides() -> [Override] {
@@ -31,23 +27,6 @@ extension Home {
 
         var enactedSuggestion: Suggestion? {
             storage.retrieve(OpenAPS.Enact.enacted, as: Suggestion.self)
-        }
-
-        func reasons() -> [IOBData]? {
-            let reasons = CoreDataStorage().fetchReasons(interval: DateFilter().day)
-
-            guard reasons.count > 3 else {
-                return nil
-            }
-
-            return reasons.compactMap {
-                entry -> IOBData in
-                IOBData(
-                    date: entry.date ?? Date(),
-                    iob: (entry.iob ?? 0) as Decimal,
-                    cob: (entry.cob ?? 0) as Decimal
-                )
-            }
         }
 
         func pumpTimeZone() -> TimeZone? {

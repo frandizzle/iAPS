@@ -2,7 +2,8 @@ import Foundation
 import SwiftUI
 
 extension PreferencesEditor {
-    final class StateModel: BaseStateModel<Provider>, PreferencesSettable { private(set) var preferences = Preferences()
+    final class StateModel: BaseStateModel<Provider>, PreferencesSettable {
+        private(set) var preferences = Preferences()
         @Published var unitsIndex = 1
         @Published var allowAnnouncements = false
         @Published var skipBolusScreenAfterCarbs = false
@@ -19,7 +20,53 @@ extension PreferencesEditor {
             } didSet: { [weak self] _ in
                 self?.provider.migrateUnits()
             }
+
+            let quickPrefs = [
+                Field(
+                    displayName: "Exercise Mode",
+                    type: .boolean(keypath: \.exerciseMode),
+                    infoText: NSLocalizedString(
+                        "Defaults to false. When true, > 100 mg/dL high temp target adjusts sensitivityRatio for exercise mode. Synonym for high_temptarget_raises_sensitivity",
+                        comment: "Exercise Mode"
+                    ),
+                    settable: self
+                ),
+                Field(
+                    displayName: NSLocalizedString("Half Basal Exercise Target", comment: "Half Basal Exercise Target") +
+                        " (mg/dL)",
+                    type: .decimal(keypath: \.halfBasalExerciseTarget),
+                    infoText: NSLocalizedString(
+                        "Set to a number in mg/dl, e.g. 160, which means when TempTarget (TT) is 160 mg/dL and exercise mode = true, it will run 50% basal at this TT level (if high TT at 120 = 75%; 140 = 60%). This can be adjusted, to give you more control over your exercise modes.",
+                        comment: "Half Basal Exercise Target"
+                    ),
+                    settable: self
+                )
+            ]
+
             let mainFields = [
+                Field(
+                    displayName: NSLocalizedString("Insulin curve", comment: "Insulin curve"),
+                    type: .insulinCurve(keypath: \.curve),
+                    infoText: "Insulin curve info",
+                    settable: self
+                ),
+                Field(
+                    displayName: NSLocalizedString("Use Custom Peak Time", comment: "Use Custom Peak Time"),
+                    type: .boolean(keypath: \.useCustomPeakTime),
+                    infoText: NSLocalizedString(
+                        "Defaults to false. Setting to true allows changing insulinPeakTime", comment: "Use Custom Peak Time"
+                    ),
+                    settable: self
+                ),
+                Field(
+                    displayName: NSLocalizedString("Insulin Peak Time", comment: "Insulin Peak Time"),
+                    type: .decimal(keypath: \.insulinPeakTime),
+                    infoText: NSLocalizedString(
+                        "Time of maximum blood glucose lowering effect of insulin, in minutes. Beware: Oref assumes for ultra-rapid (Lyumjev) & rapid-acting (Fiasp) curves minimal (35 & 50 min) and maximal (100 & 120 min) applicable insulinPeakTimes. Using a custom insulinPeakTime outside these bounds will result in issues with iAPS, longer loop calculations and possible red loops.",
+                        comment: "Insulin Peak Time"
+                    ),
+                    settable: self
+                ),
                 Field(
                     displayName: NSLocalizedString("Max IOB", comment: "Max IOB"),
                     type: .decimal(keypath: \.maxIOB),
@@ -35,6 +82,15 @@ extension PreferencesEditor {
                     infoText: NSLocalizedString(
                         "The default of maxCOB is 120. (If someone enters more carbs in one or multiple entries, iAPS will cap COB to maxCOB and keep it at maxCOB until the carbs entered above maxCOB have shown to be absorbed. Essentially, this just limits UAM as a safety cap against weird COB calculations due to fluky data.)",
                         comment: "Max COB"
+                    ),
+                    settable: self
+                ),
+                Field(
+                    displayName: "Enable Floating Carbs",
+                    type: .boolean(keypath: \.floatingcarbs),
+                    infoText: NSLocalizedString(
+                        "Defaults to false. If true, then dose slightly more aggressively by using all entered carbs for calculating COBpredBGs. This avoids backing off too quickly as COB decays. Even with this option, oref0 still switches gradually from using COBpredBGs to UAMpredBGs proportionally to how many carbs are left as COB. Summary: use all entered carbs in the future for predBGs & don't decay them as COB, only once they are actual.",
+                        comment: "Floating Carbs"
                     ),
                     settable: self
                 ),
@@ -56,7 +112,15 @@ extension PreferencesEditor {
                     ),
                     settable: self
                 ),
-
+                Field(
+                    displayName: NSLocalizedString("Enable Autosens", comment: "Enable Autosens"),
+                    type: .boolean(keypath: \.enableAutosens),
+                    infoText: NSLocalizedString(
+                        "Switch Autosens on/off",
+                        comment: "Autosens"
+                    ),
+                    settable: self
+                ),
                 Field(
                     displayName: NSLocalizedString("Autosens Max", comment: "Autosens Max"),
                     type: .decimal(keypath: \.autosensMax),
@@ -88,10 +152,37 @@ extension PreferencesEditor {
                     settable: self
                 ),
                 Field(
-                    displayName: NSLocalizedString("Max Delta-BG Threshold SMB", comment: "Max Delta-BG Threshold"),
-                    type: .decimal(keypath: \.maxDeltaBGthreshold),
+                    displayName: "Enable SMB With High BG",
+                    type: .boolean(keypath: \.enableSMB_high_bg),
                     infoText: NSLocalizedString(
-                        "Defaults to 0.2 (20%). Maximum positive percentual change of BG level to use SMB, above that will disable SMB. Hardcoded cap of 40%. For UAM fully-closed-loop 30% is advisable. Observe in log and popup (maxDelta 27 > 20% of BG 100 - disabling SMB!).",
+                        "Enable SMBs when a high BG is detected, based on the high BG target (adjusted or profile). When this is enabled, Enable SMB Always should be off, to disable SMB's below High BG.",
+                        comment: "Enable SMB With High BG"
+                    ),
+                    settable: self
+                ),
+                Field(
+                    displayName: "Enable SMB over this BG" + " (mg/dL",
+                    type: .decimal(keypath: \.enableSMB_high_bg_target),
+                    infoText: NSLocalizedString(
+                        "The Value above which Enable SMB With High BG will switch on SMB's. If you want no SMB's below that value Enable SMB Always needs to be off.",
+                        comment: "Over This BG (mg/dl):"
+                    ),
+                    settable: self
+                ),
+//                Field(
+//                    displayName: NSLocalizedString("Max Delta-BG Threshold SMB", comment: "Max Delta-BG Threshold"),
+//                    type: .decimal(keypath: \.maxDeltaBGthreshold),
+//                    infoText: NSLocalizedString(
+//                        "Defaults to 0.2 (20%). Maximum positive percentual change of BG level to use SMB, above that will disable SMB. Hardcoded cap of 40%. For UAM fully-closed-loop 30% is advisable. Observe in log and popup (maxDelta 27 > 20% of BG 100 - disabling SMB!).",
+//                        comment: "Max Delta-BG Threshold"
+//                    ),
+//                    settable: self
+//                ),
+                Field(
+                    displayName: NSLocalizedString("SMB Threshold Ratio", comment: "SMB Threshold Ratio"),
+                    type: .decimal(keypath: \.smbThresholdRatio),
+                    infoText: NSLocalizedString(
+                        "Defaults to 0.5! Used to determine when SMB's are disabled due to BG being low. Used in formula threshold = min_bg - (1-threshold_ratio) * (min_bg - 40). The higher the ratio the higher the threshold (BG) below which SMB's are NOT applied. With 0.5 thresholds depending on target are: min_bg of 90 -> threshold of 65, 100 -> 70 110 -> 75, and 130 -> 85.  Minimum value is 0.5, max value is 1, at which the Threshold will be equal to Target BG.",
                         comment: "Max Delta-BG Threshold"
                     ),
                     settable: self
@@ -136,27 +227,6 @@ extension PreferencesEditor {
                     settable: self
                 ),
                 Field(
-                    displayName: NSLocalizedString("Enable SMB With High BG", comment: "Enable SMB With High BG"),
-                    type: .boolean(keypath: \.enableSMB_high_bg),
-                    infoText: NSLocalizedString(
-                        "Enable SMBs when a high BG is detected, based on the high BG target (adjusted or profile)",
-                        comment: "Enable SMB With High BG"
-                    ),
-                    settable: self
-                ),
-                Field(
-                    displayName: NSLocalizedString(
-                        "... When Blood Glucose Is Over (mg/dl):",
-                        comment: "... When Blood Glucose Is Over (mg/dl):"
-                    ),
-                    type: .decimal(keypath: \.enableSMB_high_bg_target),
-                    infoText: NSLocalizedString(
-                        "Set the value enableSMB_high_bg will compare against to enable SMB. If BG > than this value, SMBs should enable.",
-                        comment: "... When Blood Glucose Is Over (mg/dl):"
-                    ),
-                    settable: self
-                ),
-                Field(
                     displayName: NSLocalizedString("Enable UAM", comment: "Enable UAM"),
                     type: .boolean(keypath: \.enableUAM),
                     infoText: NSLocalizedString(
@@ -180,15 +250,6 @@ extension PreferencesEditor {
                     infoText: NSLocalizedString(
                         "Defaults to start at 30. This is the maximum minutes of basal that can be delivered by UAM as a single SMB when IOB exceeds COB. This gives the ability to make UAM more or less aggressive if you choose. It is recommended that the value is set to start at 30, in line with the default, and if you choose to increase this value, do so in no more than 15 minute increments, keeping a close eye on the effects of the changes. Reducing the value will cause UAM to dose less insulin for each SMB. It is not recommended to set this value higher than 60 mins, as this may affect the ability for the algorithm to safely zero temp. It is also recommended that pushover is used when setting the value to be greater than default, so that alerts are generated for any predicted lows or highs.",
                         comment: "Max UAM SMB Basal Minutes"
-                    ),
-                    settable: self
-                ),
-                Field(
-                    displayName: NSLocalizedString("SMB DeliveryRatio", comment: "SMB DeliveryRatio"),
-                    type: .decimal(keypath: \.smbDeliveryRatio),
-                    infoText: NSLocalizedString(
-                        "Default value: 0.5 This is another key OpenAPS safety cap, and specifies what share of the total insulin required can be delivered as SMB. Increase this experimental value slowly and with caution.",
-                        comment: "SMB DeliveryRatio"
                     ),
                     settable: self
                 ),
@@ -256,15 +317,6 @@ extension PreferencesEditor {
                         comment: "Resistance Lowers Target"
                     ),
                     settable: self
-                ),
-                Field(
-                    displayName: NSLocalizedString("Half Basal Exercise Target", comment: "Half Basal Exercise Target"),
-                    type: .decimal(keypath: \.halfBasalExerciseTarget),
-                    infoText: NSLocalizedString(
-                        "Set to a number, e.g. 160, which means when temp target is 160 mg/dL, run 50% basal at this level (120 = 75%; 140 = 60%). This can be adjusted, to give you more control over your exercise modes.",
-                        comment: "Half Basal Exercise Target"
-                    ),
-                    settable: self
                 )
             ]
 
@@ -277,23 +329,6 @@ extension PreferencesEditor {
                     infoText: NSLocalizedString(
                         "This feature, enabled by default, resets the autosens ratio to neutral when you rewind your pump, on the assumption that this corresponds to a probable site change. Autosens will begin learning sensitivity anew from the time of the rewind, which may take up to 6 hours. If you usually rewind your pump independently of site changes, you may want to consider disabling this feature.",
                         comment: "Rewind Resets Autosens"
-                    ),
-                    settable: self
-                ),
-                Field(
-                    displayName: NSLocalizedString("Use Custom Peak Time", comment: "Use Custom Peak Time"),
-                    type: .boolean(keypath: \.useCustomPeakTime),
-                    infoText: NSLocalizedString(
-                        "Defaults to false. Setting to true allows changing insulinPeakTime", comment: "Use Custom Peak Time"
-                    ),
-                    settable: self
-                ),
-                Field(
-                    displayName: NSLocalizedString("Insulin Peak Time", comment: "Insulin Peak Time"),
-                    type: .decimal(keypath: \.insulinPeakTime),
-                    infoText: NSLocalizedString(
-                        "Time of maximum blood glucose lowering effect of insulin, in minutes. Beware: Oref assumes for ultra-rapid (Lyumjev) & rapid-acting (Fiasp) curves minimal (35 & 50 min) and maximal (100 & 120 min) applicable insulinPeakTimes. Using a custom insulinPeakTime outside these bounds will result in issues with iAPS, longer loop calculations and possible red loops.",
-                        comment: "Insulin Peak Time"
                     ),
                     settable: self
                 ),
@@ -376,18 +411,23 @@ extension PreferencesEditor {
 
             sections = [
                 FieldSection(
-                    displayName: NSLocalizedString("OpenAPS main settings", comment: "OpenAPS main settings"), fields: mainFields
+                    displayName: NSLocalizedString("Target Control Sports", comment: "Target Control Sports"),
+                    fields: quickPrefs
                 ),
                 FieldSection(
-                    displayName: NSLocalizedString("OpenAPS SMB settings", comment: "OpenAPS SMB settings"),
+                    displayName: NSLocalizedString("oref0 Main Settings", comment: "oref0 main settings"),
+                    fields: mainFields
+                ),
+                FieldSection(
+                    displayName: NSLocalizedString("oref1 SMB Settings", comment: "oref1 main settings"),
                     fields: smbFields
                 ),
                 FieldSection(
-                    displayName: NSLocalizedString("OpenAPS targets settings", comment: "OpenAPS targets settings"),
+                    displayName: NSLocalizedString("oref0 Targets Settings", comment: "oref0 targets settings"),
                     fields: targetSettings
                 ),
                 FieldSection(
-                    displayName: NSLocalizedString("OpenAPS other settings", comment: "OpenAPS other settings"),
+                    displayName: NSLocalizedString("oref0 Other Settings", comment: "oref0 other settings"),
                     fields: otherSettings
                 )
             ]

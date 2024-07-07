@@ -3,10 +3,10 @@ import Foundation
 
 @available(iOS 16.0, *) struct ApplyTempPresetIntent: AppIntent {
     // Title of the action in the Shortcuts app
-    static var title: LocalizedStringResource = "Apply a temporary Preset"
+    static var title = LocalizedStringResource("Activate TempTarget Preset", table: "ShortcutsDetail")
 
     // Description of the action in the Shortcuts app
-    static var description = IntentDescription("Allow to apply a specific temporary preset.")
+    static var description = IntentDescription(.init("Activate an existing TempTarget Preset", table: "ShortcutsDetail"))
 
     internal var intentRequest: TempPresetsIntentRequest
 
@@ -14,24 +14,35 @@ import Foundation
         intentRequest = TempPresetsIntentRequest()
     }
 
-    @Parameter(title: "Preset") var preset: tempPreset?
+    @Parameter(
+        title: LocalizedStringResource("Preset", table: "ShortcutsDetail"),
+        description: LocalizedStringResource("Preset choice", table: "ShortcutsDetail")
+    ) var preset: tempPreset?
 
     @Parameter(
-        title: "Confirm Before applying",
-        description: "If toggled, you will need to confirm before applying",
+        title: LocalizedStringResource("Confirm Before applying", table: "ShortcutsDetail"),
+        description: LocalizedStringResource("If toggled, you will need to confirm before applying", table: "ShortcutsDetail"),
         default: true
     ) var confirmBeforeApplying: Bool
 
     static var parameterSummary: some ParameterSummary {
         When(\ApplyTempPresetIntent.$confirmBeforeApplying, .equalTo, true, {
-            Summary("Applying \(\.$preset)") {
+            Summary("Activiating \(\.$preset)", table: "ShortcutsDetail") {
                 \.$confirmBeforeApplying
             }
         }, otherwise: {
-            Summary("Immediately applying \(\.$preset)") {
-                \.$confirmBeforeApplying
-            }
+            Summary("Immediately activating \(\.$preset)", table: "ShortcutsDetail") {}
         })
+    }
+
+    private func decimalToTimeFormattedString(decimal: Decimal) -> String {
+        let timeInterval = TimeInterval(decimal * 60) // seconds
+
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute]
+        formatter.unitsStyle = .brief // example: 1h 10 min
+
+        return formatter.string(from: timeInterval) ?? ""
     }
 
     @MainActor func perform() async throws -> some ProvidesDialog {
@@ -42,24 +53,33 @@ import Foundation
             } else {
                 presetToApply = try await $preset.requestDisambiguation(
                     among: intentRequest.fetchAll(),
-                    dialog: "What temp preset would you like ?"
+                    dialog: IntentDialog(LocalizedStringResource("Select Temporary Target", table: "ShortcutsDetail"))
                 )
             }
 
             let displayName: String = presetToApply.name
             if confirmBeforeApplying {
                 try await requestConfirmation(
-                    result: .result(dialog: "Are you sure to applying the temp target \(displayName) ?")
+                    result: .result(
+                        dialog: IntentDialog(LocalizedStringResource(
+                            "Confirm to apply TempTarget '\(displayName)'",
+                            table: "ShortcutsDetail"
+                        ))
+                    )
                 )
             }
 
             // TODO: enact the temp target
             let tempTarget = try intentRequest.findTempTarget(presetToApply)
             let finalTempTargetApply = try intentRequest.enactTempTarget(tempTarget)
-            let displayDetail: String =
-                "the target \(finalTempTargetApply.displayName) is applying during \(finalTempTargetApply.duration) mn"
+            let formattedTime = decimalToTimeFormattedString(decimal: finalTempTargetApply.duration)
             return .result(
-                dialog: IntentDialog(stringLiteral: displayDetail)
+                dialog: IntentDialog(
+                    LocalizedStringResource(
+                        "Target '\(finalTempTargetApply.displayName)' applied for \(formattedTime)",
+                        table: "ShortcutsDetail"
+                    )
+                )
             )
         } catch {
             throw error

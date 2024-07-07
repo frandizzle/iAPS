@@ -7,6 +7,24 @@ extension ISFEditor {
         @StateObject var state = StateModel()
         @State private var editMode = EditMode.inactive
 
+        @Environment(\.colorScheme) var colorScheme
+        var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
+
         private var dateFormatter: DateFormatter {
             let formatter = DateFormatter()
             formatter.timeZone = TimeZone(secondsFromGMT: 0)
@@ -42,18 +60,17 @@ extension ISFEditor {
                         header: !state.settingsManager.preferences
                             .useNewFormula ? Text("Autosens") : Text("Dynamic Sensitivity")
                     ) {
-                        let ratio = state.provider.suggestion?.sensitivityRatio ?? 0
-                        let isf = state.provider.sensitivity
+                        let dynamicRatio = state.provider.suggestion?.sensitivityRatio ?? 0
+                        let dynamicISF = state.provider.suggestion?.isf ?? 0
                         HStack {
                             Text("Sensitivity Ratio")
                             Spacer()
                             Text(
                                 rateFormatter
-                                    .string(
-                                        from:
-                                        ratio
-                                            as NSNumber
-                                    ) ?? "1"
+                                    .string(from: (
+                                        !state.settingsManager.preferences.useNewFormula ? state
+                                            .autosensRatio : dynamicRatio
+                                    ) as NSNumber) ?? "1"
                             )
                         }
                         HStack {
@@ -61,7 +78,10 @@ extension ISFEditor {
                             Spacer()
                             Text(
                                 rateFormatter
-                                    .string(from: isf ?? 0) ?? ""
+                                    .string(from: (
+                                        !state.settingsManager.preferences
+                                            .useNewFormula ? newISF : dynamicISF
+                                    ) as NSNumber) ?? "0"
                             )
                             Text(state.units.rawValue + "/U").foregroundColor(.secondary)
                         }
@@ -83,7 +103,7 @@ extension ISFEditor {
                     .disabled(state.items.isEmpty)
                 }
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            .scrollContentBackground(.hidden).background(color)
             .onAppear(perform: configureView)
             .navigationTitle("Insulin Sensitivities")
             .navigationBarTitleDisplayMode(.automatic)

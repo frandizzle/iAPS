@@ -97,25 +97,22 @@ public struct Pod {
 }
 
 // DeliveryStatus used in StatusResponse and DetailedStatus
-// Since bits 1 & 2 are exclusive and bits 4 & 8 are exclusive,
-// these are all the possible values that can be returned.
 public enum DeliveryStatus: UInt8, CustomStringConvertible {
     case suspended = 0
     case scheduledBasal = 1
     case tempBasalRunning = 2
-    case priming = 4 // bolusing while suspended, should only occur during priming
+    case priming = 4
     case bolusInProgress = 5
     case bolusAndTempBasal = 6
-    case extendedBolusWhileSuspended = 8 // should never occur
     case extendedBolusRunning = 9
     case extendedBolusAndTempBasal = 10
 
     public var suspended: Bool {
-        return self == .suspended || self == .priming || self == .extendedBolusWhileSuspended
+        return self == .suspended
     }
 
     public var bolusing: Bool {
-        return self == .bolusInProgress || self == .bolusAndTempBasal || self == .extendedBolusRunning || self == .extendedBolusAndTempBasal || self == .priming || self == .extendedBolusWhileSuspended
+        return self == .bolusInProgress || self == .bolusAndTempBasal || self == .extendedBolusRunning || self == .extendedBolusAndTempBasal
     }
 
     public var tempBasalRunning: Bool {
@@ -123,7 +120,7 @@ public enum DeliveryStatus: UInt8, CustomStringConvertible {
     }
 
     public var extendedBolusRunning: Bool {
-        return self == .extendedBolusRunning || self == .extendedBolusAndTempBasal || self == .extendedBolusWhileSuspended
+        return self == .extendedBolusRunning || self == .extendedBolusAndTempBasal
     }
 
     public var description: String {
@@ -140,8 +137,6 @@ public enum DeliveryStatus: UInt8, CustomStringConvertible {
             return LocalizedString("Bolusing", comment: "Delivery status when bolusing")
         case .bolusAndTempBasal:
             return LocalizedString("Bolusing with temp basal", comment: "Delivery status when bolusing and temp basal is running")
-        case .extendedBolusWhileSuspended:
-            return LocalizedString("Extended bolus running while suspended", comment: "Delivery status when extended bolus is running while suspended")
         case .extendedBolusRunning:
             return LocalizedString("Extended bolus running", comment: "Delivery status when extended bolus is running")
         case .extendedBolusAndTempBasal:

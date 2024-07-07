@@ -26,6 +26,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var carbsRequiredThreshold: Decimal = 10
     var animatedBackground: Bool = false
     var useFPUconversion: Bool = true
+    var tins: Bool = false
     var individualAdjustmentFactor: Decimal = 0.5
     var timeCap: Int = 8
     var minuteInterval: Int = 30
@@ -47,27 +48,19 @@ struct FreeAPSSettings: JSON, Equatable {
     var confirmBolusFaster: Bool = false
     var onlyAutotuneBasals: Bool = false
     var overrideFactor: Decimal = 0.8
-    var useCalc: Bool = true
+    var useCalc: Bool = false
     var fattyMeals: Bool = false
     var fattyMealFactor: Decimal = 0.7
     var displayPredictions: Bool = true
     var useLiveActivity: Bool = false
+    var historyLayout: HistoryLayout = .twoTabs
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = true
     var timeSettings: Bool = true
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
     var allowedRemoteBolusAmount: Decimal = 0.0
-    var eventualBG: Bool = false
-    var minumimPrediction: Bool = false
-    var minimumSMB: Decimal = 0.3
-    var useInsulinBars: Bool = false
-    var disableCGMError: Bool = true
-    var uploadVersion: Bool = true
-    var skipGlucoseChart: Bool = false
-    var birthDate = Date.distantPast
-    // var sex: Sex = .secret
-    var sexSetting: Int = 3
+    var lockScreenView: LockScreenView = .simple
 }
 
 extension FreeAPSSettings: Decodable {
@@ -156,6 +149,10 @@ extension FreeAPSSettings: Decodable {
 
         if let useFPUconversion = try? container.decode(Bool.self, forKey: .useFPUconversion) {
             settings.useFPUconversion = useFPUconversion
+        }
+
+        if let tins = try? container.decode(Bool.self, forKey: .tins) {
+            settings.tins = tins
         }
 
         if let individualAdjustmentFactor = try? container.decode(Decimal.self, forKey: .individualAdjustmentFactor) {
@@ -285,8 +282,8 @@ extension FreeAPSSettings: Decodable {
             settings.useLiveActivity = useLiveActivity
         }
 
-        if let useTargetButton = try? container.decode(Bool.self, forKey: .useTargetButton) {
-            settings.useTargetButton = useTargetButton
+        if let historyLayout = try? container.decode(HistoryLayout.self, forKey: .historyLayout) {
+            settings.historyLayout = historyLayout
         }
 
         if let alwaysUseColors = try? container.decode(Bool.self, forKey: .alwaysUseColors) {
@@ -309,40 +306,8 @@ extension FreeAPSSettings: Decodable {
             settings.allowedRemoteBolusAmount = allowedRemoteBolusAmount
         }
 
-        if let eventualBG = try? container.decode(Bool.self, forKey: .eventualBG) {
-            settings.eventualBG = eventualBG
-        }
-
-        if let minumimPrediction = try? container.decode(Bool.self, forKey: .minumimPrediction) {
-            settings.minumimPrediction = minumimPrediction
-        }
-
-        if let minimumSMB = try? container.decode(Decimal.self, forKey: .minimumSMB) {
-            settings.minimumSMB = minimumSMB
-        }
-
-        if let useInsulinBars = try? container.decode(Bool.self, forKey: .useInsulinBars) {
-            settings.useInsulinBars = useInsulinBars
-        }
-
-        if let disableCGMError = try? container.decode(Bool.self, forKey: .disableCGMError) {
-            settings.disableCGMError = disableCGMError
-        }
-
-        if let uploadVersion = try? container.decode(Bool.self, forKey: .uploadVersion) {
-            settings.uploadVersion = uploadVersion
-        }
-
-        if let skipGlucoseChart = try? container.decode(Bool.self, forKey: .skipGlucoseChart) {
-            settings.skipGlucoseChart = skipGlucoseChart
-        }
-
-        if let birthDate = try? container.decode(Date.self, forKey: .birthDate) {
-            settings.birthDate = birthDate
-        }
-
-        if let sexSetting = try? container.decode(Int.self, forKey: .sexSetting) {
-            settings.sexSetting = sexSetting
+        if let lockScreenView = try? container.decode(LockScreenView.self, forKey: .lockScreenView) {
+            settings.lockScreenView = lockScreenView
         }
 
         self = settings

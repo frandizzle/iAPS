@@ -1,29 +1,29 @@
 /* CGM display title */
-"Dexcom G5" = "ديكسكوم G5";
+"Dexcom G5" = "Dexcom G5";
 
 /* CGM display title */
-"Dexcom G6" = "ديكسكوم G6";
+"Dexcom G6" = "Dexcom G6";
 
 /* Error description for unreliable state */
 "Glucose data is unavailable" = "Glucose data is unavailable";
 
 /* Describes a low battery */
-"Low Battery" = "البطارية منخفضة";
+"Low Battery" = "Low Battery";
 
 /* Describes a functioning transmitter */
 "OK" = "موافق";
 
 /* invlid config error description */
-"Peripheral command was invalid" = "أمر الجهاز الطرفي غير صالح";
+"Peripheral command was invalid" = "Peripheral command was invalid";
 
 /* Timeout error description */
-"Peripheral did not respond in time" = "الجهاز الطرفي لم يستجب في الوقت المحدد";
+"Peripheral did not respond in time" = "Peripheral did not respond in time";
 
 /* Not ready error description */
-"Peripheral isnʼt connected" = "الجهاز الطرفي غير متصل";
+"Peripheral isnʼt connected" = "Peripheral isnʼt connected";
 
 /* The description of sensor calibration state when sensor calibration is ok. */
-"Sensor calibration is OK" = "معايرة المستشعر مضبوطة";
+"Sensor calibration is OK" = "Sensor calibration is OK";
 
 /* The description of sensor calibration state when raw value is unknown. (1: missing data details) */
 "Sensor is in unknown state %1$d" = "Sensor is in unknown state %1$d";
@@ -35,7 +35,7 @@
 "Sensor is warming up" = "Sensor is warming up";
 
 /* The description of sensor calibration state when sensor needs calibration. */
-"Sensor needs calibration" = "المستشعر بحاجة الى معايرة";
+"Sensor needs calibration" = "Sensor needs calibration";
 
 /* Error description */
-"Unknown characteristic" = "خاصية مجهولة";
+"Unknown characteristic" = "Unknown characteristic";

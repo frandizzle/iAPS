@@ -19,9 +19,9 @@ protocol HealthKitManager: GlucoseSource {
     func saveIfNeeded(carbs: [CarbsEntry])
     /// Save Insulin to Health store
     func saveIfNeeded(pumpEvents events: [PumpHistoryEvent])
-    /// Create observer for data passing beetwen Health Store and iAPS
+    /// Create observer for data passing beetwen Health Store and FreeAPS
     func createBGObserver()
-    /// Enable background delivering objects from Apple Health to iAPS
+    /// Enable background delivering objects from Apple Health to FreeAPS
     func enableBackgroundDelivery()
     /// Delete glucose with syncID
     func deleteGlucose(syncID: String)
@@ -45,7 +45,7 @@ final class BaseHealthKitManager: HealthKitManager, Injectable, CarbsObserver, P
         static let healthCarbObject = HKObjectType.quantityType(forIdentifier: .dietaryCarbohydrates)
         static let healthInsulinObject = HKObjectType.quantityType(forIdentifier: .insulinDelivery)
 
-        // Meta-data key of iAPS data in HealthStore
+        // Meta-data key of FreeASPX data in HealthStore
         static let freeAPSMetaKey = "From iAPS"
     }
 
@@ -173,6 +173,7 @@ final class BaseHealthKitManager: HealthKitManager, Injectable, CarbsObserver, P
                     debug(.service, "Failed to store blood glucose in HealthKit Store! Error: " + error.localizedDescription)
                 }
             }
+//            { _, _ in }
         }
 
         loadSamplesFromHealth(sampleType: sampleType, withIDs: bloodGlucose.map(\.id))
@@ -198,7 +199,7 @@ final class BaseHealthKitManager: HealthKitManager, Injectable, CarbsObserver, P
             let sampleDates = samples.map(\.startDate)
             let samplesToSave = carbsWithId
                 .filter { !sampleIDs.contains($0.id ?? "") } // id existing in AH
-                .filter { !sampleDates.contains($0.actualDate ?? $0.createdAt) } // not id but exactly the same datetime
+                .filter { !sampleDates.contains($0.actualDate ?? $0.createdAt) } // not id but exaclty the same datetime
                 .map {
                     HKQuantitySample(
                         type: sampleType,
@@ -206,7 +207,6 @@ final class BaseHealthKitManager: HealthKitManager, Injectable, CarbsObserver, P
                         start: $0.actualDate ?? $0.createdAt,
                         end: $0.actualDate ?? $0.createdAt,
                         metadata: [
-                            HKMetadataKeyExternalUUID: $0.id ?? "_id",
                             HKMetadataKeySyncIdentifier: $0.id ?? "_id",
                             HKMetadataKeySyncVersion: 1,
                             Config.freeAPSMetaKey: true
@@ -219,6 +219,7 @@ final class BaseHealthKitManager: HealthKitManager, Injectable, CarbsObserver, P
                     debug(.service, "Failed to store carb entry in HealthKit Store! Error: " + error.localizedDescription)
                 }
             }
+//            { _, _ in }
         }
 
         loadSamplesFromHealth(sampleType: sampleType)
@@ -290,6 +291,7 @@ final class BaseHealthKitManager: HealthKitManager, Injectable, CarbsObserver, P
                     debug(.service, "Failed to store insulin entry in HealthKit Store! Error: " + error.localizedDescription)
                 }
             }
+//            { _, _ in }
         }
         // delete existing event in HK where the amount is not the last value in the pumphistory
         loadSamplesFromHealth(sampleType: sampleType, withIDs: events.map(\.id))

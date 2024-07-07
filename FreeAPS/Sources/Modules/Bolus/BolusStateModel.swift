@@ -23,13 +23,14 @@ extension Bolus {
         @Published var threshold: Decimal = 0
         @Published var maxBolus: Decimal = 0
         @Published var errorString: Decimal = 0
-        @Published var evBG: Decimal = 0
+        @Published var evBG: Int = 0
         @Published var insulin: Decimal = 0
         @Published var isf: Decimal = 0
         @Published var error: Bool = false
-        @Published var minPredBG: Decimal = 0
+        @Published var minGuardBG: Decimal = 0
         @Published var minDelta: Decimal = 0
         @Published var expectedDelta: Decimal = 0
+        @Published var minPredBG: Decimal = 0
         @Published var waitForSuggestion: Bool = false
         @Published var carbRatio: Decimal = 0
 
@@ -45,57 +46,40 @@ extension Bolus {
         @Published var fifteenMinInsulin: Decimal = 0
         @Published var deltaBG: Decimal = 0
         @Published var targetDifferenceInsulin: Decimal = 0
+        @Published var targetDifference: Decimal = 0
         @Published var wholeCobInsulin: Decimal = 0
         @Published var iobInsulinReduction: Decimal = 0
         @Published var wholeCalc: Decimal = 0
         @Published var insulinCalculated: Decimal = 0
-        @Published var roundedInsulinCalculated: Decimal = 0
         @Published var fraction: Decimal = 0
-        @Published var useCalc: Bool = true
+        @Published var useCalc: Bool = false
+        @Published var basal: Decimal = 0
         @Published var fattyMeals: Bool = false
         @Published var fattyMealFactor: Decimal = 0
         @Published var useFattyMealCorrectionFactor: Bool = false
         @Published var displayPredictions: Bool = true
+        @Published var roundedWholeCalc: Decimal = 0
+        @Published var roundedInsulinCalculated: Decimal = 0
 
         @Published var meal: [CarbsEntry]?
         @Published var carbs: Decimal = 0
         @Published var fat: Decimal = 0
         @Published var protein: Decimal = 0
         @Published var note: String = ""
-        @Published var data = [InsulinRequired(agent: "Something", amount: 0)]
-        @Published var bolusIncrement: Decimal = 0.1
-        @Published var eventualBG: Bool = false
-        @Published var minimumPrediction: Bool = false
-        @Published var closedLoop: Bool = false
-        @Published var loopDate: Date = .distantFuture
-        @Published var now = Date.now
-
-        let loopReminder: CGFloat = 20
-
-        private var loopFormatter: NumberFormatter {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            formatter.maximumFractionDigits = 0
-            return formatter
-        }
 
         override func subscribe() {
             setupInsulinRequired()
             broadcaster.register(SuggestionObserver.self, observer: self)
             units = settingsManager.settings.units
-            minimumPrediction = settingsManager.settings.minumimPrediction
-            threshold = settingsManager.preferences.threshold_setting
+            percentage = settingsManager.settings.insulinReqPercentage
+            threshold = provider.suggestion?.threshold ?? 0
             maxBolus = provider.pumpSettings().maxBolus
             // added
             fraction = settings.settings.overrideFactor
             useCalc = settings.settings.useCalc
             fattyMeals = settings.settings.fattyMeals
             fattyMealFactor = settings.settings.fattyMealFactor
-            eventualBG = settings.settings.eventualBG
             displayPredictions = settings.settings.displayPredictions
-            bolusIncrement = settings.preferences.bolusIncrement
-            closedLoop = settings.settings.closedLoop
-            loopDate = apsManager.lastLoopDate
 
             if waitForSuggestionInitial {
                 apsManager.determineBasal()
@@ -108,7 +92,6 @@ extension Bolus {
                             self.insulinRecommended = 0
                         }
                     }.store(in: &lifetime)
-                loopDate = apsManager.lastLoopDate
             }
             if let notNilSugguestion = provider.suggestion {
                 suggestion = notNilSugguestion
@@ -120,32 +103,28 @@ extension Bolus {
 
         func getDeltaBG() {
             let glucose = provider.fetchGlucose()
-            guard let lastGlucose = glucose.first, glucose.count >= 4 else { return }
-            deltaBG = Decimal(lastGlucose.glucose + glucose[1].glucose) / 2 -
-                (Decimal(glucose[3].glucose + glucose[2].glucose) / 2)
+            guard glucose.count >= 3 else { return }
+            let lastGlucose = glucose.first?.glucose ?? 0
+            let thirdLastGlucose = glucose[2]
+            let delta = Decimal(lastGlucose) - Decimal(thirdLastGlucose.glucose)
+            deltaBG = delta
         }
 
         func calculateInsulin() -> Decimal {
-            let conversion: Decimal = units == .mmolL ? 0.0555 : 1
-            // The actual glucose threshold
-            threshold = max(target - 0.5 * (target - 40 * conversion), threshold * conversion)
-
-            // Use either the eventual glucose prediction or just the Swift code
-            if eventualBG {
-                if evBG > target {
-                    // Use Oref0 predictions{
-                    insulin = (evBG - target) / isf
-                } else { insulin = 0 }
-            } else {
-                let targetDifference = currentBG - target
-                targetDifferenceInsulin = isf == 0 ? 0 : targetDifference / isf
+            var conversion: Decimal = 1.0
+            if units == .mmolL {
+                conversion = 0.0555
             }
+            // insulin needed for the current blood glucose
+            targetDifference = (currentBG - target * conversion)
+            targetDifferenceInsulin = targetDifference / (isf * conversion)
+//            targetDifference = (currentBG - target) * conversion
 
             // more or less insulin because of bg trend in the last 15 minutes
-            fifteenMinInsulin = isf == 0 ? 0 : (deltaBG * conversion) / isf
+            fifteenMinInsulin = (deltaBG * conversion) / (isf * conversion)
 
             // determine whole COB for which we want to dose insulin for and then determine insulin for wholeCOB
-            wholeCobInsulin = carbRatio != 0 ? cob / carbRatio : 0
+            wholeCobInsulin = cob / carbRatio
 
             // determine how much the calculator reduces/ increases the bolus because of IOB
             iobInsulinReduction = (-1) * iob
@@ -164,8 +143,12 @@ extension Bolus {
                 }
             }
 
+            // rounding
+            let wholeCalcAsDouble = Double(wholeCalc)
+            roundedWholeCalc = Decimal(round(100 * wholeCalcAsDouble) / 100)
+
             // apply custom factor at the end of the calculations
-            let result = !eventualBG ? wholeCalc * fraction : insulin * fraction
+            let result = wholeCalc * fraction
 
             // apply custom factor if fatty meal toggle in bolus calc config settings is on and the box for fatty meals is checked (in RootView)
             if useFattyMealCorrectionFactor {
@@ -174,20 +157,14 @@ extension Bolus {
                 insulinCalculated = result
             }
 
-            // A blend of Oref0 predictions and the Swift calculator {
-            if minimumPrediction, minPredBG < threshold {
-                if eventualBG { insulin = 0 }
-                return 0
-            }
+            // display no negative insulinCalculated
+            insulinCalculated = max(insulinCalculated, 0)
+            let insulinCalculatedAsDouble = Double(insulinCalculated)
+            roundedInsulinCalculated = Decimal(round(100 * insulinCalculatedAsDouble) / 100)
+            insulinCalculated = min(insulinCalculated, maxBolus)
 
-            // Account for increments (Don't use the apsManager function as that gets much too slow)
-            insulinCalculated = roundBolus(insulinCalculated)
-            // 0 up to maxBolus
-            insulinCalculated = min(max(insulinCalculated, 0), maxBolus)
-
-            prepareData()
-
-            return insulinCalculated
+            return apsManager
+                .roundBolus(amount: max(insulinCalculated, 0))
         }
 
         func add() {
@@ -208,33 +185,48 @@ extension Bolus {
         }
 
         func setupInsulinRequired() {
-            let conversion: Decimal = units == .mmolL ? 0.0555 : 1
             DispatchQueue.main.async {
-                if let suggestion = self.provider.suggestion {
-                    self.insulinRequired = suggestion.insulinReq ?? 0
-                    self.evBG = Decimal(suggestion.eventualBG ?? 0) * conversion
-                    self.iob = suggestion.iob ?? 0
-                    self.currentBG = (suggestion.bg ?? 0) * conversion
-                    self.cob = suggestion.cob ?? 0
+                self.insulinRequired = self.provider.suggestion?.insulinReq ?? 0
+
+                var conversion: Decimal = 1.0
+                if self.units == .mmolL {
+                    conversion = 0.0555
                 }
-                // Unwrap. We can't have NaN values.
-                if let reasons = CoreDataStorage().fetchReason(), let target = reasons.target, let isf = reasons.isf,
-                   let carbRatio = reasons.cr, let minPredBG = reasons.minPredBG
-                {
-                    self.target = target as Decimal
-                    self.isf = isf as Decimal
-                    self.carbRatio = carbRatio as Decimal
-                    self.minPredBG = minPredBG as Decimal
-                }
+
+                self.evBG = self.provider.suggestion?.eventualBG ?? 0
+                self.insulin = self.provider.suggestion?.insulinForManualBolus ?? 0
+                self.target = self.provider.suggestion?.current_target ?? 0
+                self.isf = self.provider.suggestion?.isf ?? 0
+                self.iob = self.provider.suggestion?.iob ?? 0
+                self.currentBG = (self.provider.suggestion?.bg ?? 0)
+                self.cob = self.provider.suggestion?.cob ?? 0
+                self.basal = self.provider.suggestion?.rate ?? 0
+                self.carbRatio = self.provider.suggestion?.carbRatio ?? 0
+
+                if self.settingsManager.settings.insulinReqPercentage != 100 {
+                    self.insulinRecommended = self.insulin * (self.settingsManager.settings.insulinReqPercentage / 100)
+                } else { self.insulinRecommended = self.insulin }
+
+                self.errorString = self.provider.suggestion?.manualBolusErrorString ?? 0
+                if self.errorString != 0 {
+                    self.error = true
+                    self.minGuardBG = (self.provider.suggestion?.minGuardBG ?? 0) * conversion
+                    self.minDelta = (self.provider.suggestion?.minDelta ?? 0) * conversion
+                    self.expectedDelta = (self.provider.suggestion?.expectedDelta ?? 0) * conversion
+                    self.minPredBG = (self.provider.suggestion?.minPredBG ?? 0) * conversion
+                } else { self.error = false }
+
+                self.insulinRecommended = self.apsManager
+                    .roundBolus(amount: max(self.insulinRecommended, 0))
 
                 if self.useCalc {
                     self.getDeltaBG()
-                    self.insulinCalculated = self.roundBolus(max(self.calculateInsulin(), 0))
-                    self.prepareData()
+                    self.insulinCalculated = self.calculateInsulin()
                 }
             }
         }
 
+        // To do rewrite everything! Looking ridiculous now.
         func backToCarbsView(
             complexEntry: Bool,
             _ meal: FetchedResults<Meals>,
@@ -268,22 +260,12 @@ extension Bolus {
             }
         }
 
-        func carbsView(fetch: Bool, hasFatOrProtein: Bool, mealSummary: FetchedResults<Meals>) -> Bool {
-            var keepForNextWiew = false
-            if fetch {
-                keepForNextWiew = true
-                backToCarbsView(complexEntry: hasFatOrProtein, mealSummary, override: false, deleteNothing: false, editMode: true)
-            } else {
-                backToCarbsView(complexEntry: false, mealSummary, override: true, deleteNothing: true, editMode: false)
-            }
-            return keepForNextWiew
-        }
-
         func remoteBolus() -> String? {
             if let enactedAnnouncement = announcementStorage.recentEnacted() {
                 let components = enactedAnnouncement.notes.split(separator: ":")
                 guard components.count == 2 else { return nil }
                 let command = String(components[0]).lowercased()
+                let arguments = String(components[1]).lowercased()
                 let eventual: String = units == .mmolL ? evBG.asMmolL
                     .formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) : evBG.formatted()
 
@@ -303,51 +285,6 @@ extension Bolus {
             }
             return nil
         }
-
-        func notActive() {
-            let defaults = UserDefaults.standard
-            defaults.set(false, forKey: IAPSconfig.inBolusView)
-            // print("Active: NO") // For testing
-        }
-
-        func viewActive() {
-            let defaults = UserDefaults.standard
-            defaults.set(true, forKey: IAPSconfig.inBolusView)
-            // print("Active: YES") // For testing
-        }
-
-        private func prepareData() {
-            if !eventualBG {
-                var prepareData = [
-                    InsulinRequired(agent: NSLocalizedString("Carbs", comment: ""), amount: wholeCobInsulin),
-                    InsulinRequired(agent: NSLocalizedString("IOB", comment: ""), amount: iobInsulinReduction),
-                    InsulinRequired(agent: NSLocalizedString("Glucose", comment: ""), amount: targetDifferenceInsulin),
-                    InsulinRequired(agent: NSLocalizedString("Trend", comment: ""), amount: fifteenMinInsulin),
-                    InsulinRequired(agent: NSLocalizedString("Factors", comment: ""), amount: 0),
-                    InsulinRequired(agent: NSLocalizedString("Amount", comment: ""), amount: insulinCalculated)
-                ]
-                let total = prepareData.dropLast().map(\.amount).reduce(0, +)
-                if total > 0 {
-                    let factor = -1 * (total - insulinCalculated)
-                    prepareData[4].amount = abs(factor) >= bolusIncrement ? factor : 0
-                }
-                data = prepareData
-            }
-        }
-
-        func lastLoop() -> String? {
-            guard closedLoop else { return nil }
-            guard abs(now.timeIntervalSinceNow / 60) > loopReminder else { return nil }
-            let minAgo = abs(loopDate.timeIntervalSinceNow / 60)
-
-            let stringAgo = loopFormatter.string(from: minAgo as NSNumber) ?? ""
-            return "Last loop \(stringAgo) minutes ago. Complete or cancel this meal/bolus transaction to allow for next loop cycle to run"
-        }
-
-        private func roundBolus(_ amount: Decimal) -> Decimal {
-            // Account for increments (don't use the APSManager function as that gets too slow)
-            Decimal(round(Double(amount / bolusIncrement))) * bolusIncrement
-        }
     }
 }
 
@@ -357,12 +294,5 @@ extension Bolus.StateModel: SuggestionObserver {
             self.waitForSuggestion = false
         }
         setupInsulinRequired()
-        loopDate = apsManager.lastLoopDate
-
-        if abs(loopDate.timeIntervalSinceNow / 60) > loopReminder * 1.5, abs(now.timeIntervalSinceNow / 60) > loopReminder {
-            hideModal()
-            notActive()
-            debug(.apsManager, "Force Closing Bolus View", printToConsole: true)
-        }
     }
 }

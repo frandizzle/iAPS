@@ -16,7 +16,6 @@ extension Home {
         @Published var isManual: [BloodGlucose] = []
         @Published var announcement: [Announcement] = []
         @Published var suggestion: Suggestion?
-        @Published var dynamicVariables: DynamicVariables?
         @Published var uploadStats = false
         @Published var enactedSuggestion: Suggestion?
         @Published var recentGlucose: BloodGlucose?
@@ -66,8 +65,8 @@ extension Home {
         @Published var hours: Int = 6
         @Published var totalBolus: Decimal = 0
         @Published var isStatusPopupPresented: Bool = false
+        @Published var tins: Bool = false
         @Published var readings: [Readings] = []
-        @Published var loopStatistics: (Int, Int, Double, String) = (0, 0, 0, "")
         @Published var standing: Bool = false
         @Published var preview: Bool = true
         @Published var useTargetButton: Bool = false
@@ -75,24 +74,19 @@ extension Home {
         @Published var overrides: [Override] = []
         @Published var alwaysUseColors: Bool = true
         @Published var timeSettings: Bool = true
-        @Published var useCalc: Bool = true
-        @Published var minimumSMB: Decimal = 0.3
-        @Published var maxBolus: Decimal = 0
-        @Published var maxBolusValue: Decimal = 1
-        @Published var useInsulinBars: Bool = false
-        @Published var iobData: [IOBData] = []
-        @Published var neg: Int = 0
-        @Published var tddChange: Decimal = 0
-        @Published var tddAverage: Decimal = 0
-        @Published var tddYesterday: Decimal = 0
-        @Published var tdd2DaysAgo: Decimal = 0
-        @Published var tdd3DaysAgo: Decimal = 0
-        @Published var tddActualAverage: Decimal = 0
-        @Published var skipGlucoseChart: Bool = false
+        @Published var calculatedTins: String = ""
+
+        private var numberFormatter: NumberFormatter {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.maximumFractionDigits = 2
+            return formatter
+        }
 
         let coredataContext = CoreDataStack.shared.persistentContainer.viewContext
 
         override func subscribe() {
+            calculateTINS()
             setupGlucose()
             setupBasals()
             setupBoluses()
@@ -106,12 +100,8 @@ extension Home {
             setupAnnouncements()
             setupCurrentPumpTimezone()
             setupOverrideHistory()
-            setupLoopStats()
-            setupData()
 
-            // iobData = provider.reasons()
             suggestion = provider.suggestion
-            dynamicVariables = provider.dynamicVariables
             overrideHistory = provider.overrideHistory()
             uploadStats = settingsManager.settings.uploadStats
             enactedSuggestion = provider.enactedSuggestion
@@ -132,15 +122,11 @@ extension Home {
             displayXgridLines = settingsManager.settings.xGridLines
             displayYgridLines = settingsManager.settings.yGridLines
             thresholdLines = settingsManager.settings.rulerMarks
+            tins = settingsManager.settings.tins
             useTargetButton = settingsManager.settings.useTargetButton
             hours = settingsManager.settings.hours
             alwaysUseColors = settingsManager.settings.alwaysUseColors
             timeSettings = settingsManager.settings.timeSettings
-            useCalc = settingsManager.settings.useCalc
-            minimumSMB = settingsManager.settings.minimumSMB
-            maxBolus = settingsManager.pumpSettings.maxBolus
-            useInsulinBars = settingsManager.settings.useInsulinBars
-            skipGlucoseChart = settingsManager.settings.skipGlucoseChart
 
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -348,8 +334,70 @@ extension Home {
                 self.boluses = self.provider.pumpHistory(hours: self.filteredHours).filter {
                     $0.type == .bolus
                 }
-                self.maxBolusValue = self.boluses.compactMap(\.amount).max() ?? 1
             }
+        }
+
+        // MARK: WORKS....BUT MAYBE TIMEZONE PROBLEMS COULD OCCUR
+
+        func calculateTINS() -> String {
+            let date = Date()
+            let calendar = Calendar.current
+            let offset = hours
+            var offsetComponents = DateComponents()
+            offsetComponents.hour = -Int(offset)
+            let startTime = calendar.date(byAdding: offsetComponents, to: date)!
+
+            let bolusesForCurrentDay = boluses.filter { $0.timestamp >= startTime && $0.type == .bolus }
+            guard let basalInsulinForCurrentDay = getDeliveredBasal() else { return "" }
+
+            /// add all boluses for specified time together
+            let totalBoluses = bolusesForCurrentDay.map { $0.amount ?? 0 }.reduce(0, +)
+            /// final TINS value, i.e. boluses AND delivered basal
+            let total = totalBoluses + basalInsulinForCurrentDay
+            debug(.default, "TINS Bolus \(startTime): \(numberFormatter.string(from: totalBoluses as NSNumber) ?? "NaN")")
+            debug(.default, "TINS Basal: \(numberFormatter.string(from: basalInsulinForCurrentDay as NSNumber) ?? "NaN")")
+
+            calculatedTins = numberFormatter.string(from: total as NSNumber) ?? "NaN"
+
+            return calculatedTins
+        }
+
+        private func getDeliveredBasal() -> Decimal? {
+            let date = Date()
+            let calendar = Calendar.current
+            let offset = hours
+            var offsetComponents = DateComponents()
+            offsetComponents.hour = -Int(offset)
+            let startTime = calendar.date(byAdding: offsetComponents, to: date)!
+
+            /// retrieve basal entries in defined time
+            let basalEntriesForCurrentDay = tempBasals.filter { $0.timestamp >= startTime && $0.type == .tempBasal }
+
+            /// sort basal entries in order to prepare for the duration calculation
+            let basalEntriesForCurrentDaySorted = basalEntriesForCurrentDay.sorted { $0.timestamp < $1.timestamp }
+            /// empty array to append basal entries
+            var basalDurations: [Double] = []
+            /// calculate every basal entries duration
+            for (index, basalEntry) in basalEntriesForCurrentDaySorted.enumerated() {
+                /// proof if a next entry exists
+                if index + 1 < basalEntriesForCurrentDaySorted.count {
+                    let nextEntry = basalEntriesForCurrentDaySorted[index + 1]
+                    /// calculate difference of timestamps, result is in seconds
+                    let durationInSeconds = nextEntry.timestamp.timeIntervalSince(basalEntry.timestamp)
+                    let durationInHours = durationInSeconds / 3600 /// conversion to hours
+                    basalDurations.append(durationInHours)
+                }
+            }
+            /// calculate how much insulin was given, i.e. rate * duration for every entry
+            let basalInsulinForCurrentDay = zip(basalEntriesForCurrentDaySorted, basalDurations).map { basalEntry, duration in
+                if let rate = basalEntry.rate {
+                    return rate * Decimal(duration)
+                } else {
+                    return 0
+                }
+            }.reduce(0, +)
+
+            return basalInsulinForCurrentDay > 0 ? basalInsulinForCurrentDay : nil
         }
 
         private func setupSuspensions() {
@@ -401,24 +449,6 @@ extension Home {
                 guard let self = self else { return }
                 self.overrideHistory = self.provider.overrideHistory()
             }
-        }
-
-        private func setupLoopStats() {
-            let loopStats = CoreDataStorage().fetchLoopStats(interval: DateFilter().today)
-            let loops = loopStats.compactMap({ each in each.loopStatus }).count
-            let readings = CoreDataStorage().fetchGlucose(interval: DateFilter().today).compactMap({ each in each.glucose }).count
-            let percentage = min(readings != 0 ? (Double(loops) / Double(readings) * 100) : 0, 100)
-            // First loop date
-            let time = (loopStats.last?.start ?? Date.now).addingTimeInterval(-5.minutes.timeInterval)
-
-            let average = -1 * (time.timeIntervalSinceNow / 60) / max(Double(loops), 1)
-
-            loopStatistics = (
-                loops,
-                readings,
-                percentage,
-                average.formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) + " min"
-            )
         }
 
         private func setupOverrides() {
@@ -485,36 +515,6 @@ extension Home {
             }
         }
 
-        private func setupData() {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self else { return }
-                if let data = self.provider.reasons() {
-                    self.iobData = data
-                    neg = data.filter({ $0.iob < 0 }).count * 5
-                    let tdds = CoreDataStorage().fetchTDD(interval: DateFilter().tenDays)
-                    let yesterday = (tdds.first(where: {
-                        ($0.timestamp ?? .distantFuture) <= Date().addingTimeInterval(-24.hours.timeInterval)
-                    })?.tdd ?? 0) as Decimal
-                    let oneDaysAgo = CoreDataStorage().fetchTDD(interval: DateFilter().today).last
-                    tddChange = ((tdds.first?.tdd ?? 0) as Decimal) - yesterday
-                    tddYesterday = (oneDaysAgo?.tdd ?? 0) as Decimal
-                    tdd2DaysAgo = (tdds.first(where: {
-                        ($0.timestamp ?? .distantFuture) <= (oneDaysAgo?.timestamp ?? .distantPast)
-                            .addingTimeInterval(-1.days.timeInterval)
-                    })?.tdd ?? 0) as Decimal
-                    tdd3DaysAgo = (tdds.first(where: {
-                        ($0.timestamp ?? .distantFuture) <= (oneDaysAgo?.timestamp ?? .distantPast)
-                            .addingTimeInterval(-2.days.timeInterval)
-                    })?.tdd ?? 0) as Decimal
-
-                    if let tdds_ = self.provider.dynamicVariables {
-                        tddAverage = ((tdds.first?.tdd ?? 0) as Decimal) - tdds_.average_total_data
-                        tddActualAverage = tdds_.average_total_data
-                    }
-                }
-            }
-        }
-
         func openCGM() {
             guard var url = nightscoutManager.cgmURL else { return }
 
@@ -555,9 +555,13 @@ extension Home.StateModel:
     PumpReservoirObserver,
     PumpTimeZoneObserver
 {
+    /*
+     func overridesDidUpdate(_: [Override]) {
+         setupOverrides()
+     }*/
+
     func glucoseDidUpdate(_: [BloodGlucose]) {
         setupGlucose()
-        setupLoopStats()
     }
 
     func suggestionDidUpdate(_ suggestion: Suggestion) {
@@ -565,8 +569,6 @@ extension Home.StateModel:
         carbsRequired = suggestion.carbsReq
         setStatusTitle()
         setupOverrideHistory()
-        setupLoopStats()
-        setupData()
     }
 
     func settingsDidChange(_ settings: FreeAPSSettings) {
@@ -583,18 +585,13 @@ extension Home.StateModel:
         displayXgridLines = settingsManager.settings.xGridLines
         displayYgridLines = settingsManager.settings.yGridLines
         thresholdLines = settingsManager.settings.rulerMarks
+        tins = settingsManager.settings.tins
         useTargetButton = settingsManager.settings.useTargetButton
         hours = settingsManager.settings.hours
         alwaysUseColors = settingsManager.settings.alwaysUseColors
         timeSettings = settingsManager.settings.timeSettings
-        useCalc = settingsManager.settings.useCalc
-        minimumSMB = settingsManager.settings.minimumSMB
-        maxBolus = settingsManager.pumpSettings.maxBolus
-        useInsulinBars = settingsManager.settings.useInsulinBars
-        skipGlucoseChart = settingsManager.settings.skipGlucoseChart
         setupGlucose()
         setupOverrideHistory()
-        setupData()
     }
 
     func pumpHistoryDidUpdate(_: [PumpHistoryEvent]) {
@@ -625,8 +622,6 @@ extension Home.StateModel:
         enactedSuggestion = suggestion
         setStatusTitle()
         setupOverrideHistory()
-        setupLoopStats()
-        setupData()
     }
 
     func pumpBatteryDidChange(_: Battery) {

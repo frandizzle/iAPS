@@ -1,6 +1,8 @@
 import Foundation
 
 struct Oref2_variables: JSON, Equatable {
+    var tddYtd: Decimal
+    var tdd7d: Decimal
     var average_total_data: Decimal
     var weightedAverage: Decimal
     var past2hoursAverage: Decimal
@@ -18,13 +20,15 @@ struct Oref2_variables: JSON, Equatable {
     var isfAndCr: Bool
     var isf: Bool
     var cr: Bool
-    var smbIsAlwaysOff: Bool
+    var smbIsScheduledOff: Bool
     var start: Decimal
     var end: Decimal
     var smbMinutes: Decimal
     var uamMinutes: Decimal
 
     init(
+        tddYtd: Decimal,
+        tdd7d: Decimal,
         average_total_data: Decimal,
         weightedAverage: Decimal,
         past2hoursAverage: Decimal,
@@ -42,12 +46,14 @@ struct Oref2_variables: JSON, Equatable {
         isfAndCr: Bool,
         isf: Bool,
         cr: Bool,
-        smbIsAlwaysOff: Bool,
+        smbIsScheduledOff: Bool,
         start: Decimal,
         end: Decimal,
         smbMinutes: Decimal,
         uamMinutes: Decimal
     ) {
+        self.tddYtd = tddYtd
+        self.tdd7d = tdd7d
         self.average_total_data = average_total_data
         self.weightedAverage = weightedAverage
         self.past2hoursAverage = past2hoursAverage
@@ -65,7 +71,7 @@ struct Oref2_variables: JSON, Equatable {
         self.isfAndCr = isfAndCr
         self.isf = isf
         self.cr = cr
-        self.smbIsAlwaysOff = smbIsAlwaysOff
+        self.smbIsScheduledOff = smbIsScheduledOff
         self.start = start
         self.end = end
         self.smbMinutes = smbMinutes
@@ -75,6 +81,8 @@ struct Oref2_variables: JSON, Equatable {
 
 extension Oref2_variables {
     private enum CodingKeys: String, CodingKey {
+        case tddYtd
+        case tdd7d
         case average_total_data
         case weightedAverage
         case past2hoursAverage
@@ -92,7 +100,7 @@ extension Oref2_variables {
         case isfAndCr
         case isf
         case cr
-        case smbIsAlwaysOff
+        case smbIsScheduledOff
         case start
         case end
         case smbMinutes

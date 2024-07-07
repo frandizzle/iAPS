@@ -1,0 +1,32 @@
+[
+  {
+    "duration" : 30,
+    "targetBottom" : 99,
+    "enteredBy" : "iAPS",
+    "_id" : "CE536E49-5B5C-4A45-91FF-99CACDBA7181",
+    "reason" : "⭕️ SMB off",
+    "name" : "⭕️ SMB off",
+    "targetTop" : 99,
+    "created_at" : "2023-10-29T18:49:26.633Z"
+  },
+  {
+    "reason" : "Cancel",
+    "targetBottom" : 0,
+    "targetTop" : 0,
+    "created_at" : "2023-10-29T18:47:31.858Z",
+    "name" : "Cancel",
+    "duration" : 0,
+    "_id" : "AD087F7B-6447-40E6-895E-6DAB27BF5A92",
+    "enteredBy" : "iAPS"
+  },
+  {
+    "reason" : "🩸🍌 Hypo/IV protection",
+    "targetTop" : 199,
+    "enteredBy" : "iAPS",
+    "_id" : "5C6183AB-9F4F-40DE-A38F-6E3A316850A9",
+    "name" : "🩸🍌 Hypo/IV protection",
+    "created_at" : "2023-10-29T18:47:21.798Z",
+    "duration" : 45,
+    "targetBottom" : 199
+  }
+]

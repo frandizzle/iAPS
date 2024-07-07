@@ -33,31 +33,32 @@ struct DecimalTextField: UIViewRepresentable {
         textfield.text = cleanInput ? "" : formatter.string(for: value) ?? placeholder
         textfield.textAlignment = .right
 
-        let toolBar = UIToolbar(frame: CGRect(
-            x: 0,
-            y: 0,
-            width: textfield.frame.size.width,
-            height: 44
-        ))
-        let clearButton = UIBarButtonItem(
-            title: NSLocalizedString("Clear", comment: "Clear button"),
-            style: .plain,
-            target: self,
-            action: #selector(textfield.clearButtonTapped(button:))
-        )
-        let doneButton = UIBarButtonItem(
-            title: NSLocalizedString("Done", comment: "Done button"),
-            style: .done,
-            target: self,
-            action: #selector(textfield.doneButtonTapped(button:))
-        )
-        let space = UIBarButtonItem(
-            barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace,
-            target: nil,
-            action: nil
-        )
+        lazy var toolBar: UIToolbar = {
+            let tool: UIToolbar = .init(frame: .init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 35))
+            tool.barStyle = .default
+            tool.isTranslucent = true
+            tool.sizeToFit()
+
+            let spaceArea: UIBarButtonItem = .init(systemItem: .flexibleSpace)
+            let clearButton: UIBarButtonItem = .init(
+                title: "Clear",
+                style: .plain,
+                target: self,
+                action: #selector(textfield.clearButtonTapped(button:))
+            )
+            let doneButton: UIBarButtonItem = .init(
+                title: "Done",
+                style: .done,
+                target: self,
+                action: #selector(textfield.doneButtonTapped(button:))
+            )
+            tool.setItems([clearButton, spaceArea, doneButton], animated: false)
+            tool.isUserInteractionEnabled = true
+
+            return tool
+        }()
+
         if useButtons {
-            toolBar.setItems([clearButton, space, doneButton], animated: true)
             textfield.inputAccessoryView = toolBar
         }
 

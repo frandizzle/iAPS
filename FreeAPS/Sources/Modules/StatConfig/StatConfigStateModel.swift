@@ -11,14 +11,8 @@ extension StatConfig {
         @Published var rulerMarks: Bool = false
         @Published var skipBolusScreenAfterCarbs: Bool = false
         @Published var useFPUconversion: Bool = true
-        @Published var useTargetButton: Bool = false
-        @Published var hours: Decimal = 6
-        @Published var alwaysUseColors: Bool = true
-        @Published var timeSettings: Bool = true
-        @Published var minimumSMB: Decimal = 0.3
-        @Published var useInsulinBars: Bool = false
-        @Published var skipGlucoseChart: Bool = false
-
+        @Published var tins: Bool = false
+        @Published var historyLayout: HistoryLayout = .twoTabs
         var units: GlucoseUnits = .mmolL
 
         override func subscribe() {
@@ -29,15 +23,11 @@ extension StatConfig {
             subscribeSetting(\.xGridLines, on: $xGridLines) { xGridLines = $0 }
             subscribeSetting(\.yGridLines, on: $yGridLines) { yGridLines = $0 }
             subscribeSetting(\.rulerMarks, on: $rulerMarks) { rulerMarks = $0 }
-            subscribeSetting(\.skipGlucoseChart, on: $skipGlucoseChart) { skipGlucoseChart = $0 }
-            subscribeSetting(\.timeSettings, on: $timeSettings) { timeSettings = $0 }
-            subscribeSetting(\.alwaysUseColors, on: $alwaysUseColors) { alwaysUseColors = $0 }
             subscribeSetting(\.useFPUconversion, on: $useFPUconversion) { useFPUconversion = $0 }
-            subscribeSetting(\.useTargetButton, on: $useTargetButton) { useTargetButton = $0 }
+            subscribeSetting(\.tins, on: $tins) { tins = $0 }
             subscribeSetting(\.skipBolusScreenAfterCarbs, on: $skipBolusScreenAfterCarbs) { skipBolusScreenAfterCarbs = $0 }
             subscribeSetting(\.oneDimensionalGraph, on: $oneDimensionalGraph) { oneDimensionalGraph = $0 }
-            subscribeSetting(\.useInsulinBars, on: $useInsulinBars) { useInsulinBars = $0 }
-
+            subscribeSetting(\.historyLayout, on: $historyLayout) { historyLayout = $0 }
             subscribeSetting(\.low, on: $low, initial: {
                 let value = max(min($0, 90), 40)
                 low = units == .mmolL ? value.asMmolL : value
@@ -52,19 +42,6 @@ extension StatConfig {
             }, map: {
                 guard units == .mmolL else { return $0 }
                 return $0.asMgdL
-            })
-
-            subscribeSetting(\.hours, on: $hours.map(Int.init), initial: {
-                let value = max(min($0, 24), 2)
-                hours = Decimal(value)
-            }, map: {
-                $0
-            })
-
-            subscribeSetting(\.minimumSMB, on: $minimumSMB, initial: {
-                minimumSMB = max(min($0, 10), 0)
-            }, map: {
-                $0
             })
         }
     }

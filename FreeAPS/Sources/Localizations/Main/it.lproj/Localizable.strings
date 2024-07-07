@@ -46,9 +46,6 @@
 /* Button */
 "Done" = "Fine";
 
-/* Bolus View footer */
-"Last loop %@ minutes ago. Complete or cancel this meal/bolus transaction to allow for next loop cycle to run" = "L'ultimo ciclo %@ minuti fa. Completa o annulla questa transazione pasto/bolo per consentire che il ciclo successivo venga eseguito";
-
 /* Calender Option */
 "Display Emojis as Labels" = "Visualizza Emoji come etichette";
 
@@ -66,9 +63,6 @@
 
 /*  */
 "Agree and continue" = "Acconsenti e Continua";
-
-/* */
-"Log external insulin" = "Registro insulina esterna";
 
 /* Bolus progress view */
 "of" = "di";
@@ -120,9 +114,6 @@
 
 /* For the  Bolus View pop-up */
 "Fatty Meal Factor" = "Fattore Pasto Grasso";
-
-/* Footer */
-"Carbs and previous insulin are included in the eventual glucose prediction." = "I carboidrati e l’insulina precedenti sono inclusi nella previsione della glicemia.";
 
 /* For the  Bolus View pop-up */
 "Result" = "Risultato";
@@ -291,6 +282,9 @@
 
 /*  */
 "Save on Pump" = "Salva sul microinfusore";
+
+/*  */
+"Saving..." = "Sto salvando...";
 
 /*  */
 "Schedule" = "Programmazione";
@@ -627,10 +621,10 @@ Enact a temp Basal or a temp target */
 "Temp Targets" = "Obiettivi Temporanei";
 
 /* Delete carbs from data table and Nightscout */
-"Delete Carbs?" = "Cancella carboidrati?";
+"Delete Carbs?" = "Delete Carbs?";
 
 /* Delete insulin from pump history and Nightscout */
-"Delete Insulin?" = "Cancella l'insulina?";
+"Delete Insulin?" = "Delete Insulin?";
 
 /* Treatments list */
 "Treatments" = "Trattamenti";
@@ -1010,9 +1004,6 @@ Enact a temp Basal or a temp target */
 /* Bolus shortcut. Setting */
 "Allow iOS Bolus Shortcuts" = "Consenti i comandi rapidi iOS per il Bolo";
 
-/* Bolus shortcut setting. Header */
-"iOS Shortcuts" = "scorciatoie iOS";
-
 /* Bolus shortcut. Pop-up */
 "If you enable this setting you will be able to use iOS shortcuts and its automations to trigger a bolus in iAPS.\n\nObserve that the iOS shortuts also works with Siri!\n\nIf you need to use Bolus Shorcuts, please make sure to turn off the listen for 'Hey Siri' setting in iPhone Siri settings, to avoid any inadvertant activaton of a bolus with Siri.\nIf you don't disable 'Hey Siri' the iAPS bolus shortcut can be triggered with the utterance 'Hey Siri, iAPS Bolus'.\n\nWhen triggered with Siri you will be asked for an amount and a confirmation before the bolus command can be sent to iAPS." = "Se abiliti questa impostazione potrai utilizzare i comandi rapidi iOS e le sue automazioni per attivare un bolo in iAPS. \n\nFai attenzione che i comandi rapidi iOS funzionano anche con Siri! \n\nSe devi utilizzare i comandi rapidi iOS per il Bolo, assicurati di disattivare l'ascolto dell'impostazione 'Ehi Siri' nelle impostazioni Siri dell'iPhone, per evitare qualsiasi attivazione involontaria di un bolo con Siri. \nSe non disabiliti 'Ehi Siri', il comando rapido iOS del bolo iAPS può essere attivato con la frase 'Ehi Siri, iAPS Bolus'. \n\nQuando viene attivato con Siri ti verrà chiesta una quantità e una conferma prima che il comando del bolo possa essere inviato a iAPS.";
 
@@ -1021,6 +1012,12 @@ Enact a temp Basal or a temp target */
 
 /* Bolus shortcut. Error */
 "not available" = "non disponibile";
+
+/* Bolus shortcut. Setting */
+"Max allowed bolus amount using shortcuts " = "Max allowed bolus amount using shortcuts ";
+
+/* Bolus shortcut. Error */
+"not available" = "not available";
 
 /* Override Shortcut */
 "Activate an Override Preset" = "Attiva un profilo preimpostato";
@@ -1239,12 +1236,6 @@ Enact a temp Basal or a temp target */
 /* Online or internal server */
 "Online or internal server" = "Server online o interno";
 
-/* Pump Error Message */
-"Can't enact the new loop cycle recommendation, because a Bolus is in progress. Wait for next loop cycle" = "Non è possibile attuare un nuovo ciclo loop, perché un bolo è in corso. Attendere il ciclo loop successivo";
-
-/* Pump Error */
-"Error: Pump is Busy." = "Errore: la pompa sta già lavorando.";
-
 /* -------------- Developer settings ---------------------- */
 /* Debug options */
 
@@ -1460,9 +1451,6 @@ Enact a temp Basal or a temp target */
 /* */
 "Save as Profile" = "Salva Profilo";
 
-/* */
-"Save as preset" = "Salva come predefinito";
-
 /* Alert */
 "Cancel Profile Override" = "Cancella Profilo";
 
@@ -1503,7 +1491,7 @@ Enact a temp Basal or a temp target */
 "Statistics and Home View" = "Statistiche e Vista Iniziale";
 
 /* Alert text */
-"Delete Carb Equivalents?" = "Cancella i carb equivalenti?";
+"Delete Carb Equivalents?" = "Delete Carb Equivalents?";
 
 /* */
 "All FPUs of the meal will be deleted." = "Tutti gli indici insulinici del pasto verranno eliminati.";
@@ -1538,8 +1526,10 @@ Enact a temp Basal or a temp target */
 /* Watch Config Option */
 "Display Protein & Fat" = "Mostra Proteine & Grassi";
 
+
 /* Time of new meal entry */
 "Now" = "Adesso";
+
 
 /* Display future data table entries */
 "Show Future" = "Visualizza Futuro";
@@ -1929,200 +1919,9 @@ Enact a temp Basal or a temp target */
 "Experimental" = "Sperimentale";
 /* Smoothing of CGM readings */
 "Smooth Glucose Value" = "Valori Glicemici Levigati";
-/* ------------------------------------------- Sharing -------------------------------------------------------*/
-/* */
 
-"Woman" = "Donna";
+/* -----------------------------------------------------------------------------------------------------------
 
-/* */
-"Man" = "Uomo";
-
-/* */
-"Other" = "Altro";
-
-/* */
-"Secret" = "Segreto";
-
-/* */
-"Birth Date" = "Data di nascita";
-
-/* */
-"Share all of your Statistics" = "Condividi tutte le tue statistiche";
-
-/* */
-"Just iAPS version number" = "Solo il numero di versione iAPS";
-
-/* */
-"Share Bare Minimum" = "Condividi Minimo Nullo";
-
-/* */
-"Every bit of information you choose to share is uploaded anonymously. To prevent duplicate uploads, the data is identified with a unique random string saved on your phone." = "Ogni bit di informazioni che si sceglie di condividere viene caricato in modo anonimo. Per evitare duplicati di caricamenti, i dati sono identificati con una stringa casuale univoca salvata sul telefono.";
-
-/* */
-"Tap to display" = "Tocca per visualizzare";
-
-/* */
-"Your identifier" = "Il tuo identificativo";
-
-/* */
-"Share your data anonymously" = "Condividi i tuoi dati in modo anonimo";
-
-/* Setting Title */
-"Sharing" = "Condivisione";
-
-/* ——————————Contact Image ————————*/
-/* Contact Image, contacts list - prefix before the contact given name */
-
-"Contact" = "Contatto";
-
-/* Contact Image, settings, header of the contacts list */
-"Contacts" = "Contatti";
-
-/* Contact Image, settings, save your changes reminedr */
-"Don't forget to save your changes." = "Non dimenticare di salvare le modifiche.";
-
-/* Contact Image, settings, message about need to access contacts */
-"iAPS needs access to your contacts for this feature to work" = "iAPS ha bisogno di accedere ai tuoi contatti affinché questa funzionalità funzioni";
-
-/* Contact Image, settings, button to grant access to contacts */
-"Grant iAPS access to contacts" = "Concedi a iAPS l'accesso ai contatti";
-
-/* Contact Image, settings, message when access to contacts denied */
-"Access to contacts denied" = "Accesso ai contatti negato";
-
-/* Contact Image, settings, message when access to contacts restricted */
-"Access to contacts is restricted (parental control?)" = "L'accesso ai contatti è limitato (parental control?)";
-
-/* Contact Image, settings, message when access to contacts is in unknown state */
-"Access to contacts - unknown state" = "Accesso ai contatti - stato sconosciuto";
-
-/* Contact Image, settings, short description of the feature */
-"A Contact Image can be used to get live updates from iAPS to your Apple Watch Contact complication and/or your iPhone Contact widget." = "Un'immagine di contatto può essere utilizzata per ottenere aggiornamenti in tempo reale da iAPS al vostro complication contatto su Apple Watch e/o al vostro widget contatto su Iphone.";
-
-/* Contact Image, settings, main header */
-"Contact Image" = "Immagine Contatto";
-
-/* Contact Image, settings, label for the layout picker */
-"Layout" = "Disposizione";
-
-/* Contact Image, settings, single layout name */
-"Single" = "Singolo";
-
-/* Contact Image, settings, split layout name */
-"Split" = "Separa";
-
-/* Contact Image, settings, outer ring - don't show */
-"DontShowRing" = "Non mostrare";
-
-/* Contact Image, settings, outer ring - Loop status */
-"LoopStatusRing" = "Stato loop";
-
-/* Contact Image, settings, outer ring - IOB */
-"IOBRing" = "IOB";
-
-/* Contact Image, settings, outer ring - COB */
-"COBRing" = "COB";
-
-/* Contact Image, settings, outer ring - IOB+COB */
-"IOB+COBRing" = "IOB+COB";
-
-/* Contact Image, settings, label for the primary value picker */
-"Primary" = "Primario";
-
-/* Contact Image, settings, label for the top value picker */
-"Top" = "Superiore";
-
-/* Contact Image, settings, label for the bottom value picker */
-"Bottom" = "Inferiore";
-
-/* Contact Image, settings, header for the outer ring section */
-"Ring" = "Suoneria";
-
-/* Contact Image, settings, label for the outer ring picker */
-"Outer" = "Esterno";
-
-/* Contact Image, settings, label for the ring width picker */
-"Width" = "Ampiezza";
-
-/* Contact Image, settings, label for the ring gap picker */
-"Gap" = "Intervallo";
-
-/* Contact Image, settings, header for the font section */
-"Font" = "Tipo di carattere";
-
-/* Contact Image, settings, label for the font size picker */
-"Size" = "Dimensione";
-
-/* Contact Image, settings, label for the secondary font size picker */
-"Secondary size" = "Dimensione secondaria";
-
-/* Contact Image, settings, label for the font tracking picker (tracking - horizontal spacing between letters) */
-"Tracking" = "Monitoraggio";
-
-/* Contact Image, settings, label for the font weight picker */
-"Weight" = "Peso";
-
-/* Contact Image, settings, label for the dark-mode switcher */
-"Dark mode" = "Tema scuro";
-
-/* Contact Image, settings, tighter font tracking */
-"TighterFontTracking" = "Più stretto";
-
-/* Contact Image, settings, tight font tracking */
-"TightFontTracking" = "Stretto";
-
-/* Contact Image, settings, normal font tracking */
-"NormalFontTracking" = "Normale";
-
-/* Contact Image, settings, wide font tracking */
-"WideFontTracking" = "Ampio";
-
-/* Contact Image, settings, light font weight */
-"LightFontWeight" = "Chiaro";
-
-/* Contact Image, settings, regular font weight */
-"RegularFontWeight" = "Normale";
-
-/* Contact Image, settings, medium font weight */
-"MediumFontWeight" = "Medio";
-
-/* Contact Image, settings, semibold font weight */
-"SemiboldFontWeight" = "Semi Grassetto";
-
-/* Contact Image, settings, bold font weight */
-"BoldFontWeight" = "Grassetto";
-
-/* Contact Image, settings, black font weight (black is "very bold") */
-"BlackFontWeight" = "Nero";
-
-/* Contact Image, settings, don't display any value */
-"NoneContactValue" = "Nessuno";
-
-/* Contact Image, settings, Glucose (data to display) */
-"GlucoseContactValue" = "Glicemie";
-
-/* Contact Image, settings, Eventual BG (data to display) */
-"EventualBGContactValue" = "Probabile Glicemia";
-
-/* Contact Image, settings, Delta (data to display) */
-"DeltaContactValue" = "Delta";
-
-/* Contact Image, settings, Trend (data to display) */
-"TrendContactValue" = "Tendenza";
-
-/* Contact Image, settings, Last loop time (data to display) */
-"LastLoopTimeContactValue" = "Orario dell'ultimo ciclo loop";
-
-/* Contact Image, settings, COB (data to display) */
-"COBContactValue" = "COB";
-
-/* Contact Image, settings, IOB (data to display) */
-"IOBContactValue" = "IOB";
-
-/* Contact Image, settings, loop status (data to display) */
-"LoopStatusContactValue" = "Stato loop";
-
-/* ---------------------------------------------------------------------------------------------------------------
   Infotexts from openaps.docs and androidaps.docs
   iAPS
 */
@@ -2441,9 +2240,6 @@ Per gli utenti più giovani si consiglia di iniziare con un dosaggio ancora più
 
 /* Bolus Calculator Footer */
 "The new alternate bolus calculator is another approach to the default bolus calculator in iAPS. If the toggle is on you use this bolus calculator and not the original iAPS calculator. At the end of the calculation a custom factor is applied as it is supposed to be when using smbs (default 0.8).\n\nYou can also add the option in your bolus calculator to apply another (!) customizable factor at the end of the calculation which could be useful for fatty meals, e.g Pizza (default 0.7)." = "Il nuovo calcolatore alternativo di bolo è un altro approccio al calcolatore di bolo predefinito in iAPS. Se l'interruttore è acceso, si utilizza questa calcolatrice per il bolo e non la calcolatrice iAPS originale. Alla fine del calcolo viene applicato un fattore personalizzato come si suppone che sia quando si utilizza smbs (predefinita 0.8).\n\nPuoi anche aggiungere l'opzione nella calcolatrice del bolo per applicarne un altro (!) fattore personalizzabile al termine del calcolo che potrebbe essere utile per i pasti grassi. es. Pizza (predefinita 0.7).";
-
-/* Settings Section */
-"Extra Features" = "Funzioni aggiuntive";
 
 /* UI/UX option */
 "Display Predictions" = "Mostra Previsioni";

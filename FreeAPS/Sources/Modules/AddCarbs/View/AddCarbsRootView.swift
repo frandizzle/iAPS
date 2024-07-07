@@ -22,12 +22,30 @@ extension AddCarbs {
         ) var carbPresets: FetchedResults<Presets>
 
         @Environment(\.managedObjectContext) var moc
+        @Environment(\.colorScheme) var colorScheme
 
         private var formatter: NumberFormatter {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
             formatter.maximumFractionDigits = 1
             return formatter
+        }
+
+        private var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
         }
 
         var body: some View {
@@ -75,7 +93,6 @@ extension AddCarbs {
 
                     // Time
                     HStack {
-                        let now = Date.now
                         Text("Time")
                         Spacer()
                         if !pushed {
@@ -127,16 +144,21 @@ extension AddCarbs {
                 Section {
                     mealPresets
                 }
-            }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-            .onAppear {
-                configureView {
-                    state.loadEntries(editMode)
+            }.scrollContentBackground(.hidden).background(color)
+                .onAppear {
+                    configureView {
+                        state.loadEntries(editMode)
+                    }
                 }
-            }
-            .navigationTitle("Add Meal")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: Button("Cancel", action: state.hideModal))
+                .navigationTitle("Add Meal")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Close") {
+                            state.hideModal()
+                        }
+                    }
+                }
         }
 
         private var presetPopover: some View {
@@ -164,7 +186,7 @@ extension AddCarbs {
                         isPromptPresented = false }
                     label: { Text("Cancel") }
                 } header: { Text("Enter Meal Preset Name") }
-            }.dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            }
         }
 
         private var empty: Bool {
@@ -244,7 +266,7 @@ extension AddCarbs {
                     if state.selection != nil {
                         plusButton
                     }
-                }.dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                }
 
                 HStack {
                     Button("Delete Preset") {

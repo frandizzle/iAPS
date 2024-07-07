@@ -19,6 +19,8 @@ extension Stat {
             sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
         ) var fetchedInsulin: FetchedResults<InsulinDistribution>
 
+        @Environment(\.colorScheme) var colorScheme
+
         enum Duration: String, CaseIterable, Identifiable {
             case Today
             case Day
@@ -28,12 +30,29 @@ extension Stat {
             var id: Self { self }
         }
 
-        @State private var selectedDuration: Duration = .Today
+        @State private var selectedDuration: Duration = .Day
         @State var paddingAmount: CGFloat? = 10
         @State var headline: Color = .secondary
         @State var days: Double = 0
         @State var pointSize: CGFloat = 3
         @State var conversionFactor = 0.0555
+
+        private var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
 
         @ViewBuilder func stats() -> some View {
             ZStack {
@@ -146,11 +165,17 @@ extension Stat {
                 .pickerStyle(.segmented).background(.cyan.opacity(0.2))
                 stats()
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            .scrollContentBackground(.hidden).background(color)
             .onAppear(perform: configureView)
             .navigationBarTitle("Statistics")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: Button("Close", action: state.hideModal))
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Close") {
+                        state.hideModal()
+                    }
+                }
+            }
         }
     }
 }

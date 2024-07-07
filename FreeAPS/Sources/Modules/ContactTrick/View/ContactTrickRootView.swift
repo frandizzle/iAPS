@@ -8,6 +8,24 @@ extension ContactTrick {
         let resolver: Resolver
         @StateObject var state = StateModel()
 
+        @Environment(\.colorScheme) var colorScheme
+        private var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
+
         @State private var contactStore = CNContactStore()
         @State private var authorization = CNContactStore.authorizationStatus(for: .contacts)
 
@@ -71,18 +89,10 @@ extension ContactTrick {
                         )
                     }
                 }
-
-                Section {}
-                footer: {
-                    Text(
-                        "A Contact Image can be used to get live updates from iAPS to your Apple Watch Contact complication and/or your iPhone Contact widget."
-                    )
-                    .frame(maxWidth: .infinity, alignment: .center)
-                }
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            .scrollContentBackground(.hidden).background(color)
             .onAppear(perform: configureView)
-            .navigationTitle("Contact Image")
+            .navigationTitle("Contact Trick")
             .navigationBarTitleDisplayMode(.automatic)
             .navigationBarItems(
                 trailing: EditButton()
@@ -192,6 +202,24 @@ extension ContactTrick {
     struct EntryView: View {
         @Binding var entry: ContactTrickEntry
         @State private var availableFonts: [String]? = nil
+        @Environment(\.colorScheme) var colorScheme
+        private var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
+
         let previewState: ContactTrickState
 
         private let fontSizes: [Int] = [100, 120, 130, 140, 160, 180, 200, 225, 250, 275, 300, 350, 400]
@@ -199,170 +227,173 @@ extension ContactTrick {
         private let ringGaps: [Int] = [0, 1, 2, 3, 4, 5]
 
         var body: some View {
-            Section {
-                HStack {
-                    ZStack {
-                        Circle()
-                            .fill(entry.darkMode ? .black : .white)
-                            .foregroundColor(.white)
-                        Image(uiImage: ContactPicture.getImage(contact: entry, state: previewState))
-                            .resizable()
-                            .aspectRatio(1, contentMode: .fit)
-                            .frame(width: 64, height: 64)
-                            .clipShape(Circle())
-                        Circle()
-                            .stroke(lineWidth: 2)
-                            .foregroundColor(.white)
-                    }
-                    .frame(width: 64, height: 64)
-                }
-            }
-            Form {
+            VStack {
                 Section {
-                    Picker(
-                        selection: $entry.layout,
-                        label: Text("Layout")
-                    ) {
-                        ForEach(ContactTrickLayout.allCases) { v in
-                            Text(v.displayName).tag(v)
+                    HStack {
+                        ZStack {
+                            Circle()
+                                .fill(entry.darkMode ? .black : .white)
+                                .foregroundColor(.white)
+                            Image(uiImage: ContactPicture.getImage(contact: entry, state: previewState))
+                                .resizable()
+                                .aspectRatio(1, contentMode: .fit)
+                                .frame(width: 64, height: 64)
+                                .clipShape(Circle())
+                            Circle()
+                                .stroke(lineWidth: 2)
+                                .foregroundColor(.white)
                         }
+                        .frame(width: 64, height: 64)
                     }
                 }
-                Section {
-                    switch entry.layout {
-                    case .single:
+                Form {
+                    Section {
                         Picker(
-                            selection: $entry.primary,
-                            label: Text("Primary")
+                            selection: $entry.layout,
+                            label: Text("Layout")
                         ) {
-                            ForEach(ContactTrickValue.allCases) { v in
-                                Text(v.displayName).tag(v)
-                            }
-                        }
-                        Picker(
-                            selection: $entry.top,
-                            label: Text("Top")
-                        ) {
-                            ForEach(ContactTrickValue.allCases) { v in
-                                Text(v.displayName).tag(v)
-                            }
-                        }
-                        Picker(
-                            selection: $entry.bottom,
-                            label: Text("Bottom")
-                        ) {
-                            ForEach(ContactTrickValue.allCases) { v in
-                                Text(v.displayName).tag(v)
-                            }
-                        }
-                    case .split:
-                        Picker(
-                            selection: $entry.top,
-                            label: Text("Top")
-                        ) {
-                            ForEach(ContactTrickValue.allCases) { v in
-                                Text(v.displayName).tag(v)
-                            }
-                        }
-                        Picker(
-                            selection: $entry.bottom,
-                            label: Text("Bottom")
-                        ) {
-                            ForEach(ContactTrickValue.allCases) { v in
+                            ForEach(ContactTrickLayout.allCases) { v in
                                 Text(v.displayName).tag(v)
                             }
                         }
                     }
-                }
+                    Section {
+                        switch entry.layout {
+                        case .single:
+                            Picker(
+                                selection: $entry.primary,
+                                label: Text("Primary")
+                            ) {
+                                ForEach(ContactTrickValue.allCases) { v in
+                                    Text(v.displayName).tag(v)
+                                }
+                            }
+                            Picker(
+                                selection: $entry.top,
+                                label: Text("Top")
+                            ) {
+                                ForEach(ContactTrickValue.allCases) { v in
+                                    Text(v.displayName).tag(v)
+                                }
+                            }
+                            Picker(
+                                selection: $entry.bottom,
+                                label: Text("Bottom")
+                            ) {
+                                ForEach(ContactTrickValue.allCases) { v in
+                                    Text(v.displayName).tag(v)
+                                }
+                            }
+                        case .split:
+                            Picker(
+                                selection: $entry.top,
+                                label: Text("Top")
+                            ) {
+                                ForEach(ContactTrickValue.allCases) { v in
+                                    Text(v.displayName).tag(v)
+                                }
+                            }
+                            Picker(
+                                selection: $entry.bottom,
+                                label: Text("Bottom")
+                            ) {
+                                ForEach(ContactTrickValue.allCases) { v in
+                                    Text(v.displayName).tag(v)
+                                }
+                            }
+                        }
+                    }
 
-                Section(header: Text("Ring")) {
-                    Picker(
-                        selection: $entry.ring1,
-                        label: Text("Outer")
-                    ) {
-                        ForEach(ContactTrickLargeRing.allCases) { v in
-                            Text(v.displayName).tag(v)
+                    Section(header: Text("Ring")) {
+                        Picker(
+                            selection: $entry.ring1,
+                            label: Text("Outer")
+                        ) {
+                            ForEach(ContactTrickLargeRing.allCases) { v in
+                                Text(v.displayName).tag(v)
+                            }
+                        }
+                        Picker(
+                            selection: $entry.ringWidth,
+                            label: Text("Width")
+                        ) {
+                            ForEach(ringWidths, id: \.self) { s in
+                                Text("\(s)").tag(s)
+                            }
+                        }
+                        Picker(
+                            selection: $entry.ringGap,
+                            label: Text("Gap")
+                        ) {
+                            ForEach(ringGaps, id: \.self) { s in
+                                Text("\(s)").tag(s)
+                            }
                         }
                     }
-                    Picker(
-                        selection: $entry.ringWidth,
-                        label: Text("Width")
-                    ) {
-                        ForEach(ringWidths, id: \.self) { s in
-                            Text("\(s)").tag(s)
-                        }
-                    }
-                    Picker(
-                        selection: $entry.ringGap,
-                        label: Text("Gap")
-                    ) {
-                        ForEach(ringGaps, id: \.self) { s in
-                            Text("\(s)").tag(s)
-                        }
-                    }
-                }
 
-                Section(header: Text("Font")) {
-                    if availableFonts == nil {
-                        HStack {
-                            Spacer()
-                            Button {
-                                loadFonts()
-                            } label: {
-                                Text(entry.fontName)
+                    Section(header: Text("Font")) {
+                        if availableFonts == nil {
+                            HStack {
+                                Spacer()
+                                Button {
+                                    loadFonts()
+                                } label: {
+                                    Text(entry.fontName)
+                                }
+                            }
+                        } else {
+                            Picker(
+                                selection: $entry.fontName,
+                                label: EmptyView()
+                            ) {
+                                ForEach(availableFonts!, id: \.self) { f in
+                                    Text(f).tag(f)
+                                }
+                            }
+                            .pickerStyle(.navigationLink)
+                            .labelsHidden()
+                        }
+                        Picker(
+                            selection: $entry.fontSize,
+                            label: Text("Size")
+                        ) {
+                            ForEach(fontSizes, id: \.self) { s in
+                                Text("\(s)").tag(s)
                             }
                         }
-                    } else {
                         Picker(
-                            selection: $entry.fontName,
-                            label: EmptyView()
+                            selection: $entry.secondaryFontSize,
+                            label: Text("Secondary size")
                         ) {
-                            ForEach(availableFonts!, id: \.self) { f in
-                                Text(f).tag(f)
+                            ForEach(fontSizes, id: \.self) { s in
+                                Text("\(s)").tag(s)
                             }
                         }
-                        .pickerStyle(.navigationLink)
-                        .labelsHidden()
-                    }
-                    Picker(
-                        selection: $entry.fontSize,
-                        label: Text("Size")
-                    ) {
-                        ForEach(fontSizes, id: \.self) { s in
-                            Text("\(s)").tag(s)
-                        }
-                    }
-                    Picker(
-                        selection: $entry.secondaryFontSize,
-                        label: Text("Secondary size")
-                    ) {
-                        ForEach(fontSizes, id: \.self) { s in
-                            Text("\(s)").tag(s)
-                        }
-                    }
-                    Picker(
-                        selection: $entry.fontTracking,
-                        label: Text("Tracking")
-                    ) {
-                        ForEach(FontTracking.allCases) { w in
-                            Text(w.displayName).tag(w)
-                        }
-                    }
-                    if entry.isDefaultFont() {
                         Picker(
-                            selection: $entry.fontWeight,
-                            label: Text("Weight")
+                            selection: $entry.fontTracking,
+                            label: Text("Tracking")
                         ) {
-                            ForEach(FontWeight.allCases) { w in
+                            ForEach(FontTracking.allCases) { w in
                                 Text(w.displayName).tag(w)
                             }
                         }
+                        if entry.isDefaultFont() {
+                            Picker(
+                                selection: $entry.fontWeight,
+                                label: Text("Weight")
+                            ) {
+                                ForEach(FontWeight.allCases) { w in
+                                    Text(w.displayName).tag(w)
+                                }
+                            }
+                        }
+                    }
+                    Section {
+                        Toggle("Dark mode", isOn: $entry.darkMode)
                     }
                 }
-                Section {
-                    Toggle("Dark mode", isOn: $entry.darkMode)
-                }
             }
+            .scrollContentBackground(.hidden).background(color)
         }
 
         private func loadFonts() {

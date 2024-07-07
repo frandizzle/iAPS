@@ -20,44 +20,16 @@ final class CoreDataStorage {
         return fetchGlucose
     }
 
-    func fetchLoopStats(interval: NSDate) -> [LoopStatRecord] {
-        var fetchLoopStats = [LoopStatRecord]()
-        coredataContext.performAndWait {
-            let requestLoopStats = LoopStatRecord.fetchRequest() as NSFetchRequest<LoopStatRecord>
-            let sort = NSSortDescriptor(key: "start", ascending: false)
-            requestLoopStats.sortDescriptors = [sort]
-            requestLoopStats.predicate = NSPredicate(
-                format: "interval > 0 AND start > %@", interval
-            )
-            try? fetchLoopStats = self.coredataContext.fetch(requestLoopStats)
-        }
-        return fetchLoopStats
-    }
-
     func fetchTDD(interval: NSDate) -> [TDD] {
         var uniqueEvents = [TDD]()
         coredataContext.performAndWait {
             let requestTDD = TDD.fetchRequest() as NSFetchRequest<TDD>
             requestTDD.predicate = NSPredicate(format: "timestamp > %@ AND tdd > 0", interval)
-            let sortTDD = NSSortDescriptor(key: "timestamp", ascending: false)
+            let sortTDD = NSSortDescriptor(key: "timestamp", ascending: true)
             requestTDD.sortDescriptors = [sortTDD]
             try? uniqueEvents = coredataContext.fetch(requestTDD)
         }
         return uniqueEvents
-    }
-
-    func saveTDD(_ insulin: (bolus: Decimal, basal: Decimal, hours: Double)) {
-        coredataContext.perform {
-            let saveToTDD = TDD(context: self.coredataContext)
-            saveToTDD.timestamp = Date.now
-            saveToTDD.tdd = (insulin.basal + insulin.bolus) as NSDecimalNumber?
-            let saveToInsulin = InsulinDistribution(context: self.coredataContext)
-            saveToInsulin.bolus = insulin.bolus as NSDecimalNumber?
-            // saveToInsulin.scheduledBasal = (suggestion.insulin?.scheduled_basal ?? 0) as NSDecimalNumber?
-            saveToInsulin.tempBasal = insulin.basal as NSDecimalNumber?
-            saveToInsulin.date = Date()
-            try? self.coredataContext.save()
-        }
     }
 
     func fetchTempTargetsSlider() -> [TempTargetsSlider] {
@@ -117,93 +89,5 @@ final class CoreDataStorage {
             try? insulinDistribution = coredataContext.fetch(requestInsulinDistribution)
         }
         return insulinDistribution
-    }
-
-    func fetchReason() -> Reasons? {
-        var suggestion = [Reasons]()
-        coredataContext.performAndWait {
-            let requestReasons = Reasons.fetchRequest() as NSFetchRequest<Reasons>
-            let sort = NSSortDescriptor(key: "date", ascending: false)
-            requestReasons.sortDescriptors = [sort]
-            try? suggestion = coredataContext.fetch(requestReasons)
-        }
-        return suggestion.first
-    }
-
-    func fetchReasons(interval: NSDate) -> [Reasons] {
-        var reasonArray = [Reasons]()
-        coredataContext.performAndWait {
-            let requestReasons = Reasons.fetchRequest() as NSFetchRequest<Reasons>
-            let sort = NSSortDescriptor(key: "date", ascending: false)
-            requestReasons.sortDescriptors = [sort]
-            requestReasons.predicate = NSPredicate(
-                format: "date > %@", interval
-            )
-            try? reasonArray = self.coredataContext.fetch(requestReasons)
-        }
-        return reasonArray
-    }
-
-    func saveStatUploadCount() {
-        coredataContext.performAndWait { [self] in
-            let saveStatsCoreData = StatsData(context: self.coredataContext)
-            saveStatsCoreData.lastrun = Date()
-            try? self.coredataContext.save()
-        }
-        UserDefaults.standard.set(false, forKey: IAPSconfig.newVersion)
-    }
-
-    func saveVNr(_ versions: Version?) {
-        if let version = versions {
-            coredataContext.performAndWait { [self] in
-                let saveNr = VNr(context: self.coredataContext)
-                saveNr.nr = version.main
-                saveNr.dev = version.dev
-                saveNr.date = Date.now
-                try? self.coredataContext.save()
-            }
-        }
-    }
-
-    func fetchVNr() -> VNr? {
-        var nr = [VNr]()
-        coredataContext.performAndWait {
-            let requestNr = VNr.fetchRequest() as NSFetchRequest<VNr>
-            let sort = NSSortDescriptor(key: "date", ascending: false)
-            requestNr.sortDescriptors = [sort]
-            requestNr.fetchLimit = 1
-            try? nr = coredataContext.fetch(requestNr)
-        }
-        return nr.first
-    }
-
-    func fetchMealPreset(_ name: String) -> Presets? {
-        var presetsArray = [Presets]()
-        var preset: Presets?
-        coredataContext.performAndWait {
-            let requestPresets = Presets.fetchRequest() as NSFetchRequest<Presets>
-            requestPresets.predicate = NSPredicate(
-                format: "dish == %@", name
-            )
-            try? presetsArray = self.coredataContext.fetch(requestPresets)
-
-            guard let mealPreset = presetsArray.first else {
-                return
-            }
-            preset = mealPreset
-        }
-        return preset
-    }
-
-    func fetchMealPresets() -> [Presets] {
-        var presetsArray = [Presets]()
-        coredataContext.performAndWait {
-            let requestPresets = Presets.fetchRequest() as NSFetchRequest<Presets>
-            requestPresets.predicate = NSPredicate(
-                format: "dish != %@", "" as String
-            )
-            try? presetsArray = self.coredataContext.fetch(requestPresets)
-        }
-        return presetsArray
     }
 }

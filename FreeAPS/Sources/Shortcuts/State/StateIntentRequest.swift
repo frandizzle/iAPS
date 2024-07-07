@@ -10,10 +10,11 @@ enum StateIntentError: Error {
 @available(iOS 16, *) struct StateiAPSResults: AppEntity {
     static var defaultQuery = StateBGQuery()
 
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = "iAPS State Result"
+    static var typeDisplayRepresentation: TypeDisplayRepresentation =
+        .init(name: LocalizedStringResource("State Result", table: "ShortcutsDetail"))
 
     var displayRepresentation: DisplayRepresentation {
-        DisplayRepresentation(title: "\(glucose)")
+        DisplayRepresentation(title: LocalizedStringResource("\(glucose)", table: "ShortcutsDetail"))
     }
 
     var id: UUID

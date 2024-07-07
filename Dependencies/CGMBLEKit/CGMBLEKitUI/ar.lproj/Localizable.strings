@@ -18,37 +18,37 @@ Title text for the button to remove a CGM from Loop */
 "Glucose" = "قراءات السكر";
 
 /* Describes a glucose value adjusted to reflect a recent calibration */
-"Glucose (Adjusted)" = "جلوكوز (معدّلة)";
+"Glucose (Adjusted)" = "Glucose (Adjusted)";
 
 /* Section title for latest glucose calibration */
-"Latest Calibration" = "أحدث معايرة";
+"Latest Calibration" = "Latest Calibration";
 
 /* Section title for latest glucose reading */
-"Latest Reading" = "آخر قراءة";
+"Latest Reading" = "Latest Reading";
 
 /* Section title for latest connection date */
-"Latest Connection" = "آخر اتصال";
+"Latest Connection" = "Latest Connection";
 
 /* Button title to open CGM app */
-"Open App" = "فتح التطبيق";
+"Open App" = "Open App";
 
 /* Title describing sensor session age */
-"Session Age" = "عمر الجلسة";
+"Session Age" = "Session Age";
 
 /* Section title for remote data synchronization */
-"Remote Data Synchronization" = "مزامنة البيانات عن بعد";
+"Remote Data Synchronization" = "Remote Data Synchronization";
 
 /* Title describing sensor expiration */
-"Sensor Expires" = "ينتهي المستشعر";
+"Sensor Expires" = "Sensor Expires";
 
 /* Title describing past sensor expiration */
-"Sensor Expired" = "إنتهت صلاحية المستشعر";
+"Sensor Expired" = "Sensor Expired";
 
 /* Title describing CGM calibration and battery state */
 "Status" = "الحالة";
 
 /* Title describing transmitter session age */
-"Transmitter Age" = "عمر جهاز الإرسال";
+"Transmitter Age" = "Transmitter Age";
 
 /* The title text for the Dexcom G5/G6 transmitter ID config value */
 "Transmitter ID" = "Transmitter ID";

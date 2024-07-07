@@ -6,169 +6,151 @@
 */
 /* Alert content title for multiCommand pod alert */
 
-"Multiple Command Alert" = "多个命令警报";
+"Multiple Command Alert" = "Multiple Command Alert";
 
 /* Alert content title for userPodExpiration pod alert */
-"Pod Expiration Reminder" = "Pod到期提醒";
+"Pod Expiration Reminder" = "Pod Expiration Reminder";
 
 /* Alert content title for podExpiring pod alert */
-"Pod Expired" = "Pod已到期";
+"Pod Expired" = "Pod Expired";
 
 /* Alert content title for lowReservoir pod alert */
-"Low Reservoir" = "低药量";
+"Low Reservoir" = "Low Reservoir";
 
 /* Alert content title for suspendInProgress pod alert */
-"Suspend In Progress Reminder" = "泵暂停中 的提醒";
+"Suspend In Progress Reminder" = "Suspend In Progress Reminder";
 
 /* Alert content title for suspendEnded pod alert */
-"Resume Insulin" = "恢复输注";
+"Resume Insulin" = "Resume Insulin";
 
 /* Alert content title for finishSetupReminder pod alert */
-"Pod Pairing Incomplete" = "Pod 配对未完成";
+"Pod Pairing Incomplete" = "Pod Pairing Incomplete";
 
 /* Alert content title for timeOffsetChangeDetected pod alert */
-"Time Change Detected" = "检测到时间变化";
+"Time Change Detected" = "Time Change Detected";
 
 /* Alert content body for multiCommand pod alert */
-"Multiple Command Alert" = "多个命令警报";
+"Multiple Command Alert" = "Multiple Command Alert";
 
 /* Format string for alert content body for userPodExpiration pod alert. (1: time until expiration) */
-"Pod expires in %1$@." = "Pod 将于 %1$@到期";
+"Pod expires in %1$@." = "Pod expires in %1$@.";
 
 /* Alert content body for podExpiring pod alert */
-"Change Pod now. Pod has been active for 72 hours." = "立即更换 Pod ，Pod 已使用72小时";
+"Change Pod now. Pod has been active for 72 hours." = "Change Pod now. Pod has been active for 72 hours.";
 
 /* Alert content body for podExpireImminent pod alert */
-"Change Pod now. Insulin delivery will stop in 1 hour." = "请立刻更改Pod ，胰岛素输注将在 1 小时后停止";
+"Change Pod now. Insulin delivery will stop in 1 hour." = "Change Pod now. Insulin delivery will stop in 1 hour.";
 
 /* Format string for alert content body for lowReservoir pod alert. (1: reminder value) */
-"%1$@ insulin or less remaining in Pod. Change Pod soon." = "%1$@ 或更少胰岛素剩余，请即刻更换Pod";
+"%1$@ insulin or less remaining in Pod. Change Pod soon." = "%1$@ insulin or less remaining in Pod. Change Pod soon.";
 
 /* Alert content body for suspendInProgress pod alert */
-"Suspend In Progress Reminder" = "泵暂停中 的提醒";
+"Suspend In Progress Reminder" = "Suspend In Progress Reminder";
 
 /* Alert content body for suspendEnded pod alert */
-"The insulin suspension period has ended.\n\nYou can resume delivery from the banner on the home screen or from your pump settings screen. You will be reminded again in 15 minutes." = "胰岛素输注暂停期已经结束，\n\n您可以从屏幕上方的横幅或者从您的泵设置屏幕上恢复输注，您将在 15 分钟内再次被提醒";
+"The insulin suspension period has ended.\n\nYou can resume delivery from the banner on the home screen or from your pump settings screen. You will be reminded again in 15 minutes." = "The insulin suspension period has ended.\n\nYou can resume delivery from the banner on the home screen or from your pump settings screen. You will be reminded again in 15 minutes.";
 
 /* Alert content body for finishSetupReminder pod alert */
-"Please finish pairing your pod." = "请完成配对您的pod";
+"Please finish pairing your pod." = "Please finish pairing your pod.";
 
 /* Alert content body for timeOffsetChangeDetected pod alert */
-"The time on your pump is different from the current time. You can review the pump time and and sync to current time in settings." = "您泵上的时间不同于当前时间。您可以在设置里将泵时间并同步到当前时间。";
+"The time on your pump is different from the current time. You can review the pump time and and sync to current time in settings." = "The time on your pump is different from the current time. You can review the pump time and and sync to current time in settings.";
 
 /* Alert notification body for suspendEnded pod alert user notification */
-"Suspension time is up. Open the app and resume." = "输注暂停已经结束，打开应用程序并恢复输注";
+"Suspension time is up. Open the app and resume." = "Suspension time is up. Open the app and resume.";
 
 /* Action button default text for PodAlerts */
 "Ok" = "Ok";
 
 /* Label for pod life state when pod not fully activated */
-"Unfinished Activation" = "未完成启用";
+"Unfinished Activation" = "Unfinished Activation";
 
 /* Label for pod life state when time remaining */
-"Pod expires in" = "Pod将过期于 ";
+"Pod expires in" = "Pod expires in";
 
 /* */
-"Pod Expires" = "Pod有效期限";
+"Pod Expires" = "Pod Expires";
 
 /* */
-"Pod Activated" = "Pod 已激活";
+"Pod Activated" = "Pod Activated";
 
 /* */
 "Notification Settings" = "通知设置";
 
 /* */
-"Confidence Reminders" = "二次确认提醒";
-
-/* Help text for BeepPreferenceSelectionView */
-"Confidence reminders are beeps from the Pod which can be used to acknowledge selected commands when the Pod is not silenced." = "Confidence reminders are beeps from the Pod which can be used to acknowledge selected commands when the Pod is not silenced.";
-
-/* Title for pod reminders section */
-"Pod Reminders" = "Pod Reminders";
-
-/* Footer text for pod reminders section */
-"The app configures a reminder on the Pod to notify you in advance of Pod expiration. Set the number of hours advance notice you would like to configure by default when pairing a new Pod." = "The app configures a reminder on the Pod to notify you in advance of Pod expiration. Set the number of hours advance notice you would like to configure by default when pairing a new Pod.";
-
-/* Footer text for scheduled reminder area */
-"The expiration reminder time for the current Pod." = "The expiration reminder time for the current Pod.";
-
-/* Footer text for low reservoir value row */
-"The app notifies you when the amount of insulin in the Pod reaches this level." = "The app notifies you when the amount of insulin in the Pod reaches this level.";
-
-/* Description text for critical alerts */
-"The above reminders will not sound in the app if your device is in Silent or Do Not Disturb mode. There are other critical Pod alerts that will sound in the app even if your device is set to Silent or Do Not Disturb mode.\n\nThe Pod will also use audible beeps for all Pod reminders and alerts except when the Pod is Silenced." = "The above reminders will not sound in the app if your device is in Silent or Do Not Disturb mode. There are other critical Pod alerts that will sound in the app even if your device is set to Silent or Do Not Disturb mode.\n\nThe Pod will also use audible beeps for all Pod reminders and alerts except when the Pod is Silenced.";
+"Confidence Reminders" = "Confidence Reminders";
 
 /* Text for suspend resume button when insulin delivery active */
-"Suspend Insulin Delivery" = "暂停胰岛素输注";
+"Suspend Insulin Delivery" = "Suspend Insulin Delivery";
 
 /* Label for pod life state when within pod expiration window */
-"Pod expired" = "Pod已到期";
+"Pod expired" = "Pod expired";
 
 /* Label for pod life state when pod not fully deactivated */
-"Unfinished deactivation" = "尚未完成停用";
+"Unfinished deactivation" = "Unfinished deactivation";
 
 /* Label for pod life state when no pod paired */
-"No Pod" = "无Pod";
+"No Pod" = "No Pod";
 
 /* Settings page link description when next lifecycle action is to pair new pod */
-"Pair Pod" = "配对Pod";
+"Pair Pod" = "Pair Pod";
 
 /* Pairing action button accessibility label while ready to pair */
-"Pair pod." = "配对Pod.";
+"Pair pod." = "Pair pod.";
 
 /* Pairing action button accessibility label while pairing */
-"Pairing." = "配对中.";
+"Pairing." = "Pairing.";
 
 /* Pairing action button accessibility label while priming */
-"Priming. Please wait." = "准备中，请稍候";
+"Priming. Please wait." = "Priming. Please wait.";
 
 /* Pairing action button accessibility label when pairing succeeded */
-"Pod paired successfully. Continue." = "Pod配对成功，继续";
+"Pod paired successfully. Continue." = "Pod paired successfully. Continue.";
 
 /* Settings page link description when next lifecycle action is to finish deactivation */
-"Finish deactivation" = "完成停用";
+"Finish deactivation" = "Finish deactivation";
 
 /* Settings page link description when next lifecycle action is to replace pod */
 "Replace Pod" = "更换Pod";
 
 /* Unit for singular day in pod life remaining */
-"day" = "天";
+"day" = "day";
 
 /* Unit for plural days in pod life remaining */
-"days" = "天";
+"days" = "days";
 
 /* Unit for singular hour in pod life remaining */
-"hour" = "小时";
+"hour" = "hour";
 
 /* Unit for plural hours in pod life remaining */
 "hours" = "小时";
 
 /* Unit for singular minute in pod life remaining */
-"minute" = "分钟";
+"minute" = "minute";
 
 /* Unit for plural minutes in pod life remaining */
 "minutes" = "分钟";
 
 /* Title of insulin delivery section */
-"Insulin Delivery" = "胰岛素输注";
+"Insulin Delivery" = "Insulin Delivery";
 
 /* */
-"Scheduled Basal" = "预设基础率";
+"Scheduled Basal" = "Scheduled Basal";
 
 /* Header for insulin remaining on pod settings screen */
-"Insulin Remaining" = "胰岛素余量";
+"Insulin Remaining" = "Insulin Remaining";
 
 /* Section header for activity section */
 "Activity" = "活动";
 
 /* title for device details page */
-"Device Details" = "设备详情";
+"Device Details" = "Device Details";
 
 /* Section header for configuration section */
 "Configuration" = "配置";
 
 /* Settings page link description when next lifecycle action is to finish deactivation */
-"Finish deactivation" = "完成停用";
+"Finish deactivation" = "Finish deactivation";
 
 /* Settings page link description when next lifecycle action is to replace pod */
 "Replace Pod" = "更换Pod";
@@ -177,19 +159,19 @@
 "Replace Pod" = "更换Pod";
 
 /* Label for pod life state when pod not fully activated */
-"Unfinished Activation" = "未完成启用";
+"Unfinished Activation" = "Unfinished Activation";
 
 /* Label for pod life state when time remaining */
-"Pod expires in" = "Pod将过期于 ";
+"Pod expires in" = "Pod expires in";
 
 /* Label for pod life state when within pod expiration window */
-"Pod expired" = "Pod已到期";
+"Pod expired" = "Pod expired";
 
 /* Label for pod life state when pod not fully deactivated */
-"Unfinished deactivation" = "尚未完成停用";
+"Unfinished deactivation" = "Unfinished deactivation";
 
 /* Label for pod life state when no pod paired */
-"No Pod" = "无Pod";
+"No Pod" = "No Pod";
 
 /* Pod life HUD view label */
 "Fault" = "错误";
@@ -204,10 +186,10 @@
 "Replace Pod" = "更换Pod";
 
 /* Error message shown when no pod is paired */
-"No pod paired" = "没有找到可配对的Pod";
+"No pod paired" = "No pod paired";
 
 /* Error message shown when user cannot pair because pod is already paired */
-"Pod already paired" = "Pod已经配对了";
+"Pod already paired" = "Pod already paired";
 
 /* Error description for OmniBLEPumpManagerError.insulinTypeNotConfigured */
 "Insulin type not configured" = "Insulin type not configured";
@@ -234,13 +216,13 @@
 "Finish Deactivation" = "Finish Deactivation";
 
 /* Status highlight that when no pod is paired. */
-"No Pod" = "无Pod";
+"No Pod" = "No Pod";
 
 /* Status highlight message for emptyReservoir alarm. */
 "No Insulin" = "No Insulin";
 
 /* Status highlight message for podExpired alarm. */
-"Pod Expired" = "Pod已到期";
+"Pod Expired" = "Pod Expired";
 
 /* Status highlight message for occlusion alarm. */
 "Pod Occlusion" = "Pod Occlusion";
@@ -333,13 +315,10 @@
 "Insulin delivery stopped. Change Pod now." = "Insulin delivery stopped. Change Pod now.";
 
 /* Header for insulin remaining on pod settings screen */
-"Insulin Remaining" = "胰岛素余量";
+"Insulin Remaining" = "Insulin Remaining";
 
 /* Button title to set temporary basal rate */
 "Set Temporary Basal Rate" = "Set Temporary Basal Rate";
-
-/* Description text on manual temp basal action sheet */
-"Your insulin delivery will not be automatically adjusted until the temporary basal rate finishes or is canceled." = "Your insulin delivery will not be automatically adjusted until the temporary basal rate finishes or is canceled.";
 
 /* Section header for activity section */
 "Activity" = "活动";
@@ -400,25 +379,25 @@
 /* Button text for 1 hour 30 minute suspend duration */
 "1 hour 30 minutes" = "1 hour 30 minutes";
 /* Button text for 2 hour suspend duration */
-"2 hours" = "2小时";
+"2 hours" = "2 hours";
 
 /* Alert title for suspend error */
-"Failed to Suspend Insulin Delivery" = "暂停胰岛素输注失败";
+"Failed to Suspend Insulin Delivery" = "Failed to Suspend Insulin Delivery";
 
 /* Alert title for resume error */
-"Failed to Resume Insulin Delivery" = "恢复胰岛素输注失败";
+"Failed to Resume Insulin Delivery" = "Failed to Resume Insulin Delivery";
 
 /* Alert title for time sync error */
-"Failed to Set Pump Time" = "设置泵时间失败";
+"Failed to Set Pump Time" = "Failed to Set Pump Time";
 
 /* Alert title for failing to cancel manual basal error */
-"Failed to Cancel Manual Basal" = "取消手动基础率失败";
+"Failed to Cancel Manual Basal" = "Failed to Cancel Manual Basal";
 
 /* */
-"Please deactivate the pod. When deactivation is complete, you may remove it and pair a new pod." = "请先停用Pod，停用完成后将Pod从身体上摘除并配对新的Pod";
+"Please deactivate the pod. When deactivation is complete, you may remove it and pair a new pod." = "Please deactivate the pod. When deactivation is complete, you may remove it and pair a new pod.";
 
 /* Instructions for deactivate pod when pod not on body */
-"Please deactivate the pod. When deactivation is complete, you may pair a new pod." = "请先停用Pod， 停用完成后您可以配对一个新的Pod";
+"Please deactivate the pod. When deactivation is complete, you may pair a new pod." = "Please deactivate the pod. When deactivation is complete, you may pair a new pod.";
 
 /* Deactivate pod action button */
 "Deactivate Pod" = "解除Pod";
@@ -430,148 +409,148 @@
 "Slide to Deactivate Pod" = "Slide to Deactivate Pod";
 
 /* Deactivate pod action button accessibility label while deactivating */
-"Deactivating." = "停用中";
+"Deactivating." = "Deactivating.";
 
 /* Deactivate pod action button accessibility label when deactivation complete */
-"Pod deactivated successfully. Continue." = "Pod已成功停用，继续";
+"Pod deactivated successfully. Continue." = "Pod deactivated successfully. Continue.";
 
 /* Action button description for deactivate after failed attempt */
-"Retry" = "重试";
+"Retry" = "Retry";
 
 /* Action button description when deactivated */
 "Continue" = "继续";
 
 /* Format string for recovery suggestion during deactivate pod. */
-"There was a problem communicating with the pod. If this problem persists, tap Discard Pod. You can then activate a new Pod." = "与Pod通讯时出现问题。如果这个问题无法解决，请弃用此Pod，并激活一个新Pod。";
+"There was a problem communicating with the pod. If this problem persists, tap Discard Pod. You can then activate a new Pod." = "There was a problem communicating with the pod. If this problem persists, tap Discard Pod. You can then activate a new Pod.";
 
 /* Text for discard pod button */
-"Discard Pod" = "丢弃Pod";
+"Discard Pod" = "Discard Pod";
 
 /* Title for remove pod modal */
-"Remove Pod from Body" = "从身体上取下Pod";
+"Remove Pod from Body" = "Remove Pod from Body";
 
 /* Alert message body for confirm pod attachment */
-"Your Pod may still be delivering Insulin.\nRemove it from your body, then tap “Continue.“" = "您的Pod 可能仍在输注胰岛素。\n将其从您的身体中取下，然后点击“继续”。";
+"Your Pod may still be delivering Insulin.\nRemove it from your body, then tap “Continue.“" = "Your Pod may still be delivering Insulin.\nRemove it from your body, then tap “Continue.“";
 
 /* Insulin Unit */
 "U" = "U";
 
 /* The action string on pod status page when pod expired */
-"Change Pod now. Insulin delivery will stop 8 hours after the Pod has expired or when no more insulin remains." = "现在更换Pod 。Pod 过期后的8小时后胰岛素输注将完全停止。";
+"Change Pod now. Insulin delivery will stop 8 hours after the Pod has expired or when no more insulin remains." = "Change Pod now. Insulin delivery will stop 8 hours after the Pod has expired or when no more insulin remains.";
 
 /* Label text for step 1 of pair pod instructions */
-"Fill a new pod with U-100 Insulin (leave blue Pod needle cap on)." = "用至少100个单位的胰岛素填充一个新的pod (不要取下Pod的针头盖)。";
+"Fill a new pod with U-100 Insulin (leave blue Pod needle cap on)." = "Fill a new pod with U-100 Insulin (leave blue Pod needle cap on).";
 
 /* Label text for step 1 of pair pod instructions */
 "Remove the Pod's blue needle cap and check cannula. Then remove paper backing." = "Remove the Pod's blue needle cap and check cannula. Then remove paper backing.";
 
 /* Label text for step 2 of pair pod instructions */
-"Listen for 2 beeps." = "注意听两声哔声";
+"Listen for 2 beeps." = "Listen for 2 beeps.";
 
 /* Label text indicating pairing finished.*/
-"Paired" = "已配对";
+"Paired" = "Paired";
 
 /* Cancel button text in navigation bar on pair pod UI */
 "Cancel" = "取消";
 
 /* Alert title for cancel pairing modal */
-"Are you sure you want to cancel Pod setup?" = "您确定要取消Pod安装吗？";
+"Are you sure you want to cancel Pod setup?" = "Are you sure you want to cancel Pod setup?";
 
 /* Alert message body for confirm pod attachment */
-"If you cancel Pod setup, the current Pod will be deactivated and will be unusable." = "如果您现在取消Pod 设置，当前Pod将被停用并报废。";
+"If you cancel Pod setup, the current Pod will be deactivated and will be unusable." = "If you cancel Pod setup, the current Pod will be deactivated and will be unusable.";
 
 /* Button title for confirm deactivation option */
-"Yes, Deactivate Pod" = "是的，解除Pod";
+"Yes, Deactivate Pod" = "Yes, Deactivate Pod";
 
 /* Continue pairing button title of in pairing cancel modal */
-"No, Continue With Pod" = "否，继续设置 Pod";
+"No, Continue With Pod" = "No, Continue With Pod";
 
 /* Label text for step one of attach pod instructions */
-"Prepare site." = "将注射部位做好准备";
+"Prepare site." = "Prepare site.";
 
 /* Label text for step three of attach pod instructions */
-"Check Pod, apply to site, then confirm pod attachment." = "检查Pod，贴在注射部位上，确保pod已经贴牢";
+"Check Pod, apply to site, then confirm pod attachment." = "Check Pod, apply to site, then confirm pod attachment.";
 
 /* Action button title for attach pod view */
 "Continue" = "继续";
 
 /* */
-"Attach Pod" = "粘贴Pod";
+"Attach Pod" = "Attach Pod";
 
 /* Alert title for confirm pod attachment */
-"Confirm Pod Attachment" = "确认Pod粘贴牢固";
+"Confirm Pod Attachment" = "Confirm Pod Attachment";
 
 /* Alert message body for confirm pod attachment */
-"Please confirm that the Pod is securely attached to your body.\n\nThe cannula can be inserted only once with each Pod. Tap “Confirm” when Pod is attached." = "请确认Pod 已经安全地粘贴到到你的身体.\n\n每个Pod只能插入一次软管。当Pod被贴牢后，点击\"确认\"";
+"Please confirm that the Pod is securely attached to your body.\n\nThe cannula can be inserted only once with each Pod. Tap “Confirm” when Pod is attached." = "Please confirm that the Pod is securely attached to your body.\n\nThe cannula can be inserted only once with each Pod. Tap “Confirm” when Pod is attached.";
 
 /* Button title for confirm attachment option */
-"Confirm" = "确认";
+"Confirm" = "Confirm";
 
 /* Label text for step one of insert cannula instructions */
-"Tap below to start cannula insertion." = "点击下面的按钮开始插入软管";
+"Tap below to start cannula insertion." = "Tap below to start cannula insertion.";
 
 /* Label text for step two of insert cannula instructions */
-"Wait until insertion is completed." = "等待，直到插入完成";
+"Wait until insertion is completed." = "Wait until insertion is completed.";
 
 /* Label text for step one of insert cannula instructions */
 "Slide the switch below to start cannula insertion." = "Slide the switch below to start cannula insertion.";
 
 /* Label text indicating insertion finished. */
-"Inserted" = "插入完毕";
+"Inserted" = "Inserted";
 
 /* Check Cannula */
-"Check Cannula" = "检查出药口软管";
+"Check Cannula" = "Check Cannula";
 
 /* */
-"Is the cannula inserted properly?" = "软管是否成功插入？";
+"Is the cannula inserted properly?" = "Is the cannula inserted properly?";
 
 /* Description of proper cannula insertion */
-"The window on the top of the Pod should be colored pink when the cannula is properly inserted into the skin." = "当软管被正确插入皮肤时，Pod顶部的透明窗口应该有粉红色";
+"The window on the top of the Pod should be colored pink when the cannula is properly inserted into the skin." = "The window on the top of the Pod should be colored pink when the cannula is properly inserted into the skin.";
 
 /* Button label for user to answer cannula was properly inserted  */
-"Yes" = "是";
+"Yes" = "Yes";
 
 /* Button label for user to answer cannula was not properly inserted */
-"No" = "否";
+"No" = "No";
 
 /* Pod pairing action button text while pairing */
-"Pairing..." = "配对中...";
+"Pairing..." = "Pairing...";
 
 /* Pod pairing action button text while priming */
-"Priming..." = "充盈中...";
+"Priming..." = "Priming...";
 
 /* */
-"Deactivating..." = "停用中......";
+"Deactivating..." = "Deactivating...";
 
 /* Pod state when pod has been deactivated */
-"Deactivated" = "已停用";
+"Deactivated" = "Deactivated";
 
 /* Format string for instructions for setup complete view. (1: app name) */
-"Your Pod is ready for use.\n\n%1$@ will remind you to change your pod before it expires. You can change this to a time convenient for you." = "您的Pod 已准备好。\n\n%1$@ 将会在Pod到期前发出提醒。 您也可以自行设定到期提醒时间";
+"Your Pod is ready for use.\n\n%1$@ will remind you to change your pod before it expires. You can change this to a time convenient for you." = "Your Pod is ready for use.\n\n%1$@ will remind you to change your pod before it expires. You can change this to a time convenient for you.";
 
 /* */
-"Scheduled Reminder" = "预约提醒";
+"Scheduled Reminder" = "Scheduled Reminder";
 
 /* Label for expiration reminder row */
 "Time" = "时间";
 
 /* Action button title to continue at Setup Complete */
-"Finish Setup" = "完成安装";
+"Finish Setup" = "Finish Setup";
 
 /* */
-"Setup Complete" = "安装已完成";
+"Setup Complete" = "Setup Complete";
 
 /* Value text for no expiration reminder */
-"No Reminder" = "无提醒";
+"No Reminder" = "No Reminder";
 
 /* Error message description for PeripheralManagerError.notReady */
-"Peripheral Not Ready" = "外围设备尚未准备好";
+"Peripheral Not Ready" = "Peripheral Not Ready";
 
 /* Error message description for PeripheralManagerError.incorrectResponse */
-"Incorrect Response" = "错误的响应";
+"Incorrect Response" = "Incorrect Response";
 
 /* Error message description for PeripheralManagerError.timeout */
-"Timeout" = "超时";
+"Timeout" = "Timeout";
 
 /* Error message description for PeripheralManagerError.emptyValue */
 "Empty Value" = "Empty Value";
@@ -592,7 +571,7 @@
 "This is a reminder that you scheduled when you paired your current Pod." = "This is a reminder that you scheduled when you paired your current Pod.";
 
 /* */
-"Scheduled Reminder" = "Scheduled Reminder";
+"Scheduled Reminder" = "预约提醒";
 
 /* Footer text for low reservoir value row */
 "The App notifies you when the amount of insulin in the Pod reaches this level." = "The App notifies you when the amount of insulin in the Pod reaches this level.";
@@ -609,7 +588,7 @@
 "Time" = "时间";
 
 /* Value text for no expiration reminder */
-"No Reminder" = "No Reminder";
+"No Reminder" = "无提醒";
 
 /* Label for low reservoir reminder row */
 "Low Reservoir Reminder" = "Low Reservoir Reminder";
@@ -700,7 +679,7 @@
 "BLE Firmware Version" = "BLE Firmware Version";
 
 /* description label for activated at timne pod details row */
-"Pod Activated" = "Pod 已激活";
+"Pod Activated" = "Pod Activated";
 
 /* description label for active time pod details row */
 "Active Time" = "Pod启动时间";

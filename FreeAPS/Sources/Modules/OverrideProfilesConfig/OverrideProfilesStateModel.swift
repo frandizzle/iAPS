@@ -19,17 +19,14 @@ extension OverrideProfilesConfig {
         @Published var isfAndCr: Bool = true
         @Published var isf: Bool = true
         @Published var cr: Bool = true
-        @Published var smbIsAlwaysOff: Bool = false
+        @Published var smbIsScheduledOff: Bool = false
         @Published var start: Decimal = 0
         @Published var end: Decimal = 23
         @Published var smbMinutes: Decimal = 0
         @Published var uamMinutes: Decimal = 0
         @Published var defaultSmbMinutes: Decimal = 0
         @Published var defaultUamMinutes: Decimal = 0
-        @Published var defaultmaxIOB: Decimal = 0
         @Published var emoji: String = ""
-        @Published var maxIOB: Decimal = 0
-        @Published var overrideMaxIOB: Bool = false
 
         @Injected() var broadcaster: Broadcaster!
         @Injected() var ns: NightscoutManager!
@@ -40,8 +37,6 @@ extension OverrideProfilesConfig {
             units = settingsManager.settings.units
             defaultSmbMinutes = settingsManager.preferences.maxSMBBasalMinutes
             defaultUamMinutes = settingsManager.preferences.maxUAMSMBBasalMinutes
-            defaultmaxIOB = settingsManager.preferences.maxIOB
-
             presets = [OverridePresets(context: coredataContext)]
         }
 
@@ -80,7 +75,7 @@ extension OverrideProfilesConfig {
                             ? target.asMgdL
                             : target
                     ) as NSDecimalNumber
-                } else { saveOverride.target = 6 }
+                } else { saveOverride.target = 0 }
                 if advancedSettings {
                     saveOverride.advancedSettings = true
                     if !isfAndCr {
@@ -88,16 +83,14 @@ extension OverrideProfilesConfig {
                         saveOverride.isf = isf
                         saveOverride.cr = cr
                     } else { saveOverride.isfAndCr = true }
-                    if smbIsAlwaysOff {
-                        saveOverride.smbIsAlwaysOff = true
+                    if smbIsScheduledOff {
+                        saveOverride.smbIsScheduledOff = true
                         saveOverride.start = start as NSDecimalNumber
                         saveOverride.end = end as NSDecimalNumber
-                    } else { saveOverride.smbIsAlwaysOff = false }
+                    } else { saveOverride.smbIsScheduledOff = false }
 
                     saveOverride.smbMinutes = smbMinutes as NSDecimalNumber
                     saveOverride.uamMinutes = uamMinutes as NSDecimalNumber
-                    saveOverride.maxIOB = maxIOB as NSDecimalNumber
-                    saveOverride.overrideMaxIOB = overrideMaxIOB
                 }
 
                 let duration = (self.duration as NSDecimalNumber) == 0 ? 2880 : Int(self.duration as NSDecimalNumber)
@@ -126,7 +119,7 @@ extension OverrideProfilesConfig {
                             ? target.asMgdL
                             : target
                     ) as NSDecimalNumber
-                } else { saveOverride.target = 6 }
+                } else { saveOverride.target = 0 }
 
                 if advancedSettings {
                     saveOverride.advancedSettings = true
@@ -135,16 +128,14 @@ extension OverrideProfilesConfig {
                         saveOverride.isf = isf
                         saveOverride.cr = cr
                     } else { saveOverride.isfAndCr = true }
-                    if smbIsAlwaysOff {
-                        saveOverride.smbIsAlwaysOff = true
+                    if smbIsScheduledOff {
+                        saveOverride.smbIsScheduledOff = true
                         saveOverride.start = start as NSDecimalNumber
                         saveOverride.end = end as NSDecimalNumber
-                    } else { smbIsAlwaysOff = false }
+                    } else { smbIsScheduledOff = false }
 
                     saveOverride.smbMinutes = smbMinutes as NSDecimalNumber
                     saveOverride.uamMinutes = uamMinutes as NSDecimalNumber
-                    saveOverride.maxIOB = maxIOB as NSDecimalNumber
-                    saveOverride.overrideMaxIOB = overrideMaxIOB
                 }
                 try? self.coredataContext.save()
             }
@@ -179,7 +170,7 @@ extension OverrideProfilesConfig {
             saveOverride.id = id_
 
             if let tar = profile.target, tar == 0 {
-                saveOverride.target = 6
+                saveOverride.target = 0
             } else {
                 saveOverride.target = profile.target
             }
@@ -191,16 +182,14 @@ extension OverrideProfilesConfig {
                     saveOverride.isf = profile.isf
                     saveOverride.cr = profile.cr
                 } else { saveOverride.isfAndCr = true }
-                if profile.smbIsAlwaysOff {
-                    saveOverride.smbIsAlwaysOff = true
+                if profile.smbIsScheduledOff {
+                    saveOverride.smbIsScheduledOff = true
                     saveOverride.start = profile.start
                     saveOverride.end = profile.end
-                } else { saveOverride.smbIsAlwaysOff = false }
+                } else { saveOverride.smbIsScheduledOff = false }
 
                 saveOverride.smbMinutes = (profile.smbMinutes ?? 0) as NSDecimalNumber
                 saveOverride.uamMinutes = (profile.uamMinutes ?? 0) as NSDecimalNumber
-                saveOverride.maxIOB = (profile.maxIOB ?? defaultmaxIOB as NSDecimalNumber) as NSDecimalNumber
-                saveOverride.overrideMaxIOB = profile.overrideMaxIOB
             }
             // Saves
             coredataContext.perform { try? self.coredataContext.save() }
@@ -211,7 +200,6 @@ extension OverrideProfilesConfig {
 
         func savedSettings() {
             guard let overrideArray = OverrideStorage().fetchLatestOverride().first else {
-                defaults()
                 return
             }
             isEnabled = overrideArray.enabled
@@ -221,15 +209,14 @@ extension OverrideProfilesConfig {
             smbIsOff = overrideArray.smbIsOff
             advancedSettings = overrideArray.advancedSettings
             isfAndCr = overrideArray.isfAndCr
-            smbIsAlwaysOff = overrideArray.smbIsAlwaysOff
-            overrideMaxIOB = overrideArray.overrideMaxIOB
+            smbIsScheduledOff = overrideArray.smbIsScheduledOff
 
             if advancedSettings {
                 if !isfAndCr {
                     isf = overrideArray.isf
                     cr = overrideArray.cr
                 }
-                if smbIsAlwaysOff {
+                if smbIsScheduledOff {
                     start = (overrideArray.start ?? 0) as Decimal
                     end = (overrideArray.end ?? 0) as Decimal
                 }
@@ -240,10 +227,6 @@ extension OverrideProfilesConfig {
 
                 if (overrideArray.uamMinutes as Decimal?) != nil {
                     uamMinutes = (overrideArray.uamMinutes ?? 30) as Decimal
-                }
-
-                if let maxIOB_ = overrideArray.maxIOB as Decimal? {
-                    maxIOB = maxIOB_ as Decimal
                 }
             }
 
@@ -263,11 +246,30 @@ extension OverrideProfilesConfig {
             }
             if newDuration < 0 { newDuration = 0 } else { duration = Decimal(newDuration) }
 
-            if !isEnabled { defaults() }
+            if !isEnabled {
+                _indefinite = true
+                percentage = 100
+                duration = 0
+                target = 0
+                override_target = false
+                smbIsOff = false
+                advancedSettings = false
+                smbMinutes = defaultSmbMinutes
+                uamMinutes = defaultUamMinutes
+            }
         }
 
         func cancelProfile() {
-            defaults()
+            _indefinite = true
+            isEnabled = false
+            percentage = 100
+            duration = 0
+            target = 0
+            override_target = false
+            smbIsOff = false
+            advancedSettings = false
+            smbMinutes = defaultSmbMinutes
+            uamMinutes = defaultUamMinutes
 
             let storage = OverrideStorage()
 
@@ -277,21 +279,6 @@ extension OverrideProfilesConfig {
             if let last = last_, let duration = duration_ {
                 ns.editOverride(name ?? "", duration, last.date ?? Date.now)
             }
-        }
-
-        private func defaults() {
-            _indefinite = true
-            percentage = 100
-            duration = 0
-            target = 0
-            override_target = false
-            smbIsOff = false
-            advancedSettings = false
-            isfAndCr = true
-            smbMinutes = defaultSmbMinutes
-            uamMinutes = defaultUamMinutes
-            maxIOB = defaultmaxIOB
-            overrideMaxIOB = false
         }
     }
 }

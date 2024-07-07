@@ -73,29 +73,42 @@ struct MainView: View {
 
     var header: some View {
         VStack {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading) {
-                    HStack {
-                        Text(state.glucose).font(.title)
-                        Text(state.trend)
+            HStack(alignment: .lastTextBaseline) {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .bottom) {
+                        Text(state.glucose).font(.largeTitle).foregroundColor(colorOfGlucose)
+                            .scaledToFill()
+                            .minimumScaleFactor(0.5)
+                        // .padding(.top, 2)
+                        if state.timerDate.timeIntervalSince(state.lastUpdate) > 10 {
+                            withAnimation {
+                                BlinkingView(count: 8, size: 3)
+                                    .frame(width: 25, height: 18)
+                                    .padding(.bottom, 15)
+                            }
+                        }
+                        Spacer()
+                        Text("TDD").foregroundColor(.insulin).font(.caption).fixedSize()
+                            .scaledToFill()
+                            .minimumScaleFactor(0.5)
+                            .padding(.bottom, 6)
+                    }
+                    HStack(alignment: .lastTextBaseline) {
+                        Text(state.delta).font(.caption).foregroundColor(.gray)
+                            .scaledToFill()
+                            .minimumScaleFactor(0.5)
+                        // Text(state.trend).foregroundColor(.gray)
+                        Text(state.eventualBG).font(.caption)
+                            .scaledToFill()
+                            .minimumScaleFactor(0.5)
+                        Spacer()
+                        Text(iobFormatter.string(from: (state.tdd ?? 33.3) as NSNumber)! + " U").font(.caption).fixedSize()
+                            .foregroundColor(.insulin)
                             .scaledToFill()
                             .minimumScaleFactor(0.5)
                     }
-                    /* IF YOU WANT TO DISPLAY MINUTES AGO, UNCOMMENT the gray code below
-                     let minutesAgo: TimeInterval = -1 * (state.glucoseDate ?? .distantPast).timeIntervalSinceNow / 60
-                     let minuteString = minutesAgo.formatted(.number.grouping(.never).rounded().precision(.fractionLength(0)))
-                     */
-                    HStack {
-                        /* if minutesAgo > 0 {
-                             Text(minuteString)
-                             Text("min")
-                         } */
-                        Text(state.delta)
-                    }
-                    .font(.caption2).foregroundColor(.gray)
                 }
                 Spacer()
-
                 VStack(spacing: 0) {
                     HStack {
                         Circle().stroke(color, lineWidth: 5).frame(width: 26, height: 26).padding(10)
@@ -161,10 +174,15 @@ struct MainView: View {
                         }
                     }
                 case .BGTarget:
-                    if let eventualBG = state.eventualBG.nonEmpty {
+                    if let targetString = state.targetString?.nonEmpty {
                         Spacer()
                         HStack {
-                            Text(eventualBG)
+                            Image(systemName: "scope")
+                                .renderingMode(.template)
+                                .resizable()
+                                .frame(width: 13, height: 13)
+                                .foregroundColor(.loopGreen)
+                            Text(targetString)
                                 .font(.caption2)
                                 .scaledToFill()
                                 .foregroundColor(.secondary)
@@ -182,20 +200,21 @@ struct MainView: View {
                             .minimumScaleFactor(0.5)
                     }
                 case .isf:
-                    Spacer()
-                    let isf: String = state.isf != nil ? "\(state.isf ?? 0)" : "-"
-                    HStack {
-                        Image(systemName: "arrow.up.arrow.down")
-                            .renderingMode(.template)
-                            .resizable()
-                            .frame(width: 12, height: 12)
-                            .foregroundColor(.loopGreen)
-                        Text("\(isf)")
-                            .fontWeight(.regular)
-                            .font(.caption2)
-                            .scaledToFill()
-                            .foregroundColor(.white)
-                            .minimumScaleFactor(0.5)
+                    if let isfString = state.isfString?.nonEmpty {
+                        Spacer()
+                        HStack {
+                            Image(systemName: "arrow.up.arrow.down")
+                                .renderingMode(.template)
+                                .resizable()
+                                .frame(width: 13, height: 13)
+                                .foregroundColor(.loopGreen)
+                            Text(isfString)
+                                .fontWeight(.regular)
+                                .font(.caption2)
+                                .scaledToFill()
+                                .foregroundColor(.white)
+                                .minimumScaleFactor(0.5)
+                        }
                     }
                 case .override:
                     Spacer()
@@ -266,20 +285,30 @@ struct MainView: View {
                 CarbsView()
                     .environmentObject(state)
             } label: {
-                Image("carbs", bundle: nil)
+                Image("carbs1", bundle: nil)
                     .renderingMode(.template)
                     .resizable()
                     .frame(width: 24, height: 24)
                     .foregroundColor(.loopYellow)
             }
 
+            NavigationLink(isActive: $state.isBolusViewActive) {
+                BolusView()
+                    .environmentObject(state)
+            } label: {
+                Image("bolus", bundle: nil)
+                    .renderingMode(.template)
+                    .resizable()
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.insulin)
+            }
             if state.profilesOrTempTargets {
                 NavigationLink(isActive: $state.isTempTargetViewActive) {
                     TempTargetsView()
                         .environmentObject(state)
                 } label: {
                     VStack {
-                        Image("target", bundle: nil)
+                        Image("target1", bundle: nil)
                             .renderingMode(.template)
                             .resizable()
                             .frame(width: 24, height: 24)
@@ -321,17 +350,6 @@ struct MainView: View {
                         }
                     }
                 }
-            }
-
-            NavigationLink(isActive: $state.isBolusViewActive) {
-                BolusView()
-                    .environmentObject(state)
-            } label: {
-                Image("bolus", bundle: nil)
-                    .renderingMode(.template)
-                    .resizable()
-                    .frame(width: 24, height: 24)
-                    .foregroundColor(.insulin)
             }
         }
     }
@@ -436,7 +454,23 @@ struct MainView: View {
         if minAgo > 1440 {
             return "--"
         }
-        return "\(minAgo) " + NSLocalizedString("min", comment: "Minutes ago since last loop")
+        return "\(minAgo) " + NSLocalizedString("m", comment: "Minutes ago since last loop")
+    }
+
+    var colorOfGlucose: Color {
+        guard let recentBG = Int(state.glucose)
+        else { return .loopYellow }
+
+        switch recentBG {
+        case 61 ... 69:
+            return .loopYellow
+        case 70 ... 140:
+            return .loopGreen
+        case 141 ... 180:
+            return .loopYellow
+        default:
+            return .loopRed
+        }
     }
 
     private var color: Color {

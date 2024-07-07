@@ -3,7 +3,7 @@ import SwiftUI
 
 extension AddTempTarget {
     final class StateModel: BaseStateModel<Provider> {
-        @Injected() private var storage: TempTargetsStorage!
+        @Injected() var storage: TempTargetsStorage!
         @Injected() var apsManager: APSManager!
 
         let coredataContext = CoreDataStack.shared.persistentContainer.viewContext
@@ -17,6 +17,7 @@ extension AddTempTarget {
         @Published var presets: [TempTarget] = []
         @Published var percentage = 100.0
         @Published var maxValue: Decimal = 1.2
+        @Published var use_autoISF = false
         @Published var viewPercantage = false
         @Published var hbt: Double = 160
         @Published var saveSettings: Bool = false
@@ -27,6 +28,7 @@ extension AddTempTarget {
             units = settingsManager.settings.units
             presets = storage.presets()
             maxValue = settingsManager.preferences.autosensMax
+            use_autoISF = settingsManager.preferences.autoisf
         }
 
         func enact() {
@@ -34,9 +36,13 @@ extension AddTempTarget {
                 return
             }
             var lowTarget = low
+            if units == .mmolL {
+                lowTarget = Decimal(round(Double(lowTarget.asMgdL)))
+            }
+            let highTarget = lowTarget
 
             if viewPercantage {
-                lowTarget = Decimal(round(Double(computeTarget())))
+                hbt = computeHBT()
                 coredataContext.performAndWait {
                     let saveToCoreData = TempTargets(context: self.coredataContext)
                     saveToCoreData.id = UUID().uuidString
@@ -55,12 +61,6 @@ extension AddTempTarget {
                     saveToCoreData.date = Date()
                     try? coredataContext.save()
                 }
-            }
-            var highTarget = lowTarget
-
-            if units == .mmolL, !viewPercantage {
-                lowTarget = Decimal(round(Double(lowTarget.asMgdL)))
-                highTarget = lowTarget
             }
 
             let entry = TempTarget(
@@ -98,16 +98,14 @@ extension AddTempTarget {
                 return
             }
             var lowTarget = low
+            if units == .mmolL {
+                lowTarget = Decimal(round(Double(lowTarget.asMgdL)))
+            }
+            let highTarget = lowTarget
 
             if viewPercantage {
-                lowTarget = Decimal(round(Double(computeTarget())))
+                hbt = computeHBT()
                 saveSettings = true
-            }
-            var highTarget = lowTarget
-
-            if units == .mmolL, !viewPercantage {
-                lowTarget = Decimal(round(Double(lowTarget.asMgdL)))
-                highTarget = lowTarget
             }
 
             let entry = TempTarget(
@@ -178,16 +176,17 @@ extension AddTempTarget {
             storage.storePresets(presets)
         }
 
-        func computeTarget() -> Decimal {
-            var ratio = Decimal(percentage / 100)
-            let c = Decimal(hbt - 100)
-            var target = (c / ratio) - c + 100
-
-            if c * (c + target - 100) <= 0 {
-                ratio = maxValue
-                target = (c / ratio) - c + 100
+        func computeHBT() -> Double {
+            let ratio = Decimal(percentage / 100)
+            let normalTarget: Decimal = 100
+            var target: Decimal = low
+            if units == .mmolL {
+                target = target.asMgdL }
+            var hbtcalc = Decimal(hbt)
+            if ratio != 1 {
+                hbtcalc = ((2 * ratio * normalTarget) - normalTarget - (ratio * target)) / (ratio - 1)
             }
-            return Decimal(Double(target))
+            return round(Double(hbtcalc))
         }
     }
 }

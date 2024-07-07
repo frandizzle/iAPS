@@ -6,6 +6,24 @@ extension BolusCalculatorConfig {
         let resolver: Resolver
         @StateObject var state = StateModel()
 
+        @Environment(\.colorScheme) var colorScheme
+        var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
+
         @State var isPresented = false
         @State var description = Text("")
         @State var descriptionHeader = Text("")
@@ -27,69 +45,6 @@ extension BolusCalculatorConfig {
 
         var body: some View {
             Form {
-                Section {
-                    HStack {
-                        Toggle("Use Bolus Calculator", isOn: $state.useCalc)
-                    }
-                }
-                header: { Text("Calculator settings") }
-                footer: {
-                    Text(
-                        state
-                            .useCalc ?
-                            "Depending on your settings the Swift bolus calculator is using data from the OpenAPS glucose predictions and/or from IOB, COB, glucose trend, current gluccose and target glucose. At the end of the calculation a custom factor is applied (default 0.8).\n\nYou can also have the option in your bolus calculator to apply another (!) customizable factor at the end of the calculation which could be useful for fatty meals, e.g Pizza (default 0.7).\n\nThe bolus calculator is NOT using the OpenAPS variable \"insulinRequired\", made for SMBs." :
-                            ""
-                    )
-                }
-
-                if state.useCalc {
-                    Section {
-                        HStack {
-                            Text("Override With A Factor Of ")
-                            Spacer()
-                            DecimalTextField("0.8", value: $state.overrideFactor, formatter: conversionFormatter)
-                        }
-                    } header: { Text("Adjustment") }
-                }
-
-                if state.useCalc {
-                    Section {
-                        Toggle("Apply factor for fatty meals", isOn: $state.fattyMeals)
-                        if state.fattyMeals {
-                            HStack {
-                                Text("Override With A Factor Of ")
-                                Spacer()
-                                DecimalTextField("0.7", value: $state.fattyMealFactor, formatter: conversionFormatter)
-                            }
-                        }
-                    }
-                    header: { Text("Fatty Meals") }
-
-                    Section {
-                        Toggle("Display Predictions", isOn: $state.displayPredictions)
-                    } header: { Text("Smaller iPhone Screens") }
-
-                    Section {
-                        Toggle(isOn: $state.eventualBG) {
-                            HStack {
-                                Text("1.")
-                                Text("Eventual Glucose")
-                            }
-                        }
-                        Toggle(isOn: $state.minumimPrediction) {
-                            HStack {
-                                Text("2.")
-                                Text("Minimum Predicted Glucose")
-                            }
-                        }
-                    }
-                    header: { Text("Use OpenAPS glucose predictions") }
-                    footer: {
-                        Text(
-                            "1. Use the OpenAPS eventual glucose prediction for computing the insulin recommended. This setting will enable the \"old\" calculator. On by default.\n\n2. Use the OpenAPS minPredBG prediction as a complementary safety guard rail, not allowing the glucose prediction to descend below your threshold. This setting can be used together with or without the eventual glucose. On by default"
-                        )
-                    }
-                }
                 Section {
                     HStack {
                         Toggle(isOn: $state.allowBolusShortcut) {
@@ -122,9 +77,53 @@ extension BolusCalculatorConfig {
                             DecimalTextField("0", value: $state.allowedRemoteBolusAmount, formatter: conversionFormatter)
                         }
                     }
-                } header: { Text("iOS Shortcuts") }
+                } header: { Text("Allow iOS Bolus Shortcuts") }
+                Section {
+                    HStack {
+                        Toggle("Use alternate Bolus Calculator", isOn: $state.useCalc)
+                    }
+
+                    if state.useCalc {
+                        HStack {
+                            Text("Override With A Factor Of ")
+                            Spacer()
+                            DecimalTextField("0.8", value: $state.overrideFactor, formatter: conversionFormatter)
+                        }
+                    }
+
+                    if !state.useCalc {
+                        HStack {
+                            Text("Recommended Bolus Percentage")
+                            DecimalTextField("", value: $state.insulinReqPercentage, formatter: formatter)
+                        }
+                    }
+                } header: { Text("Calculator settings") }
+
+                Section {
+                    Toggle("Display Predictions", isOn: $state.displayPredictions)
+
+                } header: { Text("Smaller iPhone Screens") }
+
+                if state.useCalc {
+                    Section {
+                        HStack {
+                            Toggle("Apply factor for fatty meals", isOn: $state.fattyMeals)
+                        }
+                        HStack {
+                            Text("Override With A Factor Of ")
+                            Spacer()
+                            DecimalTextField("0.7", value: $state.fattyMealFactor, formatter: conversionFormatter)
+                        }
+                    } header: { Text("Fatty Meals") }
+
+                    Section {}
+                    footer: { Text(
+                        "The new alternate bolus calculator is another approach to the default bolus calculator in iAPS. If the toggle is on you use this bolus calculator and not the original iAPS calculator. At the end of the calculation a custom factor is applied as it is supposed to be when using smbs (default 0.8).\n\nYou can also add the option in your bolus calculator to apply another (!) customizable factor at the end of the calculation which could be useful for fatty meals, e.g Pizza (default 0.7)."
+                    )
+                    }
+                }
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            .scrollContentBackground(.hidden).background(color)
             .onAppear(perform: configureView)
             .navigationBarTitle("Bolus Calculator")
             .navigationBarTitleDisplayMode(.automatic)

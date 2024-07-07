@@ -73,7 +73,7 @@ struct CarbsView: View {
                 .tint(selection == .carbs ? .blue : .none)
             }
             Spacer()
-            Text("🥨")
+            Text("Carb")
             Spacer()
             Text(numberFormatter.string(from: carbAmount as NSNumber)! + " g")
                 .font(selection == .carbs ? .title : .title3)
@@ -123,7 +123,7 @@ struct CarbsView: View {
                 .tint(selection == .protein ? .blue : .none)
             }
             Spacer()
-            Text("🍗")
+            Text("Prot")
             Spacer()
             Text(numberFormatter.string(from: proteinAmount as NSNumber)! + " g")
                 .font(selection == .protein ? .title : .title3)
@@ -172,7 +172,7 @@ struct CarbsView: View {
                 .tint(selection == .fat ? .blue : .none)
             }
             Spacer()
-            Text("🧀")
+            Text("Fat")
             Spacer()
             Text(numberFormatter.string(from: fatAmount as NSNumber)! + " g")
                 .font(selection == .fat ? .title : .title3)

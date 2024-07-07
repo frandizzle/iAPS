@@ -14,7 +14,7 @@ There are more detailed instructions in LoopDocs for doing Browser Builds of Loo
 
 * A [github account](https://github.com/signup). The free level comes with plenty of storage and free compute time to build iAPS, multiple times a day, if you wanted to.
 * A paid [Apple Developer account](https://developer.apple.com). You may be able to use the free version, but that has not been tested.
-* Some time. Set aside a couple of hours to perform the setup. 
+* Some time. Set aside a couple of hours to perform the setup.
 * Use the same GitHub account for all "Browser Builds" of the various DIY apps.
 
 
@@ -41,7 +41,8 @@ If you have previously built Loop or another app using the "browser build" metho
 1. Create a [new personal access token](https://github.com/settings/tokens/new):
     * Enter a name for your token. Something like "FastLane Access Token".
     * The default Expiration time is 30 days - but you should select `No Expiration`
-    * Select the `repo` permission scope.
+    * Add a check beside the `workflow` permission scope
+    * A check will automatically appear in the repo scope as well - this is normal
     * Click "Generate token".
     * Copy the token and record it. It will be used below as `GH_PAT`.
 1. In the forked iAPS repo, go to Settings -> Secrets -> Actions.
@@ -59,7 +60,7 @@ If you have previously built Loop or another app using the "browser build" metho
 1. Select "1. Validate Secrets".
 1. Click "Run Workflow", and tap the green button.
 1. Wait, and within a minute or two you should see a green checkmark indicating the workflow succeeded.
-1. The workflow will check if the required secrets are added and that they are correctly formatted. If errors are detected, please check the run log for details. 
+1. The workflow will check if the required secrets are added and that they are correctly formatted. If errors are detected, please check the run log for details.
 
 ## Add Identifiers for iAPS App
 
@@ -125,3 +126,21 @@ You do not need to fill out the next form. That is for submitting to the app sto
 1. For each phone/person you would like to support iAPS on:
     * Add them in [Users and Access](https://appstoreconnect.apple.com/access/users) on App Store Connect.
     * Add them to your TestFlight Internal Testing group.
+
+## Automatic Update & Build
+
+For someone using development code for their own use, they probably want to decide when to update their fork to the most recent commit. They can still have the advantage of automatic building without automatic updates. Refer to [LoopDoc Automatic build](https://loopkit.github.io/loopdocs/gh-actions/automatic/) for detailed instructions.
+
+### Disable Automatic Actions¶
+
+To enable the scheduled build and sync, the GH_PAT must hold the workflow permission scopes. This permission serves as the enabler for automatic and scheduled builds with browser build. To disable this, follow these steps:
+
+1. Go to your FastLane Access Token
+1. If it says repo, workflow next to the FastLane Access Token link, then automatic building is enabled
+1. To disable automatic update and build, click on the link to open the token detail view
+    * Click to uncheck the workflow box
+    * Click to check the repo box
+1. Scroll all the way down to and click the green Update token button
+1. Your token now holds only the repo permission
+
+If you choose not to have automatic building enabled, be sure the GH_PAT has repo scope or you won't be able to manually build.

@@ -23,7 +23,7 @@ enum OverrideIntentError: Error {
 
 @available(iOS 16.0, *) struct ApplyOverrideIntent: AppIntent {
     // Title of the action in the Shortcuts app
-    static var title: LocalizedStringResource = "Activate an Override Preset"
+    static var title: LocalizedStringResource = "Activate Override Preset"
 
     // Description of the action in the Shortcuts app
     static var description = IntentDescription("Allow to activate an overrride preset.")
@@ -44,11 +44,11 @@ enum OverrideIntentError: Error {
 
     static var parameterSummary: some ParameterSummary {
         When(\ApplyOverrideIntent.$confirmBeforeApplying, .equalTo, true, {
-            Summary("Applying \(\.$preset)") {
+            Summary("Activating \(\.$preset)") {
                 \.$confirmBeforeApplying
             }
         }, otherwise: {
-            Summary("Immediately applying \(\.$preset)") {
+            Summary("Immediately activating \(\.$preset)") {
                 \.$confirmBeforeApplying
             }
         })
@@ -90,8 +90,8 @@ enum OverrideIntentError: Error {
 }
 
 @available(iOS 16.0, *) struct CancelOverrideIntent: AppIntent {
-    static var title: LocalizedStringResource = "Cancel active override"
-    static var description = IntentDescription("Cancel active override.")
+    static var title: LocalizedStringResource = "Cancel active Override"
+    static var description = IntentDescription("Cancel active Override.")
 
     internal var intentRequest: OverrideIntentRequest
 

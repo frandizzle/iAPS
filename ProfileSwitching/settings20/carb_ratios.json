@@ -1,0 +1,40 @@
+{
+  "units": "grams",
+  "schedule": [
+    {
+      "start": "00:00:00",
+      "ratio": 20,
+      "offset": 0
+    },
+    {
+      "start": "04:00:00",
+      "ratio": 22,
+      "offset": 240
+    },
+    {
+      "start": "06:00:00",
+      "ratio": 27.5,
+      "offset": 360
+    },
+    {
+      "start": "09:00:00",
+      "ratio": 30,
+      "offset": 540
+    },
+    {
+      "start": "14:00:00",
+      "ratio": 28.0,
+      "offset": 840
+    },
+    {
+      "start": "17:00:00",
+      "ratio": 26,
+      "offset": 1020
+    },
+    {
+      "start": "20:00:00",
+      "ratio": 25,
+      "offset": 1200
+    }
+  ]
+}

@@ -23,6 +23,23 @@ extension Dynamic {
             return formatter
         }
 
+        var color: LinearGradient {
+            colorScheme == .dark ? LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.bgDarkBlue,
+                    Color.bgDarkerDarkBlue
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+                :
+                LinearGradient(
+                    gradient: Gradient(colors: [Color.gray.opacity(0.1)]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+        }
+
         private var formatter: NumberFormatter {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
@@ -130,7 +147,6 @@ extension Dynamic {
                                     }
                             }.disabled(isPresented)
                         }
-
                     } header: { Text("Settings") }
                 }
 
@@ -166,6 +182,7 @@ extension Dynamic {
             .description(isPresented: isPresented, alignment: .center) {
                 if scrollView { infoScrollView() } else { infoView() }
             }
+            .scrollContentBackground(.hidden).background(color)
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .onAppear(perform: configureView)
             .navigationBarTitle("Dynamic ISF")

@@ -15,8 +15,7 @@ protocol GlucoseStorage {
     func isGlucoseFresh() -> Bool
     func isGlucoseNotFlat() -> Bool
     func nightscoutGlucoseNotUploaded() -> [BloodGlucose]
-    func nightscoutCGMStateNotUploaded() -> [NigtscoutTreatment]
-    func nightscoutManualGlucoseNotUploaded() -> [NigtscoutTreatment]
+    func nightscoutCGMStateNotUploaded() -> [NightscoutTreatment]
     var alarm: GlucoseAlarm? { get }
 }
 
@@ -36,18 +35,9 @@ final class BaseGlucoseStorage: GlucoseStorage, Injectable {
         injectServices(resolver)
     }
 
-    private var glucoseFormatter: NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 0
-        if settingsManager.settings.units == .mmolL {
-            formatter.maximumFractionDigits = 1
-        }
-        formatter.decimalSeparator = "."
-        return formatter
-    }
-
     func storeGlucose(_ glucose: [BloodGlucose]) {
+        let storeGlucoseStarted = Date()
+
         processQueue.sync {
             debug(.deviceManager, "start storage glucose")
             let file = OpenAPS.Monitor.glucose
@@ -95,7 +85,7 @@ final class BaseGlucoseStorage: GlucoseStorage, Injectable {
             debug(.deviceManager, "start storage cgmState")
             self.storage.transaction { storage in
                 let file = OpenAPS.Monitor.cgmState
-                var treatments = storage.retrieve(file, as: [NigtscoutTreatment].self) ?? []
+                var treatments = storage.retrieve(file, as: [NightscoutTreatment].self) ?? []
                 var updated = false
                 for x in glucose {
                     debug(.deviceManager, "storeGlucose \(x)")
@@ -117,7 +107,7 @@ final class BaseGlucoseStorage: GlucoseStorage, Injectable {
                     if let a = x.activationDate {
                         notes = "\(notes) activated on \(a)"
                     }
-                    let treatment = NigtscoutTreatment(
+                    let treatment = NightscoutTreatment(
                         duration: nil,
                         rawDuration: nil,
                         rawRate: nil,
@@ -125,7 +115,7 @@ final class BaseGlucoseStorage: GlucoseStorage, Injectable {
                         rate: nil,
                         eventType: .nsSensorChange,
                         createdAt: sessionStartDate,
-                        enteredBy: NigtscoutTreatment.local,
+                        enteredBy: NightscoutTreatment.local,
                         bolus: nil,
                         insulin: nil,
                         notes: notes,
@@ -149,6 +139,7 @@ final class BaseGlucoseStorage: GlucoseStorage, Injectable {
                 }
             }
         }
+        print("Test time of glucoseStorage: \(-1 * storeGlucoseStarted.timeIntervalSinceNow) s")
     }
 
     func removeGlucose(ids: [String]) {
@@ -207,7 +198,6 @@ final class BaseGlucoseStorage: GlucoseStorage, Injectable {
     }
 
     func isGlucoseNotFlat() -> Bool {
-        guard !settingsManager.settings.disableCGMError else { return true }
         let count = 3 // check last 3 readings
         let lastReadings = Array(recent().suffix(count))
         let filtered = lastReadings.compactMap(\.filtered).filter { $0 != 0 }
@@ -222,30 +212,11 @@ final class BaseGlucoseStorage: GlucoseStorage, Injectable {
         return Array(Set(recentGlucose).subtracting(Set(uploaded)))
     }
 
-    func nightscoutCGMStateNotUploaded() -> [NigtscoutTreatment] {
-        let uploaded = storage.retrieve(OpenAPS.Nightscout.uploadedCGMState, as: [NigtscoutTreatment].self) ?? []
-        let recent = storage.retrieve(OpenAPS.Monitor.cgmState, as: [NigtscoutTreatment].self) ?? []
-        return Array(Set(recent).subtracting(Set(uploaded)))
-    }
+    func nightscoutCGMStateNotUploaded() -> [NightscoutTreatment] {
+        let uploaded = storage.retrieve(OpenAPS.Nightscout.uploadedCGMState, as: [NightscoutTreatment].self) ?? []
+        let recent = storage.retrieve(OpenAPS.Monitor.cgmState, as: [NightscoutTreatment].self) ?? []
 
-    func nightscoutManualGlucoseNotUploaded() -> [NigtscoutTreatment] {
-        let uploaded = (storage.retrieve(OpenAPS.Nightscout.uploadedGlucose, as: [BloodGlucose].self) ?? [])
-            .filter({ $0.type == GlucoseType.manual.rawValue })
-        let recent = recent().filter({ $0.type == GlucoseType.manual.rawValue })
-        let filtered = Array(Set(recent).subtracting(Set(uploaded)))
-        let manualReadings = filtered.map { item -> NigtscoutTreatment in
-            NigtscoutTreatment(
-                duration: nil, rawDuration: nil, rawRate: nil, absolute: nil, rate: nil, eventType: .capillaryGlucose,
-                createdAt: item.dateString, enteredBy: "iAPS", bolus: nil, insulin: nil, notes: "iAPS User", carbs: nil,
-                fat: nil,
-                protein: nil, foodType: nil, targetTop: nil, targetBottom: nil, glucoseType: "Manual",
-                glucose: settingsManager.settings
-                    .units == .mgdL ? (glucoseFormatter.string(from: Int(item.glucose ?? 100) as NSNumber) ?? "")
-                    : (glucoseFormatter.string(from: Decimal(item.glucose ?? 100).asMmolL as NSNumber) ?? ""),
-                units: settingsManager.settings.units == .mmolL ? "mmol" : "mg/dl"
-            )
-        }
-        return manualReadings
+        return Array(Set(recent).subtracting(Set(uploaded)))
     }
 
     var alarm: GlucoseAlarm? {

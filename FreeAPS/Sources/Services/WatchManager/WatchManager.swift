@@ -1,5 +1,5 @@
+import CoreData
 import Foundation
-import SwiftDate
 import Swinject
 import WatchConnectivity
 
@@ -12,14 +12,14 @@ final class BaseWatchManager: NSObject, WatchManager, Injectable {
 
     @Injected() private var broadcaster: Broadcaster!
     @Injected() private var settingsManager: SettingsManager!
+    @Injected() private var glucoseStorage: GlucoseStorage!
     @Injected() private var apsManager: APSManager!
     @Injected() private var storage: FileStorage!
     @Injected() private var carbsStorage: CarbsStorage!
     @Injected() private var tempTargetsStorage: TempTargetsStorage!
     @Injected() private var garmin: GarminManager!
-    @Injected() private var nightscout: NightscoutManager!
 
-    let coreDataStorage = CoreDataStorage()
+    let coredataContext = CoreDataStack.shared.persistentContainer.viewContext // newBackgroundContext()
 
     private var lifetime = Lifetime()
 
@@ -57,30 +57,13 @@ final class BaseWatchManager: NSObject, WatchManager, Injectable {
 
     private func configureState() {
         processQueue.async {
-            let overrideStorage = OverrideStorage()
-            let coreDataStorage = CoreDataStorage()
-            let reasons = coreDataStorage.fetchReason()
-
-            if let reason = reasons {
-                self.state.isf = (reason.isf ?? 15) as Decimal
-                self.state.target = (reason.target ?? 100) as Decimal
-                self.state.carbRatio = (reason.cr ?? 30) as Decimal
-                self.state.minPredBG = (reason.minPredBG ?? 0) as Decimal
-            }
-
-            self.state.eventualGlucose = Decimal(self.suggestion?.eventualBG ?? 0)
-
-            let readings = self.coreDataStorage.fetchGlucose(interval: DateFilter().twoHours)
-            let glucoseValues = self.glucoseText(readings)
+            let glucoseValues = self.glucoseText()
             self.state.glucose = glucoseValues.glucose
             self.state.trend = glucoseValues.trend
             self.state.delta = glucoseValues.delta
-            self.state.trendRaw = self.convertTrendToDirectionText(trend: glucoseValues.trend)
-            self.state.glucoseDate = readings.first?.date ?? .distantPast
-            self.state.glucoseDateInterval = self.state.glucoseDate.map {
-                guard $0.timeIntervalSince1970 > 0 else { return 0 }
-                return UInt64($0.timeIntervalSince1970)
-            }
+            self.state.trendRaw = self.glucoseStorage.recent().last?.direction?.rawValue
+            self.state.glucoseDate = self.glucoseStorage.recent().last?.dateString
+            self.state.glucoseDateInterval = self.state.glucoseDate.map { UInt64($0.timeIntervalSince1970) }
             self.state.lastLoopDate = self.enactedSuggestion?.recieved == true ? self.enactedSuggestion?.deliverAt : self
                 .apsManager.lastLoopDate
             self.state.lastLoopDateInterval = self.state.lastLoopDate.map {
@@ -92,8 +75,17 @@ final class BaseWatchManager: NSObject, WatchManager, Injectable {
             self.state.maxBolus = self.settingsManager.pumpSettings.maxBolus
             self.state.carbsRequired = self.suggestion?.carbsReq
 
-            let useNewCalc = self.settingsManager.settings.useCalc
-            self.state.useNewCalc = useNewCalc
+            var insulinRequired = self.suggestion?.insulinReq ?? 0
+            var double: Decimal = 2
+            if (self.suggestion?.cob ?? 0) > 0 {
+                if self.suggestion?.manualBolusErrorString == 0 {
+                    insulinRequired = self.suggestion?.insulinForManualBolus ?? 0
+                    double = 1
+                }
+            }
+
+            self.state.bolusRecommended = self.apsManager
+                .roundBolus(amount: max(insulinRequired * (self.settingsManager.settings.insulinReqPercentage / 100) * double, 0))
 
             self.state.iob = self.suggestion?.iob
             self.state.cob = self.suggestion?.cob
@@ -111,78 +103,35 @@ final class BaseWatchManager: NSObject, WatchManager, Injectable {
                         until: untilDate
                     )
                 }
-
-            self.state.overrides = overrideStorage.fetchProfiles()
-                .map { preset -> OverridePresets_ in
-                    let untilDate = overrideStorage.fetchLatestOverride().first.flatMap { currentOverride -> Date? in
-                        guard currentOverride.id == preset.id, currentOverride.enabled else { return nil }
-
-                        let duration = Double(currentOverride.duration ?? 0)
-                        let overrideDate: Date = currentOverride.date ?? Date.now
-
-                        let date = duration == 0 ? Date.distantFuture : overrideDate.addingTimeInterval(duration * 60)
-                        return date > Date.now ? date : nil
-                    }
-
-                    return OverridePresets_(
-                        name: preset.name ?? "",
-                        id: preset.id ?? "",
-                        until: untilDate,
-                        description: self.description(preset)
-                    )
-                }
-            // Is there an active override but no preset?
-            let currentButNoOverrideNotPreset = self.state.overrides.filter({ $0.until != nil }).first
-            if let last = overrideStorage.fetchLatestOverride().first, last.enabled, currentButNoOverrideNotPreset == nil {
-                let duration = Double(last.duration ?? 0)
-                let overrideDate: Date = last.date ?? Date.now
-                let date_ = duration == 0 ? Date.distantFuture : overrideDate.addingTimeInterval(duration * 60)
-                let date = date_ > Date.now ? date_ : nil
-
-                self.state.overrides
-                    .append(OverridePresets_(name: "custom", id: last.id ?? "", until: date, description: self.description(last)))
-            }
-
             self.state.bolusAfterCarbs = !self.settingsManager.settings.skipBolusScreenAfterCarbs
             self.state.displayOnWatch = self.settingsManager.settings.displayOnWatch
             self.state.displayFatAndProteinOnWatch = self.settingsManager.settings.displayFatAndProteinOnWatch
             self.state.confirmBolusFaster = self.settingsManager.settings.confirmBolusFaster
-            self.state.profilesOrTempTargets = self.settingsManager.settings.profilesOrTempTargets
 
-            let eBG = self.eventualBGString()
+            let eBG = self.evetualBGStraing()
             self.state.eventualBG = eBG.map { "⇢ " + $0 }
             self.state.eventualBGRaw = eBG
 
-            let overrideArray = overrideStorage.fetchLatestOverride()
+            let isfString = self.isfString()
+            self.state.isf = isfString
+
+            var overrideArray = [Override]()
+            let requestOverrides = Override.fetchRequest() as NSFetchRequest<Override>
+            let sortOverride = NSSortDescriptor(key: "date", ascending: false)
+            requestOverrides.sortDescriptors = [sortOverride]
+            requestOverrides.fetchLimit = 1
+            try? overrideArray = self.coredataContext.fetch(requestOverrides)
 
             if overrideArray.first?.enabled ?? false {
                 let percentString = "\((overrideArray.first?.percentage ?? 100).formatted(.number)) %"
                 self.state.override = percentString
+
             } else {
                 self.state.override = "100 %"
             }
 
-            if useNewCalc {
-                self.state.deltaBG = self.getDeltaBG(readings)
-                self.state.bolusRecommended = self.roundBolus(max(self.roundBolus(max(self.newBolusCalc(delta: readings), 0)), 0))
-            } else {
-                self.state.bolusRecommended = 0
-            }
-
             self.sendState()
         }
-    }
-
-    private func getDeltaBG(_ glucose: [Readings]) -> Decimal? {
-        guard let lastGlucose = glucose.first, glucose.count >= 4 else { return nil }
-        return Decimal(lastGlucose.glucose + glucose[1].glucose) / 2 -
-            (Decimal(glucose[3].glucose + glucose[2].glucose) / 2)
-    }
-
-    private func roundBolus(_ amount: Decimal) -> Decimal {
-        // Account for increments (don't use the APSManager function as that gets too slow)
-        let bolusIncrement = settingsManager.preferences.bolusIncrement
-        return Decimal(round(Double(amount / bolusIncrement))) * bolusIncrement
     }
 
     private func sendState() {
@@ -200,25 +149,26 @@ final class BaseWatchManager: NSObject, WatchManager, Injectable {
         }
     }
 
-    private func glucoseText(_ glucose: [Readings]) -> (glucose: String, trend: String, delta: String) {
-        let glucoseValue = glucose.first?.glucose ?? 0
+    private func glucoseText() -> (glucose: String, trend: String, delta: String) {
+        let glucose = glucoseStorage.recent()
 
-        guard !glucose.isEmpty else { return ("--", "--", "--") }
+        guard let lastGlucose = glucose.last, let glucoseValue = lastGlucose.glucose else { return ("--", "--", "--") }
 
-        let delta = glucose.count >= 2 ? glucoseValue - glucose[1].glucose : nil
+        let delta = glucose.count >= 2 ? glucoseValue - (glucose[glucose.count - 2].glucose ?? 0) : nil
 
         let units = settingsManager.settings.units
         let glucoseText = glucoseFormatter
             .string(from: Double(
-                units == .mmolL ? Decimal(glucoseValue).asMmolL : Decimal(glucoseValue)
+                units == .mmolL ? glucoseValue
+                    .asMmolL : Decimal(glucoseValue)
             ) as NSNumber)!
-
-        let directionText = glucose.first?.direction ?? "↔︎"
+        let directionText = lastGlucose.direction?.symbol ?? "↔︎"
         let deltaText = delta
             .map {
                 self.deltaFormatter
                     .string(from: Double(
-                        units == .mmolL ? Decimal($0).asMmolL : Decimal($0)
+                        units == .mmolL ? $0
+                            .asMmolL : Decimal($0)
                     ) as NSNumber)!
             } ?? "--"
 
@@ -242,7 +192,7 @@ final class BaseWatchManager: NSObject, WatchManager, Injectable {
         return description
     }
 
-    private func eventualBGString() -> String? {
+    private func evetualBGStraing() -> String? {
         guard let eventualBG = suggestion?.eventualBG else {
             return nil
         }
@@ -252,132 +202,14 @@ final class BaseWatchManager: NSObject, WatchManager, Injectable {
         )!
     }
 
-    private func convertTrendToDirectionText(trend: String) -> String {
-        switch trend {
-        case "↑↑↑":
-            return Direction.tripleUp.rawValue
-        case "↑↑":
-            return Direction.doubleUp.rawValue
-        case "↑":
-            return Direction.singleUp.rawValue
-        case "↗︎":
-            return Direction.fortyFiveUp.rawValue
-        case "→":
-            return Direction.flat.rawValue
-        case "↘︎":
-            return Direction.fortyFiveDown.rawValue
-        case "↓":
-            return Direction.singleDown.rawValue
-        case "↓↓↓":
-            return Direction.tripleDown.rawValue
-        case "↓↓":
-            return Direction.doubleDown.rawValue
-        default:
-            return Direction.notComputable.rawValue
+    private func isfString() -> String? {
+        guard let isfValue = suggestion?.isf else {
+            return nil
         }
-    }
-
-    private func newBolusCalc(delta: [Readings]) -> Decimal {
-        var conversion: Decimal = 1
-        // Settings etc
-        if settingsManager.settings.units == .mmolL {
-            conversion = 0.0555
-        }
-        let useEventual = settingsManager.settings.eventualBG
-        let useMinPredBG = settingsManager.settings.minumimPrediction
-        let isf = state.isf ?? 15
-        let target = state.target ?? 100
-        let carbRatio = state.carbRatio ?? 30
-        let deltaBG = getDeltaBG(delta) ?? 0
-        let eventualGlucose = (state.eventualGlucose ?? 0) * conversion
-
-        let currentGlucose = delta.first != nil ? (delta.first?.glucose ?? 0) : 0
-        let fraction = settingsManager.settings.overrideFactor
-        let minPredBG = state.minPredBG ?? 0
-
-        var threshold = settingsManager.preferences.threshold_setting
-        threshold = max(target - 0.5 * (target - 40 * conversion), threshold * conversion)
-        let bg = Decimal(delta.first?.glucose ?? 0) * conversion
-
-        var targetDifferenceInsulin: Decimal = 0
-
-        var insulinCalculated: Decimal = 0
-        var insulin: Decimal = 0 // Oref0
-        var wholeCalc: Decimal = 0
-
-        // Use either the eventual glucose prediction or just the Swift code
-        if useEventual {
-            if eventualGlucose > target {
-                // Use Oref0 predictions{
-                insulin = (eventualGlucose - target) / isf
-            } else { insulin = 0 }
-        } else {
-            let targetDifference = bg - target
-            targetDifferenceInsulin = isf == 0 ? 0 : targetDifference / isf
-        }
-
-        // more or less insulin because of bg trend in the last 15 minutes
-        let fifteenMinInsulin = isf == 0 ? 0 : (deltaBG * conversion) / isf
-
-        let cob = state.cob ?? 0
-        let iob = state.iob ?? 0
-        let maxBolus = settingsManager.pumpSettings.maxBolus
-
-        // determine whole COB for which we want to dose insulin for and then determine insulin for wholeCOB
-        let wholeCobInsulin = carbRatio != 0 ? cob / carbRatio : 0
-
-        // determine how much the calculator reduces/ increases the bolus because of IOB
-        let iobInsulinReduction = (-1) * iob
-
-        // adding everything together
-        if deltaBG != 0 {
-            wholeCalc = (targetDifferenceInsulin + iobInsulinReduction + wholeCobInsulin + fifteenMinInsulin)
-        } else {
-            if currentGlucose == 0 {
-                wholeCalc = (iobInsulinReduction + wholeCobInsulin)
-            } else {
-                wholeCalc = (targetDifferenceInsulin + iobInsulinReduction + wholeCobInsulin)
-            }
-        }
-
-        // apply custom factor at the end of the calculations
-        insulinCalculated = !useEventual ? wholeCalc * fraction : insulin * fraction
-
-        // A blend of Oref0 predictions and the Swift calculator {
-        if useMinPredBG, minPredBG < threshold {
-            if useEventual { insulinCalculated = 0 }
-            return 0
-        }
-
-        // Account for increments (Don't use the apsManager function as that gets much too slow)
-        insulinCalculated = roundBolus(insulinCalculated)
-        // 0 up to maxBolus
-        insulinCalculated = min(max(insulinCalculated, 0), maxBolus)
-        return insulinCalculated
-    }
-
-    private func description(_ preset: OverridePresets) -> String {
-        let rawtarget = (preset.target ?? 0) as Decimal
-
-        let targetValue = settingsManager.settings.units == .mmolL ? rawtarget.asMmolL : rawtarget
-        let target: String = rawtarget > 6 ? glucoseFormatter.string(from: targetValue as NSNumber) ?? "" : ""
-
-        let percentage = preset.percentage != 100 ? preset.percentage.formatted() + "%" : ""
-        let string = (preset.target ?? 0) as Decimal > 6 && !percentage.isEmpty ? target + " " + settingsManager.settings.units
-            .rawValue + ", " + percentage : target + percentage
-        return string
-    }
-
-    private func description(_ override: Override) -> String {
-        let rawtarget = (override.target ?? 0) as Decimal
-
-        let targetValue = settingsManager.settings.units == .mmolL ? rawtarget.asMmolL : rawtarget
-        let target: String = rawtarget > 6 ? glucoseFormatter.string(from: targetValue as NSNumber) ?? "" : ""
-
-        let percentage = override.percentage != 100 ? override.percentage.formatted() + "%" : ""
-        let string = (override.target ?? 0) as Decimal > 6 && !percentage.isEmpty ? target + " " + settingsManager.settings.units
-            .rawValue + ", " + percentage : target + percentage
-        return string
+        let units = settingsManager.settings.units
+        return glucoseFormatter.string(
+            from: units == .mmolL ? isfValue.asMmolL as NSNumber : isfValue as NSNumber
+        )
     }
 
     private var glucoseFormatter: NumberFormatter {
@@ -395,7 +227,7 @@ final class BaseWatchManager: NSObject, WatchManager, Injectable {
     private var eventualFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 2
+        formatter.maximumFractionDigits = 1
         return formatter
     }
 
@@ -453,8 +285,7 @@ extension BaseWatchManager: WCSessionDelegate {
             carbsStorage.storeCarbs(
                 [CarbsEntry(
                     id: UUID().uuidString,
-                    createdAt: Date(),
-                    actualDate: nil,
+                    createdAt: Date.now,
                     carbs: Decimal(carbs),
                     fat: Decimal(fat),
                     protein: Decimal(protein), note: nil,
@@ -495,46 +326,6 @@ extension BaseWatchManager: WCSessionDelegate {
                 )
                 tempTargetsStorage.storeTempTargets([entry])
                 replyHandler(["confirmation": true])
-                return
-            }
-        }
-
-        if let overrideID = message["override"] as? String {
-            let storage = OverrideStorage()
-            if let preset = storage.fetchProfiles().first(where: { $0.id == overrideID }) {
-                preset.date = Date.now
-
-                // Cancel eventual current active override first
-                if let activeOveride = storage.fetchLatestOverride().first, activeOveride.enabled {
-                    let name = storage.isPresetName()
-
-                    if let duration = storage.cancelProfile() {
-                        let presetName = preset.name
-                        let nsString = name != nil ? name! : activeOveride.percentage.formatted()
-                        nightscout.editOverride(nsString, duration, activeOveride.date ?? Date())
-                    }
-                }
-                // Activate the new override and uplad the new ovderride to NS. Some duplicate code now.
-                storage.overrideFromPreset(preset)
-                nightscout.uploadOverride(
-                    preset.name ?? "",
-                    Double(preset.duration ?? 0),
-                    storage.fetchLatestOverride().first?.date ?? Date.now
-                )
-                replyHandler(["confirmation": true])
-                configureState()
-                return
-            } else if overrideID == "cancel" {
-                if let activeOveride = storage.fetchLatestOverride().first, activeOveride.enabled {
-                    let presetName = storage.isPresetName()
-                    let nsString = presetName != nil ? presetName : activeOveride.percentage.formatted()
-
-                    if let duration = storage.cancelProfile() {
-                        nightscout.editOverride(nsString!, duration, activeOveride.date ?? Date.now)
-                        replyHandler(["confirmation": true])
-                        configureState()
-                    }
-                }
                 return
             }
         }

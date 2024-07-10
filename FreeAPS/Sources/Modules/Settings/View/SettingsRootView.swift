@@ -1,4 +1,6 @@
 import HealthKit
+import LoopKit
+import LoopKitUI
 import SwiftUI
 import Swinject
 
@@ -7,44 +9,16 @@ extension Settings {
         let resolver: Resolver
         @StateObject var state = StateModel()
         @State private var showShareSheet = false
-
-        @FetchRequest(
-            entity: VNr.entity(),
-            sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)], predicate: NSPredicate(
-                format: "nr != %@", "" as String
-            )
-        ) var fetchedVersionNumber: FetchedResults<VNr>
+        @StateObject private var viewModel = SettingsRootViewModel()
 
         var body: some View {
             Form {
                 Section {
                     Toggle("Closed loop", isOn: $state.closedLoop)
-                }
-                header: {
-                    VStack(alignment: .leading) {
-                        if let expirationDate = Bundle.main.profileExpiration {
-                            Text(
-                                "iAPS v\(state.versionNumber) (\(state.buildNumber))\nBranch: \(state.branch) \(state.copyrightNotice)" +
-                                    "\nBuild Expires: " + expirationDate
-                            ).textCase(nil)
-                        } else {
-                            Text(
-                                "iAPS v\(state.versionNumber) (\(state.buildNumber))\nBranch: \(state.branch) \(state.copyrightNotice)"
-                            )
-                        }
-
-                        if let latest = fetchedVersionNumber.first,
-                           ((latest.nr ?? "") > state.versionNumber) ||
-                           ((latest.nr ?? "") < state.versionNumber && (latest.dev ?? "") > state.versionNumber)
-                        {
-                            Text(
-                                "Latest version on GitHub: " +
-                                    ((latest.nr ?? "") < state.versionNumber ? (latest.dev ?? "") : (latest.nr ?? "")) + "\n"
-                            )
-                            .foregroundStyle(.orange).bold()
-                            .multilineTextAlignment(.leading)
-                        }
-                    }
+                } header: {
+                    Text(
+                        "Trio v\(state.versionNumber) (\(state.buildNumber))\nBranch: \(state.branch)\n\(state.copyrightNotice) "
+                    ).textCase(nil)
                 }
 
                 Section {
@@ -54,35 +28,39 @@ extension Settings {
                 } header: { Text("Devices") }
 
                 Section {
+                    Text("oref").navigationLink(to: .preferencesEditor, from: self)
+                    Text("autoISF").navigationLink(to: .autoISFConf, from: self)
+                    Text("AIMI B30").navigationLink(to: .B30Conf, from: self)
+                    Text("Ketoacidosis Protection").navigationLink(to: .KetoConfig, from: self)
+//                    Text("Dynamic ISF").navigationLink(to: .dynamicISF, from: self)
+                    Text("Autotune").navigationLink(to: .autotuneConfig, from: self)
+                } header: { Text("Algorithm") }
+
+                Section {
+                    Text("UI/UX Settings").navigationLink(to: .statisticsConfig, from: self)
                     Text("Nightscout").navigationLink(to: .nighscoutConfig, from: self)
+                    NavigationLink(destination: TidepoolStartView(state: state)) {
+                        Text("Tidepool")
+                    }
                     if HKHealthStore.isHealthDataAvailable() {
                         Text("Apple Health").navigationLink(to: .healthkit, from: self)
                     }
                     Text("Notifications").navigationLink(to: .notificationsConfig, from: self)
+                    Text("App Icons").navigationLink(to: .iconConfig, from: self)
+                    Text("Statistics and Home View").navigationLink(to: .statisticsConfig, from: self)
+                    Text("Shortcuts", tableName: "ShortcutsDetail").navigationLink(to: .shortcutsConfig, from: self)
                 } header: { Text("Services") }
 
                 Section {
+//                    Text("Preferences").navigationLink(to: .preferencesEditor, from: self)   // is done in oref under Algorithm
                     Text("Pump Settings").navigationLink(to: .pumpSettingsEditor, from: self)
+                    Text("Meal Settings").navigationLink(to: .fpuConfig, from: self)
                     Text("Basal Profile").navigationLink(to: .basalProfileEditor, from: self)
                     Text("Insulin Sensitivities").navigationLink(to: .isfEditor, from: self)
                     Text("Carb Ratios").navigationLink(to: .crEditor, from: self)
                     Text("Target Glucose").navigationLink(to: .targetsEditor, from: self)
-                } header: { Text("Configuration") }
-
-                Section {
-                    Text("OpenAPS").navigationLink(to: .preferencesEditor, from: self)
                     Text("Autotune").navigationLink(to: .autotuneConfig, from: self)
-                } header: { Text("OpenAPS") }
-
-                Section {
-                    Text("UI/UX").navigationLink(to: .statisticsConfig, from: self)
-                    Text("App Icons").navigationLink(to: .iconConfig, from: self)
-                    Text("Bolus Calculator").navigationLink(to: .bolusCalculatorConfig, from: self)
-                    Text("Fat And Protein Conversion").navigationLink(to: .fpuConfig, from: self)
-                    Text("Dynamic ISF").navigationLink(to: .dynamicISF, from: self)
-                    Text("Sharing").navigationLink(to: .sharing, from: self)
-                    Text("Contact Image").navigationLink(to: .contactTrick, from: self)
-                } header: { Text("Extra Features") }
+                } header: { Text("Configuration") }
 
                 Section {
                     Toggle("Debug options", isOn: $state.debugOptions)
@@ -94,18 +72,16 @@ extension Settings {
                                     .frame(maxWidth: .infinity, alignment: .trailing)
                                     .buttonStyle(.borderedProminent)
                             }
-                            /*
-                             HStack {
-                                 Text("Delete All NS Overrides")
-                                 Button("Delete") { state.deleteOverrides() }
-                                     .frame(maxWidth: .infinity, alignment: .trailing)
-                                     .buttonStyle(.borderedProminent)
-                                     .tint(.red)
-                             }*/
-
-                            HStack {
-                                Toggle("Ignore flat CGM readings", isOn: $state.disableCGMError)
-                            }
+                            // Commenting this out for now, as not needed and possibly dangerous for users to be able to nuke their pump pairing informations via the debug menu
+                            // Leaving it in here, as it may be a handy functionality for further testing or developers.
+                            // See https://github.com/nightscout/Trio/pull/277 for more information
+//
+//                            HStack {
+//                                Text("Delete Stored Pump State Binary Files")
+//                                Button("Delete") { state.resetLoopDocuments() }
+//                                    .frame(maxWidth: .infinity, alignment: .trailing)
+//                                    .buttonStyle(.borderedProminent)
+//                            }
                         }
                         Group {
                             Text("Preferences")
@@ -139,8 +115,6 @@ extension Settings {
                                 .navigationLink(to: .configEditor(file: OpenAPS.FreeAPS.announcements), from: self)
                             Text("Enacted announcements")
                                 .navigationLink(to: .configEditor(file: OpenAPS.FreeAPS.announcementsEnacted), from: self)
-                            Text("Overrides Not Uploaded")
-                                .navigationLink(to: .configEditor(file: OpenAPS.Nightscout.notUploadedOverrides), from: self)
                             Text("Autotune")
                                 .navigationLink(to: .configEditor(file: OpenAPS.Settings.autotune), from: self)
                             Text("Glucose")
@@ -176,11 +150,10 @@ extension Settings {
             .sheet(isPresented: $showShareSheet) {
                 ShareSheet(activityItems: state.logItems())
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .onAppear(perform: configureView)
             .navigationTitle("Settings")
-            .navigationBarItems(trailing: Button("Close", action: state.hideSettingsModal))
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(leading: Button("Close", action: state.hideSettingsModal))
+            .navigationBarTitleDisplayMode(.automatic)
             .onDisappear(perform: { state.uploadProfileAndSettings(false) })
         }
     }

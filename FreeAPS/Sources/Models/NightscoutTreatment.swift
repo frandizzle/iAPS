@@ -1,6 +1,15 @@
 import Foundation
 
-struct NigtscoutTreatment: JSON, Hashable, Equatable {
+func determineBolusEventType(for event: PumpHistoryEvent) -> EventType {
+    if event.isExternalInsulin ?? false {
+        return .nsExternalInsulin
+    } else if event.isSMB ?? false {
+        return .smb
+    }
+    return event.type
+}
+
+struct NightscoutTreatment: JSON, Hashable, Equatable {
     var duration: Int?
     var rawDuration: PumpHistoryEvent?
     var rawRate: PumpHistoryEvent?
@@ -18,17 +27,12 @@ struct NigtscoutTreatment: JSON, Hashable, Equatable {
     var foodType: String?
     let targetTop: Decimal?
     let targetBottom: Decimal?
-    var glucoseType: String?
-    var glucose: String?
-    var units: String?
-    var id: String?
-    var fpuID: String?
 
-    static let local = "iAPS"
+    static let local = "Trio"
 
-    static let empty = NigtscoutTreatment(from: "{}")!
+    static let empty = NightscoutTreatment(from: "{}")!
 
-    static func == (lhs: NigtscoutTreatment, rhs: NigtscoutTreatment) -> Bool {
+    static func == (lhs: NightscoutTreatment, rhs: NightscoutTreatment) -> Bool {
         (lhs.createdAt ?? Date()) == (rhs.createdAt ?? Date())
     }
 
@@ -37,7 +41,7 @@ struct NigtscoutTreatment: JSON, Hashable, Equatable {
     }
 }
 
-extension NigtscoutTreatment {
+extension NightscoutTreatment {
     private enum CodingKeys: String, CodingKey {
         case duration
         case rawDuration = "raw_duration"
@@ -56,10 +60,5 @@ extension NigtscoutTreatment {
         case foodType
         case targetTop
         case targetBottom
-        case glucoseType
-        case glucose
-        case units
-        case id
-        case fpuID
     }
 }

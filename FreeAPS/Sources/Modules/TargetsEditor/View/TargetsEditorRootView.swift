@@ -38,7 +38,6 @@ extension TargetsEditor {
                     .disabled(state.items.isEmpty)
                 }
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .onAppear(perform: configureView)
             .navigationTitle("Target Glucose")
             .navigationBarTitleDisplayMode(.automatic)

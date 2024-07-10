@@ -19,6 +19,4 @@ protocol HomeProvider: Provider {
     func pumpBattery() -> Battery?
     func pumpReservoir() -> Decimal?
     func tempTarget() -> TempTarget?
-    func announcement(_ hours: Int) -> [Announcement]
-    func overrides() -> [Override]
 }

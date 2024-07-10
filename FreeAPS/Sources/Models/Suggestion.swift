@@ -1,13 +1,13 @@
 import Foundation
 
 struct Suggestion: JSON, Equatable {
-    var reason: String
+    let reason: String
     let units: Decimal?
     let insulinReq: Decimal?
     let eventualBG: Int?
     let sensitivityRatio: Decimal?
-    var rate: Decimal?
-    var duration: Int?
+    let rate: Decimal?
+    let duration: Int?
     let iob: Decimal?
     let cob: Decimal?
     var predictions: Predictions?
@@ -16,9 +16,29 @@ struct Suggestion: JSON, Equatable {
     let temp: TempType?
     let bg: Decimal?
     let reservoir: Decimal?
+    let isf: Decimal?
     var timestamp: Date?
     var recieved: Bool?
-    var targetBG: Decimal?
+    let tdd: Decimal?
+    let tddytd: Decimal?
+    let tdd7d: Decimal?
+    var duraISFratio: Decimal?
+    var bgISFratio: Decimal?
+    var deltaISFratio: Decimal?
+    var ppISFratio: Decimal?
+    var acceISFratio: Decimal?
+    var autoISFratio: Decimal?
+    let current_target: Decimal?
+    var tick: Decimal?
+    var SMBratio: Decimal?
+    let insulin: Insulin?
+    let insulinForManualBolus: Decimal?
+    let manualBolusErrorString: Decimal?
+    let minDelta: Decimal?
+    let expectedDelta: Decimal?
+    let minGuardBG: Decimal?
+    let minPredBG: Decimal?
+    let threshold: Decimal?
 }
 
 struct Predictions: JSON, Equatable {
@@ -26,6 +46,13 @@ struct Predictions: JSON, Equatable {
     let zt: [Int]?
     let cob: [Int]?
     let uam: [Int]?
+}
+
+struct Insulin: JSON, Equatable {
+    let TDD: Decimal?
+    let bolus: Decimal?
+    let temp_basal: Decimal?
+    let scheduled_basal: Decimal?
 }
 
 extension Suggestion {
@@ -47,7 +74,27 @@ extension Suggestion {
         case reservoir
         case timestamp
         case recieved
-        case targetBG = "target_bg"
+        case isf = "ISF"
+        case tdd = "TDD"
+        case tddytd = "TDDytd"
+        case tdd7d = "TDD7d"
+        case duraISFratio = "dura_ISFratio"
+        case bgISFratio = "bg_ISFratio"
+        case deltaISFratio = "delta_ISFratio"
+        case ppISFratio = "pp_ISFratio"
+        case acceISFratio = "acce_ISFratio"
+        case autoISFratio = "auto_ISFratio"
+        case current_target
+        case tick
+        case SMBratio
+        case insulin
+        case insulinForManualBolus
+        case manualBolusErrorString
+        case minDelta
+        case expectedDelta
+        case minGuardBG
+        case minPredBG
+        case threshold
     }
 }
 
@@ -57,6 +104,15 @@ extension Predictions {
         case zt = "ZT"
         case cob = "COB"
         case uam = "UAM"
+    }
+}
+
+extension Insulin {
+    private enum CodingKeys: String, CodingKey {
+        case TDD
+        case bolus
+        case temp_basal
+        case scheduled_basal
     }
 }
 

@@ -1,5 +1,4 @@
 import Combine
-import CoreData
 import EventKit
 import Swinject
 
@@ -17,7 +16,6 @@ final class BaseCalendarManager: CalendarManager, Injectable {
     @Injected() private var settingsManager: SettingsManager!
     @Injected() private var broadcaster: Broadcaster!
     @Injected() private var glucoseStorage: GlucoseStorage!
-    @Injected() private var storage: FileStorage!
 
     init(resolver: Resolver) {
         injectServices(resolver)
@@ -25,37 +23,17 @@ final class BaseCalendarManager: CalendarManager, Injectable {
         setupGlucose()
     }
 
-    let coredataContext = CoreDataStack.shared.persistentContainer.newBackgroundContext()
-
     func requestAccessIfNeeded() -> AnyPublisher<Bool, Never> {
         Future { promise in
             let status = EKEventStore.authorizationStatus(for: .event)
             switch status {
             case .notDetermined:
-                #if swift(>=5.9)
-                    if #available(iOS 17.0, *) {
-                        EKEventStore().requestFullAccessToEvents(completion: { (granted: Bool, error: Error?) -> Void in
-                            if let error = error {
-                                warning(.service, "Calendar access not granted", error: error)
-                            }
-                            promise(.success(granted))
-                        })
-                    } else {
-                        EKEventStore().requestAccess(to: .event) { granted, error in
-                            if let error = error {
-                                warning(.service, "Calendar access not granted", error: error)
-                            }
-                            promise(.success(granted))
-                        }
+                EKEventStore().requestAccess(to: .event) { granted, error in
+                    if let error = error {
+                        warning(.service, "Calendar access not granded", error: error)
                     }
-                #else
-                    EKEventStore().requestAccess(to: .event) { granted, error in
-                        if let error = error {
-                            warning(.service, "Calendar access not granted", error: error)
-                        }
-                        promise(.success(granted))
-                    }
-                #endif
+                    promise(.success(granted))
+                }
             case .denied,
                  .restricted:
                 promise(.success(false))
@@ -100,31 +78,6 @@ final class BaseCalendarManager: CalendarManager, Injectable {
         // create an event now
         let event = EKEvent(eventStore: eventStore)
 
-        // Calendar settings
-        let displeyCOBandIOB = settingsManager.settings.displayCalendarIOBandCOB
-        let displayEmojis = settingsManager.settings.displayCalendarEmojis
-
-        // Latest Loop data (from CoreData)
-        var freshLoop: Double = 20
-        var lastLoop = [LastLoop]()
-        if displeyCOBandIOB || displayEmojis {
-            coredataContext.performAndWait {
-                let requestLastLoop = LastLoop.fetchRequest() as NSFetchRequest<LastLoop>
-                let sortLoops = NSSortDescriptor(key: "timestamp", ascending: false)
-                requestLastLoop.sortDescriptors = [sortLoops]
-                requestLastLoop.fetchLimit = 1
-                try? lastLoop = coredataContext.fetch(requestLastLoop)
-            }
-            freshLoop = -1 * (lastLoop.first?.timestamp ?? .distantPast).timeIntervalSinceNow.minutes
-        }
-
-        var glucoseIcon = "🟢"
-        if displayEmojis {
-            glucoseIcon = Double(glucoseValue) <= Double(settingsManager.settings.low) ? "🔴" : glucoseIcon
-            glucoseIcon = Double(glucoseValue) >= Double(settingsManager.settings.high) ? "🟠" : glucoseIcon
-            glucoseIcon = freshLoop > 15 ? "🚫" : glucoseIcon
-        }
-
         let glucoseText = glucoseFormatter
             .string(from: Double(
                 settingsManager.settings.units == .mmolL ?glucoseValue
@@ -137,30 +90,10 @@ final class BaseCalendarManager: CalendarManager, Injectable {
                     .string(from: Double(settingsManager.settings.units == .mmolL ? $0.asMmolL : Decimal($0)) as NSNumber)!
             } ?? "--"
 
-        let iobText = iobFormatter.string(from: (lastLoop.first?.iob ?? 0) as NSNumber) ?? ""
-        let cobText = cobFormatter.string(from: (lastLoop.first?.cob ?? 0) as NSNumber) ?? ""
+        let title = glucoseText + " " + directionText + " " + deltaText
 
-        var glucoseDisplayText = displayEmojis ? glucoseIcon + " " : ""
-        glucoseDisplayText += glucoseText + " " + directionText + " " + deltaText
-
-        var iobDisplayText = ""
-        var cobDisplayText = ""
-
-        if displeyCOBandIOB {
-            if displayEmojis {
-                iobDisplayText += "💉"
-                cobDisplayText += "🥨"
-            } else {
-                iobDisplayText += "IOB:"
-                cobDisplayText += "COB:"
-            }
-            iobDisplayText += " " + iobText
-            cobDisplayText += " " + cobText
-            event.location = iobDisplayText + " " + cobDisplayText
-        }
-
-        event.title = glucoseDisplayText
-        event.notes = "iAPS"
+        event.title = title
+        event.notes = "Trio"
         event.startDate = Date()
         event.endDate = Date(timeIntervalSinceNow: 60 * 10)
         event.calendar = calendar
@@ -213,20 +146,6 @@ final class BaseCalendarManager: CalendarManager, Injectable {
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = 1
         formatter.positivePrefix = "+"
-        return formatter
-    }
-
-    private var iobFormatter: NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 1
-        return formatter
-    }
-
-    private var cobFormatter: NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 0
         return formatter
     }
 

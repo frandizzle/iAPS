@@ -31,7 +31,6 @@ extension ConfigEditor {
                     .sheet(isPresented: $showShareSheet) {
                         ShareSheet(activityItems: [state.provider.urlFor(file: state.file)!])
                     }
-                    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
                     .onAppear {
                         configureView {
                             state.file = file

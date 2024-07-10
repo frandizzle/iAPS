@@ -8,6 +8,7 @@ extension DataTable {
         @Injected() var carbsStorage: CarbsStorage!
         @Injected() var nightscoutManager: NightscoutManager!
         @Injected() var healthkitManager: HealthKitManager!
+        @Injected() var tidepoolManager: TidepoolManager!
 
         func pumpHistory() -> [PumpHistoryEvent] {
             pumpHistoryStorage.recent()
@@ -32,10 +33,27 @@ extension DataTable {
         }
 
         func deleteCarbs(_ treatement: Treatment) {
-            nightscoutManager.deleteCarbs(treatement, complexMeal: false)
+            // need to start with tidepool because Nightscout delete data
+            // probably to revise the logic
+            // TODO:
+            tidepoolManager.deleteCarbs(
+                at: treatement.date,
+                isFPU: treatement.isFPU,
+                fpuID: treatement.fpuID,
+                syncID: treatement.id
+            )
+
+            nightscoutManager.deleteCarbs(
+                at: treatement.date,
+                isFPU: treatement.isFPU,
+                fpuID: treatement.fpuID,
+                syncID: treatement.id
+            )
         }
 
         func deleteInsulin(_ treatement: Treatment) {
+            // delete tidepoolManager before NS - TODO
+            tidepoolManager.deleteInsulin(at: treatement.date)
             nightscoutManager.deleteInsulin(at: treatement.date)
             if let id = treatement.idPumpEvent {
                 healthkitManager.deleteInsulin(syncID: id)
@@ -49,10 +67,6 @@ extension DataTable {
         func deleteGlucose(id: String) {
             glucoseStorage.removeGlucose(ids: [id])
             healthkitManager.deleteGlucose(syncID: id)
-        }
-
-        func deleteManualGlucose(date: Date?) {
-            nightscoutManager.deleteManualGlucose(at: date ?? .distantPast)
         }
     }
 }

@@ -2,9 +2,39 @@ import CoreData
 import Foundation
 
 @available(iOS 16.0,*) final class CarbPresetIntentRequest: BaseIntentsRequest {
-    func addCarbs(_ quantityCarbs: Double, _ quantityFat: Double, _ quantityProtein: Double, _ dateAdded: Date) throws -> String {
+    private var numberFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }
+
+    private var presetCarbsList: [CarbPresetResult] = []
+
+    override init() {
+        super.init()
+        var carbsList = [Presets]()
+        let requestCarbsList = Presets.fetchRequest() as NSFetchRequest<Presets>
+        try? carbsList = coredataContext.fetch(requestCarbsList)
+        presetCarbsList = carbsList.compactMap {
+            CarbPresetResult(
+                id: $0.objectID.uriRepresentation().absoluteString,
+                name: $0.dish ?? "-",
+                carbs: ($0.carbs ?? 0.0) as! Double,
+                fat: ($0.fat ?? 0.0) as! Double,
+                protein: ($0.protein ?? 0.0) as! Double
+            )
+        }
+    }
+
+    func addCarbs(
+        quantityCarbs: Double,
+        quantityFat: Double,
+        quantityProtein: Double,
+        dateAdded: Date
+    ) throws -> LocalizedStringResource {
         guard quantityCarbs >= 0.0 || quantityFat >= 0.0 || quantityProtein >= 0.0 else {
-            return "no carbs or carb equivalents to add"
+            return LocalizedStringResource("no adding carbs", table: "ShortcutsDetail")
         }
 
         let carbs = min(Decimal(quantityCarbs), settingsManager.settings.maxCarbs)
@@ -13,26 +43,37 @@ import Foundation
             [CarbsEntry(
                 id: UUID().uuidString,
                 createdAt: dateAdded,
-                actualDate: dateAdded,
                 carbs: carbs,
                 fat: Decimal(quantityFat),
                 protein: Decimal(quantityProtein),
                 note: "add with shortcuts",
                 enteredBy: CarbsEntry.manual,
-                isFPU: (quantityFat > 0 || quantityProtein > 0) ? true : false,
-                fpuID: (quantityFat > 0 || quantityProtein > 0) ? UUID().uuidString : nil
+                isFPU: false, fpuID: nil
             )]
         )
-        var resultDisplay: String
-        resultDisplay = "\(carbs) g carbs"
-        if quantityFat > 0.0 {
-            resultDisplay = "\(resultDisplay) and \(quantityFat) g fats"
-        }
-        if quantityProtein > 0.0 {
-            resultDisplay = "\(resultDisplay) and \(quantityProtein) g protein"
-        }
         let dateName = dateAdded.formatted()
-        resultDisplay = "\(resultDisplay) added at \(dateName)"
-        return resultDisplay
+        let carbsFormatted = numberFormatter.string(from: carbs as NSNumber) ?? "0"
+        let fatsFormatted = numberFormatter.string(from: quantityFat as NSNumber) ?? "0"
+        let proteinsFormatted = numberFormatter.string(from: quantityProtein as NSNumber) ?? "0"
+        return LocalizedStringResource(
+            " \(carbsFormatted) g carbs and \(fatsFormatted) g fats and \(proteinsFormatted) g proteins added at \(dateName)",
+            table: "ShortcutsDetail"
+        )
+    }
+
+    func listPresetCarbs() async throws -> [CarbPresetResult] {
+        presetCarbsList
+    }
+
+    func listPresetCarbs(_ ids: [String]) async throws -> [CarbPresetResult] {
+        presetCarbsList.filter {
+            ids.contains($0.id)
+        }
+    }
+
+    func getCarbsPresetInfo(presetId: String) async throws -> CarbPresetResult? {
+        presetCarbsList.first {
+            $0.id == presetId
+        }
     }
 }

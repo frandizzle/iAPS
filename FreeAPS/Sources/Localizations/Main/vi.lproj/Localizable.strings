@@ -1,6 +1,6 @@
 /*
   Localizable.strings
-  iAPS
+  Trio
 */
 /* -------------------------------- */
 /* Bolus screen when adding insulin */
@@ -15,12 +15,6 @@
 
 /* Continue after added carbs without bolus */
 "Continue without bolus" = "Tiếp tục và bỏ qua liều bolus";
-
-/* Continue after added meal without bolus */
-"Save Meal without bolus" = "Lưu bữa ăn mà không cần bolus";
-
-/* Predictions and Meal summary part of the Bolus View. */
-"Status" = "Tình trạng";
 
 /* Alert when adding large amount without bolusing */
 "\nAmount is more than your Max Bolus setting! \nAre you sure you want to add " = "\nLiều tiêm nhiều hơn liều Max Bolus! \nBạn có chắc chắn muốn thêm ";
@@ -41,25 +35,10 @@
 "Recommendation" = "LIỀU KHUYẾN NGHỊ";
 
 /* Button */
-"Clear" = "Hủy";
+"Clear" = "Hủy bỏ";
 
 /* Button */
-"Done" = "Xong";
-
-/* Bolus View footer */
-"Last loop %@ minutes ago. Complete or cancel this meal/bolus transaction to allow for next loop cycle to run" = "Vòng lặp gần nhất %@ phút trước. Hoàn thành hoặc hủy giao dịch bữa ăn/bữa ăn nhanh này để cho phép chạy chu kỳ vòng lặp tiếp theo";
-
-/* Calender Option */
-"Display Emojis as Labels" = "Hiển thị biểu tượng cảm xúc";
-
-/* Calender Option */
-"Display IOB and COB" = "Hiển thị IOB và COB";
-
-/* Apple Watch App setting */
-"Confirm Bolus Faster" = "Xác nhận Bolus nhanh";
-
-/* Setting Section */
-"UI/UX" = "Giao diện/Trải nghiệm người dùng";
+"Done" = "Hoàn thành";
 
 /*  */
 "Wait please" = "Xin đợi chốc lát";
@@ -67,23 +46,8 @@
 /*  */
 "Agree and continue" = "Đồng ý và tiếp tục";
 
-/* */
-"Log external insulin" = "Liều insulin tiêm ngoài";
-
 /* Bolus progress view */
 "of" = "của";
-
-/* Remote Bolus Alert, Part 1 */
-"A Remote Bolus " = "Một liều Bolus từ xa ";
-
-/* Remote Bolus Alert, Part 2 */
-"was delivered" = "vừa được hoàn thành";
-
-/* Remote Bolus Alert, Part 3 */
-" minutes ago, triggered remotely from Nightscout, by a caregiver or a parent. Do you still want to bolus?\n\nPredicted eventual glucose, if you don't bolus, is: " = " phút trước, được kích hoạt từ xa từ Nightscout, bởi người chăm sóc hoặc phụ huynh. Bạn vẫn muốn bolus?\n\nDự đoán lượng đường cuối cùng, nếu bạn không bolus, là: ";
-
-/* Remote Bolus Alert, Title */
-"A Remote Bolus Was Just Delivered!" = "Một liều Bolus từ xa vừa được hoàn thành!";
 
 /* Headline in enacted pop up (at: at what time) */
 "Enacted at" = "Thực hiện ở";
@@ -120,9 +84,6 @@
 
 /* For the  Bolus View pop-up */
 "Fatty Meal Factor" = "Chỉ số bữa ăn nhiều chất béo";
-
-/* Footer */
-"Carbs and previous insulin are included in the eventual glucose prediction." = "Carbs và insulin trước đó được đưa vào dự đoán lượng đường cuối cùng.";
 
 /* For the  Bolus View pop-up */
 "Result" = "Kết quả";
@@ -173,7 +134,7 @@
 "Bottom target" = "Mục tiêu dưới cùng";
 
 /* Cancel preset name */
-"Cancel" = "Hủy";
+"Cancel" = "Hủy bỏ";
 
 /*  */
 "Cancel Temp Target" = "Hủy bỏ mục tiêu tạm thời";
@@ -194,7 +155,7 @@
 "Duration" = "Duration";
 
 /*  */
-"Enact Temp Target" = "Hủy bỏ mục tiêu tạm thời";
+"Enact Temp Target" = "Chấp nhận mục tiêu tạm thời";
 
 /* */
 "Target" = "Mục tiêu";
@@ -254,7 +215,7 @@
 "for" = "của";
 
 /*  Temp target set for ... minutes */
-"min" = "min";
+"min" = "phút";
 
 /*  */
 "Autotune" = "Autotune";
@@ -272,7 +233,7 @@
 "Run now" = "Chạy ngay";
 
 /*  */
-"Last run" = "Lần chạy gần nhất";
+"Last run" = "Chạy lần trước";
 
 /*  */
 "Sensitivity" = "Độ nhạy";
@@ -291,6 +252,9 @@
 
 /*  */
 "Save on Pump" = "Lưu vào bơm";
+
+/*  */
+"Saving..." = "Đang lưu...";
 
 /*  */
 "Schedule" = "Lịch trình";
@@ -317,7 +281,7 @@
 "Calculated Sensitivity" = "Độ nhạy được tính toán";
 
 /*  */
-"Insulin Sensitivities" = "Độ nhạy Insulin";
+"Insulin Sensitivities" = "Độ nhạy của Insulin";
 
 /* */
 "Sensitivity Ratio" = "Tỷ lệ độ nhạy";
@@ -337,9 +301,6 @@
 /* Enact
 Enact a temp Basal or a temp target */
 "Enact" = "Chấp nhận";
-
-/* Start a temp target or a profile override */
-"Start" = "Khởi chạy";
 
 /* */
 "Manual Temp Basal" = "Liều cơ bản thủ công";
@@ -363,7 +324,7 @@ Enact a temp Basal or a temp target */
 "Invalid URL" = "URL không xác thực";
 
 /*  */
-"Local glucose source" = "Nguồn Glucose cục bộ";
+"Local glucose source" = "NGUỒN GLUCOSE NỘI TẠI";
 
 /* Header */
 "Nightscout Config" = "Cấu hình Nightscout";
@@ -375,7 +336,7 @@ Enact a temp Basal or a temp target */
 "URL" = "URL";
 
 /**/
-"Use local glucose server" = "Sử dụng nguồn glucose cục bộ";
+"Use local glucose server" = "Sử dụng nguồn glucose nội tại";
 
 /* Enable Statistics */
 "This enables uploading of statistics.json to Nightscout, which can be used by the Community Statistics and Demographics Project.\n\nParticipation in Community Statistics is opt-in, and requires separate registration at:\n" = "Điều này cho phép tải số liệu thống kê lên Nightscout mà có thể được sử dụng bởi Dự án Community Statictics và Demographics. \n\nTham gia vào Thống kê Cộng đồng là tùy chọn và yêu cầu đăng ký riêng tại:\n";
@@ -396,13 +357,10 @@ Enact a temp Basal or a temp target */
 "Skip Bolus screen after carbs" = "Bỏ qua màn hình bolus sau carbs";
 
 /* Allow remote control from NS */
-"Remote control" = "Điều khiển từ xa";
-
-/* Allow remote control from NS */
-"Allow Remote control of iAPS" = "Cho phép điều khiển iAPS từ xa";
+"Remote Control" = "Điều khiển từ xa";
 
 /* Imported Profiles Alert */
-"\nNow please verify all of your new settings thoroughly:\n\n* Basal Settings\n * Carb Ratios\n * Glucose Targets\n * Insulin Sensitivities\n * DIA\n\n in iAPS Settings > Configuration.\n\nBad or invalid profile settings could have disatrous effects." = "\n Bây giờ xin hãy xác minh lại tất cả các cài đặt của bạn kỹ lưỡng:\n\n* Basal Settings\n * Carb Ratios\n * Glucose Targets\n * Insulin Sensitivities\n * DIA\n\n trong iAPS Cài đặt > Cấu hình.\n\n Cấu hình không hợp lệ hoặc tồi có thể có tác động thảm họa.\n.";
+"\nNow please verify all of your new settings thoroughly: \n\n • DIA (Pump settings)\n • Basal Profile\n • Insulin Sensitivities\n • Carb Ratios\n • Target Glucose\n\n in Trio Settings -> Configuration.\n\nBad or invalid profile settings could have disastrous effects." = "\n Bây giờ xin hãy xác minh lại tất cả các cài đặt của bạn kỹ lưỡng:\n\n* Cài đặt liều nền\n * Tỷ lệ Carb\n * Mục tiêu đường huyết \n * Độ nhạy của Insulin\n * Thời gian hoạt động của insulin\n\n trong Trio Cài đặt > Cấu hình.\n\n Cấu hình không hợp lệ hoặc tồi có thể có tác động thảm họa.";
 
 /* Profile Import Alert */
 "This will replace some or all of your current pump settings. Are you sure you want to import profile settings from Nightscout?" = "Việc này có thể thay thế một vài hoặc tất cả những cấu hình bơm hiện tại của bạn. Bạn có chắc bạn muốn nhập cấu hình từ Nightscout?";
@@ -420,25 +378,25 @@ Enact a temp Basal or a temp target */
 "Yes, Import" = "Đồng ý, hãy cập nhật";
 
 /* */
-"Import settings from Nightscout" = "Nhập cấu hình từ Nightscout";
+"Import settings from Nightscout" = "Cập nhật cấu hình từ Nightscout";
 
 /* */
-"Import settings?" = "Nhập các cấu hình?";
+"Import settings?" = "Cập nhật các cấu hình?";
 
 /* */
-"Import from Nightscout" = "Nhập từ Nightscout";
+"Import from Nightscout" = "Cập nhật từ Nightscout";
 
 /* */
-"Settings imported" = "Các cấu hình đã được nhập";
+"Settings imported" = "Các cấu hình đã được cập nhật";
 
 /* Import Error */
-"\nMismatching glucose units in Nightscout and Pump Settings. Import settings aborted." = "\n Đơn vị glucose không khớp trong Cài đặt Nightscout và Pump. Nhập cấu hình bị hủy bỏ.";
+"\nMismatching glucose units in Nightscout and Pump Settings. Import settings aborted." = "\n Sai khác đơn vị Glucose giữa Nightscout và Bơm. Cập nhật cấu hình bị bỏ.";
 
 /* Import Error */
-"Can't find the default Nightscout Profile." = "Không thể tìm thấy Hồ sơ Nightscout mặc định.";
+"Can't find the default Nightscout Profile." = "Không thể tìm thấy Profile Nightscout mặc định.";
 
 /* Add Blood Glucose Test, header */
-"Blood Glucose Test" = "Kiểm tra đường huyết";
+"Blood Glucose Test" = "Xét nghiệm đường huyết";
 
 /* Add Medtronic pump */
 "Add Medtronic" = "Thêm Medtronic";
@@ -449,14 +407,11 @@ Enact a temp Basal or a temp target */
 /* Add Simulator pump */
 "Add Simulator" = "Thêm Bơm mô phỏng";
 
-/* View/Header when pod expired */
-"Replace" = "Thay thế";
-
 /* Insulin model */
 "Model" = "Model";
 
 /*  */
-"Pump config" = "Cấu hình bơm Insulin";
+"Pump config" = "Cấu hình bơm";
 
 /*  */
 "Delivery limits" = "Các giới hạn liều tiêm";
@@ -475,6 +430,30 @@ Enact a temp Basal or a temp target */
 
 /* Max setting */
 "Max Carbs" = "Khối lượng carbs tối đa";
+
+/* Max setting */
+"Max Fat" = "Max Fat";
+
+/* Max setting */
+"Max Protein" = "Max Protein";
+
+/* Max setting */
+"Limit Per Entry" = "Limit Per Entry";
+
+/* Max Carbs limit exceeded */
+"Max Carbs of" = "Max Carbs of";
+
+/* Max Fat limit exceeded */
+"Max Fat of" = "Max Fat of";
+
+/* Max Protein limit exceeded */
+"Max Protein of" = "Max Protein of";
+
+/* Max Bolus limit exceeded */
+"Max Bolus of" = "Max Bolus of";
+
+/* Limit Exceeded label */
+"exceeded" = "exceeded";
 
 /* */
 "Pump Settings" = "Cấu hình bơm";
@@ -531,7 +510,7 @@ Enact a temp Basal or a temp target */
 "Devices" = "Thiết bị";
 
 /*  */
-"Pump" = "Bơm Insulin";
+"Pump" = "Bơm";
 
 /* */
 "Watch" = "Đồng hồ";
@@ -564,7 +543,7 @@ Enact a temp Basal or a temp target */
 "ISF" = "ISF";
 
 /* */
-"The app Garmin Connect must be installed to use for iAPS.\n Go to App Store to download it" = "Phải cài đặt ứng dụng Garmin Connect để sử dụng cho iAPS.\n Hãy truy cập App Store để tải xuống ứng dụng này";
+"The app Garmin Connect must be installed to use for Trio.\n Go to App Store to download it" = "Phải cài đặt ứng dụng Garmin Connect để sử dụng cho Trio.\n Hãy truy cập App Store để tải xuống ứng dụng này";
 
 /* */
 "Garmin is not available" = "Garmin không có sẵn";
@@ -633,10 +612,10 @@ Enact a temp Basal or a temp target */
 "Delete Insulin?" = "Xóa Insulin?";
 
 /* Treatments list */
-"Treatments" = "Đã xử lý";
+"Treatments" = "Phương pháp điều trị";
 
 /* " min" in Treatments list */
-" min" = " min";
+" min" = " phút";
 
 /* */
 "Unable to change anything" = "Không thể thay đổi";
@@ -654,7 +633,7 @@ Enact a temp Basal or a temp target */
 "Create Events in Calendar" = "Tạo sự kiện trong Calendar";
 
 /* */
-"Calendar" = "Lập lịch";
+"Calendar" = "Calendar";
 
 /* Automatic delivered treatments */
 "Automatic" = "Tự động";
@@ -675,7 +654,7 @@ Enact a temp Basal or a temp target */
 "Bluetooth Transmitters" = "Bluetooth Transmitters";
 
 /* */
-"Modes" = "Loại cảm biến";
+"Modes" = "Chế độ cảm biến";
 
 /* Libre 2 Direct */
 "Libre 2 Direct" = "Libre 2 Direct";
@@ -693,7 +672,7 @@ Enact a temp Basal or a temp target */
 "mg/dL" = "mg/dL";
 
 /* */
-"Add calibration" = "Thêm hiệu chuẩn";
+"Add calibration" = "Thêm kết quả hiệu chuẩn";
 
 /* When adding capillary glucose meater reading */
 "Meter glucose" = "Máy đo đường huyết";
@@ -714,7 +693,7 @@ Enact a temp Basal or a temp target */
 "Remove" = "Loại bỏ";
 
 /* */
-"Remove Last" = "Loại bỏ mục gần nhất";
+"Remove Last" = "Loại bỏ mục sau cùng";
 
 /* */
 "Remove All" = "Loại bỏ tất cả";
@@ -810,13 +789,13 @@ Enact a temp Basal or a temp target */
 "Detected sensor seems not to be a libre 1 sensor!" = "Cảm biến được phát hiện không phải là cảm biến libre 1!";
 
 /* Detected sensor is invalid: %@ */
-"Detected sensor is invalid: %@" = "Phát hiện cảm biến không hợp lệ: %@";
+"Detected sensor is invalid: %@" = "Cảm biến được phát hiện không hợp lệ: %@";
 
 /* Low Battery */
 "Low battery" = "Pin yếu";
 
 /* */
-"Invalid sensor" = "Cảm biến không hợp lệ";
+"Invalid sensor" = "Lỗi nhập không hợp lệ";
 
 /* */
 "Sensor change" = "Thay đổi cảm biến";
@@ -843,7 +822,7 @@ Enact a temp Basal or a temp target */
 "Snooze Alerts" = "Báo lại cảnh báo";
 
 /* */
-"Last measurement" = "Lần đo gần nhất";
+"Last measurement" = "Lần đo cuối cùng";
 
 /* */
 "Sensor Footer checksum" = "Tổng kiểm tra cảm biến";
@@ -858,7 +837,7 @@ Enact a temp Basal or a temp target */
 "Sensor Info" = "Thông tin cảm biến";
 
 /* */
-"Sensor Age" = "Thời gian sử dụng cảm biến";
+"Sensor Age" = "Thời gian sử dụng sensor";
 
 /* */
 "Sensor Age Left" = "Thời gian còn lại của cảm biến";
@@ -897,10 +876,10 @@ Enact a temp Basal or a temp target */
 "Valid for footer" = "Hợp lệ";
 
 /* */
-"Edit calibrations" = "Chỉnh sửa hiệu chuẩn";
+"Edit calibrations" = "Thêm kết quả hiệu chuẩn";
 
 /* */
-"edit calibration clicked" = "nhấp vào để chỉnh sửa hiệu chuẩn";
+"edit calibration clicked" = "Nhấp vào để hiệu chuẩn";
 
 /* */
 "Delete CGM" = "Xóa CGM";
@@ -939,13 +918,13 @@ Enact a temp Basal or a temp target */
 "Saved to %@" = "Đã lưu vào %@";
 
 /* */
-"No logs available" = "Không có nhật ký nào";
+"No logs available" = "Không có nhật ký";
 
 /* */
 "Glucose Notification visibility" = "Khả năng hiển thị thông báo Glucose";
 
 /* */
-"Always Notify Glucose" = "Luôn thông báo đường huyết";
+"Always Notify Glucose" = "Luôn thông báo Glucose";
 
 /* */
 "Notify per reading" = "Thông báo cho mỗi lần đọc";
@@ -957,7 +936,7 @@ Enact a temp Basal or a temp target */
 "Adds Phone Battery" = "Hãy sạc Pin điện thoại";
 
 /* */
-"Adds Transmitter Battery" = "Hãy sạc Pin Transmitter";
+"Adds Transmitter Battery" = "Hãy sạc Pin của Transmitter";
 
 /* */
 "Also vibrate" = "Rung";
@@ -972,82 +951,13 @@ Enact a temp Basal or a temp target */
 "Unit override" = "Đơn vị ghi đè";
 
 /* */
-"Low" = "Thấp";
+"Low" = "Low";
 
 /* */
-"High" = "Cao";
-
-/* TIR Chart */
-"Very High" = "Quá cao";
-
-/* TIR Chart */
-"Very Low" = "Quá thấp";
+"High" = "High";
 
 /* */
 "glucose" = "đường huyết";
-
-/* Bolus shortcut */
-"Enter a Bolus Amount" = "Nhập số lượng Bolus";
-
-/* Bolus shortcut */
-"Your current glucose is %@. Are you sure you want to bolus %@ U of insulin?" = "Glucose hiện tại của bạn là %@. Bạn có chắc chắn muốn tiêm %@U insulin không?";
-
-/* Bolus shortcut */
-"A bolus command of " = "Một lệnh bolus của ";
-
-/* Bolus shortcut */
-" U of insulin was sent to iAPS. Verify in iAPS app or in Nightscout if the bolus was delivered." = " U insulin đã được gửi đến iAPS. Xác minh trong ứng dụng iAPS hoặc trong Nightscout xem bolus đã được phân phối hay chưa.";
-
-/* Bolus shortcut. Error */
-"too small bolus amount" = "lượng bolus quá nhỏ";
-
-/* Bolus shortcut. Error */
-"Bolus Shortcuts are disabled in iAPS settings" = "Phím tắt Bolus bị vô hiệu hóa trong cài đặt iAPS";
-
-/* Bolus shortcut */
-"Bolus Amount in U" = "Lượng Bolus tính bằng U";
-
-/* Bolus shortcut. Setting */
-"Allow iOS Bolus Shortcuts" = "Cho phép phím tắt Bolus của iOS";
-
-/* Bolus shortcut setting. Header */
-"iOS Shortcuts" = "Phím tắt iOS";
-
-/* Bolus shortcut. Pop-up */
-"If you enable this setting you will be able to use iOS shortcuts and its automations to trigger a bolus in iAPS.\n\nObserve that the iOS shortuts also works with Siri!\n\nIf you need to use Bolus Shorcuts, please make sure to turn off the listen for 'Hey Siri' setting in iPhone Siri settings, to avoid any inadvertant activaton of a bolus with Siri.\nIf you don't disable 'Hey Siri' the iAPS bolus shortcut can be triggered with the utterance 'Hey Siri, iAPS Bolus'.\n\nWhen triggered with Siri you will be asked for an amount and a confirmation before the bolus command can be sent to iAPS." = "Nếu bật cài đặt này, bạn sẽ có thể sử dụng các phím tắt iOS và tính năng tự động hóa của nó để kích hoạt bolus trong iAPS.\n\nLưu ý rằng các phím tắt iOS cũng hoạt động với Siri!\n\nNếu bạn cần sử dụng Phím tắt Bolus, hãy đảm bảo để tắt cài đặt nghe 'Hey Siri' trong cài đặt Siri của iPhone, để tránh bất kỳ sự kích hoạt vô ý nào của bolus với Siri.\nNếu bạn không tắt 'Hey Siri' thì phím tắt bolus iAPS có thể được kích hoạt bằng câu nói 'Hey Siri, iAPS Bolus'.\n\nKhi được kích hoạt bằng Siri, bạn sẽ được yêu cầu cung cấp số lượng và xác nhận trước khi lệnh truyền nhanh có thể được gửi tới iAPS.";
-
-/* Bolus shortcut. Setting */
-"Max allowed bolus amount using shortcuts " = "Lượng bolus tối đa được phép sử dụng phím tắt ";
-
-/* Bolus shortcut. Error */
-"not available" = "không có sẵn";
-
-/* Override Shortcut */
-"Activate an Override Preset" = "Kích hoạt cài đặt trước ghi đè";
-
-/* Override Shortcut */
-"Allow to activate an overrride preset." = "Cho phép kích hoạt cài đặt trước ghi đè.";
-
-/* Override Shortcut */
-"Which override preset would you like to activate?" = "Bạn muốn kích hoạt cài đặt trước ghi đè nào?";
-
-/* Override Shortcut */
-"Are you sure you want to activate the Override Preset %@?" = "Bạn có chắc chắn muốn kích hoạt Ghi đè cài sẵn %@ không?";
-
-/* Override Shortcut */
-"The Profile Override" = "Hồ sơ ghi đè";
-
-/* Override Shortcut */
-"is now activated" = "hiện đã được kích hoạt";
-
-/* Override Shortcut */
-"Cancel active override" = "Hủy bỏ ghi đè đang hoạt động";
-
-/* Override Shortcut */
-"Override canceled" = "Đã hủy ghi đè";
-
-/* Override Shortcut */
-"Activates an %@ Override Preset" = "Kích hoạt %@ cài đặt sẵn ghi đè";
 
 /* */
 "Schedule " = "Lịch trình ";
@@ -1149,13 +1059,13 @@ Enact a temp Basal or a temp target */
 "To prevent LOW required %d g of carbs" = "Để hạn chế LOW yêu cầu %d g carbs";
 
 /* */
-"iAPS not active" = "iAPS chưa hoạt động";
+"Trio Not Active" = "Trio chưa hoạt động";
 
 /* */
 "Last loop was more than %d min ago" = "Loop dừng hoạt động hơn %d phút trước";
 
 /* Glucose badge */
-"Show glucose on the app badge" = "Thể hiện đường huyết lên trên iAPS";
+"Show glucose on the app badge" = "Thể hiện đường huyết lên trên Trio";
 
 /* */
 "Backfill glucose" = "Bổ sung glucose";
@@ -1165,9 +1075,6 @@ Enact a temp Basal or a temp target */
 
 /* */
 "Bolus failed" = "Liều bolus thất bại";
-
-/* "Max Bolus Exceeded label" */
-"Max Bolus exceeded!" = "Đã vượt quá liều Bolus tối đa!";
 
 /* */
 "Bolus failed or inaccurate. Check pump history before repeating." = "Liều bolus thất bại hoặc không chính xác. Kiểm tra lại bơm trước khi lặp lại.";
@@ -1179,7 +1086,7 @@ Enact a temp Basal or a temp target */
 "Note" = "Lưu ý";
 
 /* */
-"Temp Basal" = "Temp Basal";
+"Temp Basal" = "Liều cơ bản tạm thời";
 
 /* */
 "Temp Target" = "Mục tiêu tạm thời";
@@ -1191,7 +1098,7 @@ Enact a temp Basal or a temp target */
 "Suspend" = "Đã tạm ngưng";
 
 /* */
-"Animated Background" = "Nền màn hình động";
+"Animated Background" = "Animated Background";
 
 /* Sensor day(s) */
 " day(s)" = " ngày(s)";
@@ -1201,7 +1108,7 @@ Enact a temp Basal or a temp target */
 
 
 /* Headers for settings ----------------------- */
-"OpenAPS main settings" = "Cài đặt chính OpenAPS";
+"OpenAPS main settings" = "Cài đặt chính của OpenAPS";
 
 "OpenAPS SMB settings" = "Cài đặt SMB OpenAPS";
 
@@ -1237,13 +1144,7 @@ Enact a temp Basal or a temp target */
 "Direct connection with Libre 1 transmitters or European Libre 2 sensors" = "Kết nối trực tiếp với bộ phát Libre 1 hoặc cảm biến Libre 2 của Châu Âu";
 
 /* Online or internal server */
-"Online or internal server" = "Trực tuyến hoặc máy chủ nội bộ";
-
-/* Pump Error Message */
-"Can't enact the new loop cycle recommendation, because a Bolus is in progress. Wait for next loop cycle" = "Không thể thực hiện đề xuất chu kỳ vòng lặp mới vì đang tiến hành một đợt Bolus. Đợi chu kỳ vòng lặp tiếp theo";
-
-/* Pump Error */
-"Error: Pump is Busy." = "Lỗi: Máy bơm đang bận.";
+"Online or internal server" = "Máy chủ trực tuyến hoặc nội bộ";
 
 /* -------------- Developer settings ---------------------- */
 /* Debug options */
@@ -1254,7 +1155,7 @@ Enact a temp Basal or a temp target */
 "NS Upload Profile" = "Tải hồ sơ lên NS";
 
 /* Debug option view NS Uploaded Profile */
-"NS Uploaded Profile" = "Đã tải hồ sơ lên NS";
+"NS Uploaded Profile" = "Hồ sơ đã tải lên NS";
 
 /* Debug option view Autosense */
 "Autosense" = "Autosense";
@@ -1263,7 +1164,7 @@ Enact a temp Basal or a temp target */
 "Dynamic Sensitivity" = "Độ nhạy động";
 
 /* Autotune config */
-"Only Autotune Basal Insulin" = "Chỉ Autotune Insulin liều nền";
+"Only Autotune Basal Insulin" = "Chỉ Autotune Insulin cơ bản";
 
 /* */
 "Save as your Normal Basal Rates" = "Lưu như liều nền của bạn";
@@ -1321,7 +1222,7 @@ Enact a temp Basal or a temp target */
 "For write data to Apple Health you must give permissions in Settings > Health > Data Access" = "Để ghi dữ liệu vào Apple Health, bạn phải cấp quyền trong Cài đặt > Sức khỏe > Truy cập dữ liệu";
 
 /* */
-"This allows iAPS to read from and write to Apple Heath. You must also give permissions in Settings > Health > Data Access. If you enter a glucose value into Apple Health, open iAPS to confirm it shows up." = "Điều này cho phép iAPS đọc và ghi vào Apple Heath. Bạn cũng phải cấp quyền trong Cài đặt > Sức khỏe > Truy cập dữ liệu. Nếu bạn nhập giá trị glucose vào Apple Health, hãy mở iAPS để xác nhận giá trị đó hiển thị.";
+"This allows Trio to read from and write to Apple Heath. You must also give permissions in Settings > Health > Data Access. If you enter a glucose value into Apple Health, open Trio to confirm it shows up." = "Điều này cho phép Trio đọc và ghi vào Apple Heath. Bạn cũng phải cấp quyền trong Cài đặt > Sức khỏe > Truy cập dữ liệu. Nếu bạn nhập giá trị glucose vào Apple Health, hãy mở Trio để xác nhận giá trị đó hiển thị.";
 
 /* New ALerts ------------------------- */
 /* Info title */
@@ -1337,7 +1238,7 @@ Enact a temp Basal or a temp target */
 "Manual" = "Thủ công";
 
 /* An Automatic delivered bolus (SMB) */
-"SMB" = "SMB";
+"SMB" = "Liều tiêm tự động (SMB)";
 
 /* A manually entered dose of external insulin */
 "External Insulin" = "Liều insulin tiêm ngoài";
@@ -1360,7 +1261,7 @@ Enact a temp Basal or a temp target */
 "Enable" = "Cho phép";
 
 /* Header */
-"Conversion settings" = "Cài đặt chuyển đổi";
+"Fat and Protein Conversion Settings" = "Fat and Protein Conversion Settings";
 
 /* Delay */
 "Delay In Minutes" = "Độ trễ theo phút";
@@ -1377,11 +1278,8 @@ Enact a temp Basal or a temp target */
 /* Description */
 "Allows fat and protein to be converted into future carb equivalents using the Warsaw formula of kilocalories divided by 10.\n\nThis spreads the carb equivilants over a maximum duration setting that can be configured from 5-12 hours.\n\nDelay is time from now until the first future carb entry.\n\nInterval in minutes is how many minutes are between entries. The shorter the interval, the smoother the result. 10, 15, 20, 30, or 60 are reasonable choices.\n\nAdjustment factor is how much effect the fat and protein has on the entries. 1.0 is full effect (original Warsaw Method) and 0.5 is half effect. Note that you may find that your normal carb ratio needs to increase to a larger number if you begin adding fat and protein entries. For this reason, it is best to start with a factor of about 0.5 to ease into it.\n\nDefault settings: Time Cap: 8 h, Interval: 30 min, Factor: 0.5, Delay 60 min" = "Cho phép chuyển đổi chất béo và chất đạm thành lượng carb tương đương trong tương lai bằng cách sử dụng công thức kilocalories chia cho 10 của Warsaw.\n\nĐiều này phân bổ lượng carb tương đương trong cài đặt thời lượng tối đa có thể được định cấu hình từ 5-12 giờ.\n\nĐộ trễ là thời gian từ nay cho đến lần nhập carb đầu tiên trong tương lai.\n\nKhoảng thời gian tính bằng phút là số phút giữa các lần nhập. Khoảng thời gian càng ngắn thì kết quả càng mượt. 10, 15, 20, 30 hoặc 60 là những lựa chọn hợp lý.\n\nHệ số điều chỉnh là mức độ ảnh hưởng của chất béo và chất đạm đối với các mục. 1,0 là hiệu ứng đầy đủ (Phương pháp Warsaw gốc) và 0,5 là một nửa hiệu ứng. Lưu ý rằng bạn có thể thấy rằng tỷ lệ carb bình thường của bạn cần tăng lên một con số lớn hơn nếu bạn bắt đầu bổ sung các mục chất béo và protein. Vì lý do này, tốt nhất bạn nên bắt đầu với hệ số khoảng 0,5 để dễ dàng thực hiện.\n\nCài đặt mặc định: Giới hạn thời gian: 8 giờ, Khoảng thời gian: 30 phút, Hệ số: 0,5, Độ trễ 60 phút";
 
-/* Fat/Protein additional info */
-"\n\nCarb equivalents that get to small (0.6g or under) will be excluded and the equivalents over 0.6 but under 1 will be rounded up to 1. With a higher time interval setting you'll get fewer equivalents with a higher carb amount." = "\n\nSố lượng carb tương đương có giá trị nhỏ (0,6g trở xuống) sẽ bị loại trừ và số lượng carb tương đương trên 0,6 nhưng dưới 1 sẽ được làm tròn thành 1. Với cài đặt khoảng thời gian cao hơn, bạn sẽ nhận được ít lượng carb tương đương hơn với lượng carb cao hơn.";
-
 /* FPU Settings Title */
-"Fat and Protein" = "Chất béo và chất đạm";
+"Fat and Protein" = "Fat and Protein";
 
 /* Display fat and protein entities */
 "Fat & Protein" = "Chất béo & Chất đạm";
@@ -1396,13 +1294,13 @@ Enact a temp Basal or a temp target */
 "Protein" = "Chất đạm";
 
 /* Service Section */
-"Fat And Protein Conversion" = "Chuyển đổi chất béo và chất đạm";
+"Meal Settings" = "Meal Settings";
 
 /* Service Section */
 "Profile Override" = "Mô tả ghi đè";
 
 /* */
-"Override Profiles" = "Cài đặt ghi đè";
+"Override Profiles" = "Chế độ ghi đè";
 
 /* */
 "Normal " = "Bình thường ";
@@ -1413,13 +1311,13 @@ Enact a temp Basal or a temp target */
 "Total Insulin Adjustment" = "Tổng số điều chỉnh Insulin";
 
 /* */
-"Override your Basal, ISF, CR and Target profiles" = "Chồng liều Basal, ISF, CR và mục tiêu";
+"Override your Basal, ISF, CR and Target profiles" = "Ghi đè Basal, ISF, CR và Target của bạn";
 
 /* */
 "Enable indefinitely" = "Kích hoạt vô thời hạn";
 
 /* */
-"Override Profile target" = "Mục tiêu ghi đè";
+"Override Profile target" = "Mục tiêu của ghi đè";
 
 /* */
 "Disable SMBs" = "Vô hiệu hóa SMBs";
@@ -1460,9 +1358,6 @@ Enact a temp Basal or a temp target */
 /* */
 "Save as Profile" = "Lưu profile";
 
-/* */
-"Save as preset" = "Save as preset";
-
 /* Alert */
 "Cancel Profile Override" = "Hủy bỏ ghi đè?";
 
@@ -1497,7 +1392,7 @@ Enact a temp Basal or a temp target */
 "App Icons" = "Biểu tượng ứng dụng";
 
 /* */
-"iAPS Icon" = "biểu tượng iAPS";
+"Trio Icon" = "biểu tượng Trio";
 
 /* Service Section */
 "Statistics and Home View" = "Thống kê và xem";
@@ -1530,22 +1425,13 @@ Enact a temp Basal or a temp target */
 "Save and continue" = "Lưu và tiếp tục";
 
 /* */
-"Save as Preset" = "Lưu cài đặt sẵn";
+"Save as Preset" = "Lưu mẫu cài đặt";
 
 /* */
 "Predictions" = "Dự đoán";
 
 /* Watch Config Option */
 "Display Protein & Fat" = "Hiển thị chất đạm và chất béo";
-
-/* Time of new meal entry */
-"Now" = "Bây giờ";
-
-/* Display future data table entries */
-"Show Future" = "Hiển thị tương lai";
-
-/* Hide future data table entries */
-"Hide Future" = "Ẩn tương lai";
 
 /* ----------------------- New Bolus Calculator ---------------------------*/
 /* Warning about bolus recommendation. Title */
@@ -1586,25 +1472,25 @@ Enact a temp Basal or a temp target */
 "Hide" = "Ẩn";
 
 /* Bolus pop-up / Alert string. Make translations concise! */
-"Eventual Glucose > Target Glucose, but glucose is predicted to drop down to " = "Glucose hiện tại lớn hơn Glucose mục tiêu, nhưng glucose được dự đoán trước tiên sẽ giảm xuống ";
+"Eventual Glucose > Target Glucose, but glucose is predicted to drop down to " = "Glucose hiện tại > Glucose mục tiêu, nhưng glucose được dự đoán trước tiên sẽ giảm xuống ";
 
 /* Bolus pop-up / Alert string. Make translations concise! */
 "which is below your Threshold (" = "nằm dưới Ngưỡng của bạn (";
 
 /* Bolus pop-up / Alert string. Make translations concise! */
-"Eventual Glucose > Target Glucose, but glucose is climbing slower than expected. Expected: " = "Glucose hiện tại lớn hơn Glucose mục tiêu, nhưng Glucose tăng chậm hơn dự kiến. Hy vọng: ";
+"Eventual Glucose > Target Glucose, but glucose is climbing slower than expected. Expected: " = "Glucose hiện tại > Glucose mục tiêu, nhưng glucose tăng chậm hơn dự kiến. Hy vọng: ";
 
 //* Bolus pop-up / Alert string. Make translations concise! */
-". Climbing: " = ". Đang tăng lên: ";
+". Climbing: " = ". Leo: ";
 
 /* Bolus pop-up / Alert string. Make translations concise! */
-"Eventual Glucose > Target Glucose, but glucose is falling faster than expected. Expected: " = "Glucose hiện tại lớn hơn Glucose mục tiêu, nhưng glucose đang giảm nhanh hơn dự kiến. Hy vọng: ";
+"Eventual Glucose > Target Glucose, but glucose is falling faster than expected. Expected: " = "Glucose hiện tại > Glucose mục tiêu, nhưng glucose đang giảm nhanh hơn dự kiến. Hy vọng: ";
 
 /* Bolus pop-up / Alert string. Make translations concise! */
-". Falling: " = ". Đang giảm xuống: ";
+". Falling: " = ". Lao xuóng: ";
 
 /* Bolus pop-up / Alert string. Make translations concise! */
-"Eventual Glucose > Target Glucose, but glucose is changing faster than expected. Expected: " = "Glucose hiện tại lớn hơn Glucose mục tiêu, nhưng glucose đang giảm nhanh hơn dự kiến. Hy vọng: ";
+"Eventual Glucose > Target Glucose, but glucose is changing faster than expected. Expected: " = "Glucose cuối cùng > Glucose mục tiêu, nhưng glucose đang thay đổi nhanh hơn dự kiến. Hy vọng: ";
 
 /* Bolus pop-up / Alert string. Make translations concise! */
 ". Changing: " = ". Đang thay đổi: ";
@@ -1672,7 +1558,7 @@ Enact a temp Basal or a temp target */
 "Expiration Reminder" = "Nhắc nhở hết hạn";
 
 /* */
-"Low Reservoir" = "Sắp hết insulin";
+"Low Reservoir" = "Sắp hết thuốc";
 
 /* Value text for no expiration reminder */
 "No Reminder" = "Không có lời nhắc";
@@ -1681,7 +1567,7 @@ Enact a temp Basal or a temp target */
 "Scheduled Reminder" = "Lịch biểu lời nhắc";
 
 /* */
-"Low Reservoir Reminder" = "Báo nhắc gần hết insulin";
+"Low Reservoir Reminder" = "Báo nhắc gần hết thuốc";
 
 /* The action string on pod status page when pod data is stale */
 "Make sure your phone and pod are close to each other. If communication issues persist, move to a new area." = "Đảm bảo điện thoại và pod được đặt gần nhau. Nếu kết nối vẫn gặp trở ngại, đặt lại chổ khác.";
@@ -1733,10 +1619,10 @@ Enact a temp Basal or a temp target */
 "Check Cannula" = "Kiểm tra Cannula";
 
 /* */
-"Setup Complete" = "Cài đặt hoàn thành";
+"Setup Complete" = "Cấu hình hoàn thành";
 
 /* */
-"Insulin Suspended" = "Đã tạm dừng cấp liều Insulin";
+"Insulin Suspended" = "Insulin Đã tạm ngưng";
 
 /* Text for suspend resume button when insulin delivery is suspending */
 "Suspending insulin delivery..." = "Đang tạm dừng liều insulin...";
@@ -1773,13 +1659,13 @@ Enact a temp Basal or a temp target */
 "Statistics" = "Thống kê";
 
 /* Option in preferences */
-"Allow Upload of Statistics to NS" = "Cho phép tải số liệu thống kê lên NS";
+"Allow Upload of Statistics to NS" = "Cho phép tải thống kê lên NS";
 
 /* Low Glucose Threshold in Statistics settings */
-"Low" = "Thấp";
+"Low" = "Low";
 
 /* High Glucose Threshold in Statistics settings */
-"High" = "Cao";
+"High" = "High";
 
 /* In Range */
 "In Range" = "In Range";
@@ -1819,12 +1705,6 @@ Enact a temp Basal or a temp target */
 
 /* Average BG = */
 "Average" = "Average";
-
-/* TIR Preview Headline */
-"Time In Range" = "Trong phạm vi mục tiêu";
-
-/* Average Loop Interval in minutes */
-"Average Interval" = "Khoảng thời gian trung bình";
 
 /* Median BG */
 "Median" = "Median";
@@ -1878,13 +1758,13 @@ Enact a temp Basal or a temp target */
 "Display SD instead of CV" = "Hiển thị SD thay vì CV";
 
 /* Description for display SD */
-"Display Standard Deviation (SD) instead of Coefficient of Variation (CV) in statPanel" = "Hiển thị Độ lệch chuẩn (SD) thay vì Hệ số biến thiên (CV) trong bảng điều khiển";
+"Display Standard Deviation (SD) instead of Coefficient of Variation (CV) in statPanel" = "Hiển thị Độ lệch chuẩn (SD) thay vì Hệ số biến thiên (CV) trong statPanel";
 
 /* How often to update the statistics */
 "Update every number of minutes:" = "Cập nhật theo từng phút:";
 
 /* Description for update interval for statistics */
-"Default is 20 minutes. How often to update and save the statistics.json and to upload last array, when enabled, to Nightscout." = "Mặc định là 20 phút. Tần suất cập nhật và lưu statistics.json cũng như tải danh sách cuối cùng lên Nightscout khi được bật.";
+"Default is 20 minutes. How often to update and save the statistics.json and to upload last array, when enabled, to Nightscout." = "Mặc định là 20 phút. Tần suất cập nhật và lưu stats.json cũng như tải mảng cuối cùng lên Nightscout khi được bật.";
 
 /* Duration displayed in statPanel */
 "Past 24 Hours " = "Past 24 Hours ";
@@ -1905,10 +1785,10 @@ Enact a temp Basal or a temp target */
 "Display Loop Cycle statistics" = "Hiển thị số liệu thống kê theo vòng tròn";
 
 /* Description for Display Loop statistics */
-"Displays Loop statistics in the statPanel in Home View" = "Hiển thị số liệu thống kê vòng lặp trong bảng điều khiển trong Chế độ xem trang chủ";
+"Displays Loop statistics in the statPanel in Home View" = "Hiển thị số liệu thống kê vòng lặp trong statPanel trong Chế độ xem trang chủ";
 
 /* Description for Override HbA1c unit */
-"Change default HbA1c unit in statPanlel. The unit in statPanel will be updateded with next statistics.json update" = "Thay đổi đơn vị HbA1c mặc định trong bảng điều khiển. Đơn vị trong bảng điều khiển sẽ được cập nhật với bản cập nhật statistics.json tiếp theo";
+"Change default HbA1c unit in statPanlel. The unit in statPanel will be updateded with next statistics.json update" = "Thay đổi đơn vị HbA1c mặc định trong statPanlel. Đơn vị trong statPanel sẽ được cập nhật với bản cập nhật stats.json tiếp theo";
 
 /* HbA1c for all glucose storage days */
 "all" = "Tất cả";
@@ -1928,203 +1808,12 @@ Enact a temp Basal or a temp target */
 /* New Experimental feature */
 "Experimental" = "Thực hiện";
 /* Smoothing of CGM readings */
-"Smooth Glucose Value" = "Làm mịn Glucose";
-/* ------------------------------------------- Sharing -------------------------------------------------------*/
-/* */
+"Smooth Glucose Value" = "Giá trị Glucose mịn";
 
-"Woman" = "Nữ";
+/* -----------------------------------------------------------------------------------------------------------
 
-/* */
-"Man" = "Nam";
-
-/* */
-"Other" = "Khác";
-
-/* */
-"Secret" = "Bí mật";
-
-/* */
-"Birth Date" = "Ngày sinh";
-
-/* */
-"Share all of your Statistics" = "Chia sẻ tất cả số liệu thống kê của bạn";
-
-/* */
-"Just iAPS version number" = "Chỉ phiên bản iAPS";
-
-/* */
-"Share Bare Minimum" = "Chia sẻ ở mức tối thiểu";
-
-/* */
-"Every bit of information you choose to share is uploaded anonymously. To prevent duplicate uploads, the data is identified with a unique random string saved on your phone." = "Mọi thông tin bạn chọn chia sẻ đều được tải lên ẩn danh. Để tránh tải lên trùng lặp, dữ liệu được xác định bằng một chuỗi ngẫu nhiên duy nhất được lưu trên điện thoại của bạn.";
-
-/* */
-"Tap to display" = "Chạm để hiển thị";
-
-/* */
-"Your identifier" = "Mã định danh của bạn";
-
-/* */
-"Share your data anonymously" = "Chia sẻ dữ liệu của bạn ẩn danh";
-
-/* Setting Title */
-"Sharing" = "Chia sẻ";
-
-/* ——————————Contact Image ————————*/
-/* Contact Image, contacts list - prefix before the contact given name */
-
-"Contact" = "Danh bạ";
-
-/* Contact Image, settings, header of the contacts list */
-"Contacts" = "Contacts";
-
-/* Contact Image, settings, save your changes reminedr */
-"Don't forget to save your changes." = "Đừng quên lưu các thay đổi của bạn.";
-
-/* Contact Image, settings, message about need to access contacts */
-"iAPS needs access to your contacts for this feature to work" = "iAPS cần quyền truy cập vào danh bạ của bạn để tính năng này hoạt động";
-
-/* Contact Image, settings, button to grant access to contacts */
-"Grant iAPS access to contacts" = "Cấp quyền truy cập iAPS vào danh bạ";
-
-/* Contact Image, settings, message when access to contacts denied */
-"Access to contacts denied" = "Quyền truy cập vào danh bạ bị từ chối";
-
-/* Contact Image, settings, message when access to contacts restricted */
-"Access to contacts is restricted (parental control?)" = "Quyền truy cập vào danh bạ bị hạn chế (kiểm soát của phụ huynh?)";
-
-/* Contact Image, settings, message when access to contacts is in unknown state */
-"Access to contacts - unknown state" = "Trạng thái không xác định - Quyền truy cập vào danh bạ";
-
-/* Contact Image, settings, short description of the feature */
-"A Contact Image can be used to get live updates from iAPS to your Apple Watch Contact complication and/or your iPhone Contact widget." = "Bạn có thể sử dụng Hình ảnh liên hệ để nhận các bản cập nhật trực tiếp từ iAPS cho tổ hợp Danh bạ trên Apple Watch và/hoặc tiện ích Danh bạ trên iPhone của bạn.";
-
-/* Contact Image, settings, main header */
-"Contact Image" = "Hình ảnh danh bạ";
-
-/* Contact Image, settings, label for the layout picker */
-"Layout" = "Bố cục";
-
-/* Contact Image, settings, single layout name */
-"Single" = "Single";
-
-/* Contact Image, settings, split layout name */
-"Split" = "Split";
-
-/* Contact Image, settings, outer ring - don't show */
-"DontShowRing" = "Không hiển thị";
-
-/* Contact Image, settings, outer ring - Loop status */
-"LoopStatusRing" = "Trạng thái vòng lặp";
-
-/* Contact Image, settings, outer ring - IOB */
-"IOBRing" = "IOB";
-
-/* Contact Image, settings, outer ring - COB */
-"COBRing" = "COB";
-
-/* Contact Image, settings, outer ring - IOB+COB */
-"IOB+COBRing" = "IOB+COB";
-
-/* Contact Image, settings, label for the primary value picker */
-"Primary" = "Primary";
-
-/* Contact Image, settings, label for the top value picker */
-"Top" = "Top";
-
-/* Contact Image, settings, label for the bottom value picker */
-"Bottom" = "Bottom";
-
-/* Contact Image, settings, header for the outer ring section */
-"Ring" = "Ring";
-
-/* Contact Image, settings, label for the outer ring picker */
-"Outer" = "Outer";
-
-/* Contact Image, settings, label for the ring width picker */
-"Width" = "Width";
-
-/* Contact Image, settings, label for the ring gap picker */
-"Gap" = "Gap";
-
-/* Contact Image, settings, header for the font section */
-"Font" = "Font";
-
-/* Contact Image, settings, label for the font size picker */
-"Size" = "Size";
-
-/* Contact Image, settings, label for the secondary font size picker */
-"Secondary size" = "Secondary size";
-
-/* Contact Image, settings, label for the font tracking picker (tracking - horizontal spacing between letters) */
-"Tracking" = "Đang theo dõi";
-
-/* Contact Image, settings, label for the font weight picker */
-"Weight" = "Weight";
-
-/* Contact Image, settings, label for the dark-mode switcher */
-"Dark mode" = "Chế độ tối";
-
-/* Contact Image, settings, tighter font tracking */
-"TighterFontTracking" = "Tighter";
-
-/* Contact Image, settings, tight font tracking */
-"TightFontTracking" = "Tight";
-
-/* Contact Image, settings, normal font tracking */
-"NormalFontTracking" = "Normal";
-
-/* Contact Image, settings, wide font tracking */
-"WideFontTracking" = "Rộng";
-
-/* Contact Image, settings, light font weight */
-"LightFontWeight" = "Phông nền sáng";
-
-/* Contact Image, settings, regular font weight */
-"RegularFontWeight" = "Binh thường";
-
-/* Contact Image, settings, medium font weight */
-"MediumFontWeight" = "Trung bình";
-
-/* Contact Image, settings, semibold font weight */
-"SemiboldFontWeight" = "Đậm nhẹ";
-
-/* Contact Image, settings, bold font weight */
-"BoldFontWeight" = "Đậm";
-
-/* Contact Image, settings, black font weight (black is "very bold") */
-"BlackFontWeight" = "Đen";
-
-/* Contact Image, settings, don't display any value */
-"NoneContactValue" = "Không";
-
-/* Contact Image, settings, Glucose (data to display) */
-"GlucoseContactValue" = "Đường huyết";
-
-/* Contact Image, settings, Eventual BG (data to display) */
-"EventualBGContactValue" = "Kết quả BG";
-
-/* Contact Image, settings, Delta (data to display) */
-"DeltaContactValue" = "Chênh lệch";
-
-/* Contact Image, settings, Trend (data to display) */
-"TrendContactValue" = "Xu hướng";
-
-/* Contact Image, settings, Last loop time (data to display) */
-"LastLoopTimeContactValue" = "Thời gian vòng lặp cuối cùng";
-
-/* Contact Image, settings, COB (data to display) */
-"COBContactValue" = "COB";
-
-/* Contact Image, settings, IOB (data to display) */
-"IOBContactValue" = "IOB";
-
-/* Contact Image, settings, loop status (data to display) */
-"LoopStatusContactValue" = "Trạng thái vòng lặp";
-
-/* ---------------------------------------------------------------------------------------------------------------
   Infotexts from openaps.docs and androidaps.docs
-  iAPS
+  Trio
 */
 /* Headline Rewind Resets Autosens */
 
@@ -2143,7 +1832,7 @@ Enact a temp Basal or a temp target */
 "Low Temptarget Lowers Sensitivity" = "Mục tiêu tạm thời thấp sẽ làm giảm độ nhạy";
 
 /* ”Low Temptarget Lowers Sensitivity" */
-"Defaults to false. When set to true, can lower sensitivity (higher sensitivity ratio) for temptargets <= 99. The lower your temp target below 100 will result in less sensitive (higher) ratios, e.g., temp target of 95 results in sensitivity ratio of 1.09, while 85 results in 1.33 (with default halfBasalTarget of 160)." = "Mặc định là False. Khi được đặt thành True, có thể giảm độ nhạy (tỷ lệ độ nhạy cao hơn) cho mục tiêu tạm thời <= 99. Mục tiêu tạm thời của bạn càng thấp dưới 100 sẽ dẫn đến tỷ lệ kém nhạy hơn (cao hơn), ví dụ: mục tiêu tạm thời là 95 dẫn đến tỷ lệ độ nhạy là 1,09, trong khi 85 kết quả là 1,33 (với Một nửa mục tiêu cơ bản mặc định là 160).";
+"Defaults to false. When set to true, can lower sensitivity (higher sensitivity ratio) for temptargets <= 99. The lower your temp target below 100 will result in less sensitive (higher) ratios, e.g., temp target of 95 results in sensitivity ratio of 1.09, while 85 results in 1.33 (with default halfBasalTarget of 160)." = "Mặc định là False. Khi được đặt thành True, có thể giảm độ nhạy (tỷ lệ độ nhạy cao hơn) cho mục tiêu tạm thời <= 99. Mục tiêu tạm thời của bạn càng thấp dưới 100 sẽ dẫn đến tỷ lệ kém nhạy hơn (cao hơn), ví dụ: mục tiêu tạm thời là 95 dẫn đến tỷ lệ độ nhạy là 1,09, trong khi 85 kết quả là 1,33 (với HalfBasalTarget mặc định là 160).";
 
 /* Headline ”Sensitivity Raises Target" */
 "Sensitivity Raises Target" = "Độ nhạy tăng mục tiêu";
@@ -2173,13 +1862,13 @@ Enact a temp Basal or a temp target */
 "Wide BG Target Range" = "Phạm vi mục tiêu BG rộng";
 
 /* "Wide BG Target Range" */
-"Defaults to false, which means by default only the low end of the pump’s BG target range is used as OpenAPS target. This is a safety feature to prevent too-wide targets and less-optimal outcomes. Therefore the higher end of the target range is used only for avoiding bolus wizard overcorrections. Use wide_bg_target_range: true to force neutral temps over a wider range of eventualBGs." = "Giá trị mặc định là False, có nghĩa là theo mặc định chỉ phần thấp nhất trong phạm vi mục tiêu BG của máy bơm được sử dụng làm mục tiêu OpenAPS. Đây là tính năng an toàn nhằm ngăn chặn các mục tiêu quá rộng và kết quả kém tối ưu. Do đó, mức cao hơn của phạm vi mục tiêu chỉ được sử dụng để tránh việc điều chỉnh quá mức của thuật sĩ truyền nhanh. Sử dụng Phạm vi mục tiêu BG rộng: true để buộc liều tạm thời trung tính trên phạm vi BG cuối cùng rộng hơn.";
+"Defaults to false, which means by default only the low end of the pump’s BG target range is used as OpenAPS target. This is a safety feature to prevent too-wide targets and less-optimal outcomes. Therefore the higher end of the target range is used only for avoiding bolus wizard overcorrections. Use wide_bg_target_range: true to force neutral temps over a wider range of eventualBGs." = "Giá trị mặc định là False, có nghĩa là theo mặc định chỉ phần thấp nhất trong phạm vi mục tiêu BG của máy bơm được sử dụng làm mục tiêu OpenAPS. Đây là tính năng an toàn nhằm ngăn chặn các mục tiêu quá rộng và kết quả kém tối ưu. Do đó, mức cao hơn của phạm vi mục tiêu chỉ được sử dụng để tránh việc điều chỉnh quá mức của thuật sĩ truyền nhanh. Sử dụng Phạm vi mục tiêu BG rộng: true để buộc nhiệt độ trung tính trên phạm vi BG cuối cùng rộng hơn.";
 
 /* Headline "Skip Neutral Temps" */
-"Skip Neutral Temps" = "Bỏ qua liều tạm thời trung lập";
+"Skip Neutral Temps" = "Bỏ qua tạm thời trung lập";
 
 /* "Skip Neutral Temps" */
-"Defaults to false, so that iAPS will set temps whenever it can, so it will be easier to see if the system is working, even when you are offline. This means iAPS will set a “neutral” temp (same as your default basal) if no adjustments are needed. This is an old setting for OpenAPS to have the options to minimise sounds and notifications from the 'rig', that may wake you up during the night." = "Mặc định là False, do đó iAPS sẽ đặt liều tạm thời bất cứ khi nào có thể, do đó, sẽ dễ dàng hơn để xem hệ thống có hoạt động hay không, ngay cả khi bạn ngoại tuyến. Điều này có nghĩa là OpenAPS sẽ đặt Liều tạm thời “trung tính” (giống như Liều tạm thời cơ bản mặc định của bạn) nếu không cần điều chỉnh. Đây là cài đặt cũ để OpenAPS có các tùy chọn giảm thiểu âm thanh và thông báo từ 'âm mưu' có thể đánh thức bạn vào ban đêm. ";
+"Defaults to false, so that Trio will set temps whenever it can, so it will be easier to see if the system is working, even when you are offline. This means Trio will set a “neutral” temp (same as your default basal) if no adjustments are needed. This is an old setting for OpenAPS to have the options to minimise sounds and notifications from the 'rig', that may wake you up during the night." = "Mặc định là False, do đó Trio sẽ đặt nhiệt độ bất cứ khi nào có thể, do đó, sẽ dễ dàng hơn để xem hệ thống có hoạt động hay không, ngay cả khi bạn ngoại tuyến. Điều này có nghĩa là OpenAPS sẽ đặt Temp “trung tính” (giống như Temp cơ bản mặc định của bạn) nếu không cần điều chỉnh. Đây là cài đặt cũ để OpenAPS có các tùy chọn giảm thiểu âm thanh và thông báo từ 'giàn khoan' có thể đánh thức bạn vào ban đêm. ";
 
 /* Headline "Unsuspend If No Temp” */
 "Unsuspend If No Temp" = "Bỏ tạm dừng nếu không có tạm thời";
@@ -2191,58 +1880,58 @@ Enact a temp Basal or a temp target */
 "Enable UAM" = "Kích hoạt UAM";
 
 /* "Enable UAM" */
-"With this option enabled, the SMB algorithm can recognize unannounced meals. This is helpful, if you forget to tell iAPS about your carbs or estimate your carbs wrong and the amount of entered carbs is wrong or if a meal with lots of fat and protein has a longer duration than expected. Without any carb entry, UAM can recognize fast glucose increasments caused by carbs, adrenaline, etc, and tries to adjust it with SMBs. This also works the opposite way: if there is a fast glucose decreasement, it can stop SMBs earlier." = "Khi bật tùy chọn này, thuật toán SMB có thể nhận ra các bữa ăn không báo trước. Điều này rất hữu ích nếu bạn quên thông báo cho iAPS về lượng carb của mình hoặc ước tính sai lượng carb của bạn và lượng carb đã nhập sai hoặc nếu một bữa ăn có nhiều chất béo và protein kéo dài hơn dự kiến. Nếu không có bất kỳ lượng carb nào được đưa vào, UAM có thể nhận ra mức tăng đường huyết nhanh chóng do carbs, adrenaline, v. v. gây ra và cố gắng điều chỉnh nó bằng SMB. Điều này cũng hoạt động theo cách ngược lại: nếu lượng glucose giảm nhanh, nó có thể dừng SMB sớm hơn.";
+"With this option enabled, the SMB algorithm can recognize unannounced meals. This is helpful, if you forget to tell Trio about your carbs or estimate your carbs wrong and the amount of entered carbs is wrong or if a meal with lots of fat and protein has a longer duration than expected. Without any carb entry, UAM can recognize fast glucose increasments caused by carbs, adrenaline, etc, and tries to adjust it with SMBs. This also works the opposite way: if there is a fast glucose decreasement, it can stop SMBs earlier." = "Khi bật tùy chọn này, thuật toán SMB có thể nhận ra các bữa ăn không báo trước. Điều này rất hữu ích nếu bạn quên thông báo cho Trio về lượng carb của mình hoặc ước tính sai lượng carb của bạn và lượng carb đã nhập sai hoặc nếu một bữa ăn có nhiều chất béo và protein kéo dài hơn dự kiến. Nếu không có bất kỳ lượng carb nào được đưa vào, UAM có thể nhận ra mức tăng đường huyết nhanh chóng do carbs, adrenaline, v. v. gây ra và cố gắng điều chỉnh nó bằng SMB. Điều này cũng hoạt động theo cách ngược lại: nếu lượng glucose giảm nhanh, nó có thể dừng SMB sớm hơn.";
 
 /* Headline "Enable SMB With COB" */
 "Enable SMB With COB" = "Kích hoạt SMB đối với COB";
 
 /* Enable SMB With COB" */
-"This enables supermicrobolus (SMB) while carbs on board (COB) are positive." = "Điều này cho phép Super Micro Bolus (SMB) trong khi lượng carb đang hoạt động (COB) ở mức dương.";
+"This enables supermicrobolus (SMB) while carbs on board (COB) are positive." = "Điều này cho phép supermicrobolus (SMB) trong khi lượng carb đang hoạt động (COB) ở mức dương.";
 
 /* Headline "Enable SMB With Temptarget” */
 "Enable SMB With Temptarget" = "Kích hoạt SMB với mục tiêu tạm thời";
 
 /* "Enable SMB With Temptarget” */
-"This enables supermicrobolus (SMB) with eating soon / low temp targets. With this feature enabled, any temporary target below 100mg/dL, such as a temp target of 99 (or 80, the typical eating soon target) will enable SMB." = "Điều này cho phép Super Micro Bolus (SMB) đạt được mục tiêu ăn sớm / nhiệt độ thấp. Khi tính năng này được bật, mọi mục tiêu tạm thời dưới 100mg/dL, chẳng hạn như mục tiêu tạm thời là 99 (hoặc 80, mục tiêu ăn sớm thông thường) sẽ kích hoạt SMB.";
+"This enables supermicrobolus (SMB) with eating soon / low temp targets. With this feature enabled, any temporary target below 100mg/dL, such as a temp target of 99 (or 80, the typical eating soon target) will enable SMB." = "Điều này cho phép supermicrobolus (SMB) đạt được mục tiêu ăn sớm / nhiệt độ thấp. Khi tính năng này được bật, mọi mục tiêu tạm thời dưới 100mg/dL, chẳng hạn như mục tiêu tạm thời là 99 (hoặc 80, mục tiêu ăn sớm thông thường) sẽ kích hoạt SMB.";
 
 /* Headline "Enable SMB Always" */
 "Enable SMB Always" = "Luôn bật SMB";
 
 /* "Enable SMB Always" */
-"Defaults to false. When true, always enable supermicrobolus (unless disabled by high temptarget)." = "Mặc định là False. Khi True, hãy luôn bật Super Micro Bolus (trừ khi bị tắt bởi high temptarget).";
+"Defaults to false. When true, always enable supermicrobolus (unless disabled by high temptarget)." = "Mặc định là False. Khi True, hãy luôn bật supermicrobolus (trừ khi bị tắt bởi high temptarget).";
 
 /* Headline "Enable SMB After Carbs" */
 "Enable SMB After Carbs" = "Kích hoạt SMB sau Carbs";
 
 /* "Enable SMB After Carbs" */
-"Defaults to false. When true, enables supermicrobolus (SMB) for 6h after carbs, even with 0 carbs on board (COB)." = "Mặc định là False. Khi True, hãy bật Super Micro Bolus (SMB) trong 6 giờ sau khi nạp carbs, ngay cả khi không có carbs (COB).";
+"Defaults to false. When true, enables supermicrobolus (SMB) for 6h after carbs, even with 0 carbs on board (COB)." = "Mặc định là False. Khi True, hãy bật supermicrobolus (SMB) trong 6 giờ sau khi nạp carbs, ngay cả khi không có carbs (COB).";
 
 /* Enable "Allow SMB With High Temptarget" */
-"Allow SMB With High Temptarget" = "Cho phép SMB với mục tiêu tạm thời cao";
+"Allow SMB With High Temptarget" = "Cho phép SMB có Temptarget cao";
 
 /* Headline "Allow SMB With High Temptarget" */
-"Allow SMB With High Temptarget" = "Cho phép SMB với mục tiêu tạm thời cao";
+"Allow SMB With High Temptarget" = "Cho phép SMB có Temptarget cao";
 
 /* "Allow SMB With High Temptarget" */
-"Defaults to false. When true, allows supermicrobolus (if otherwise enabled) even with high temp targets (> 100 mg/dl)." = "Mặc định là False. Khi True, cho phép Super Micro Bolus (nếu được kích hoạt khác) ngay cả với mục tiêu tạm thời cao (> 100 mg/dl).";
+"Defaults to false. When true, allows supermicrobolus (if otherwise enabled) even with high temp targets (> 100 mg/dl)." = "Mặc định là False. Khi True, cho phép supermicrobolus (nếu được bật khác) ngay cả với mục tiêu nhiệt độ cao (> 100 mg/dl).";
 
 /* Headline "Use Custom Peak Time” */
-"Use Custom Peak Time" = "Tuỳ chỉnh đỉnh Insulin";
+"Use Custom Peak Time" = "Sử dụng giờ cao điểm tùy chỉnh";
 
 /* "Use Custom Peak Time” */
 "Defaults to false. Setting to true allows changing insulinPeakTime" = "Mặc định là False. Đặt thành True cho phép thay đổi đỉnh của insulin";
 
 /* Headline "Suspend Zeros IOB” */
-"Suspend Zeros IOB" = "Tạm dừng IOB bằng 0";
+"Suspend Zeros IOB" = "Đình chỉ IOB bằng 0";
 
 /* "Suspend Zeros IOB” */
-"Default is false. Any existing temp basals during times the pump was suspended will be deleted and 0 temp basals to negate the profile basal rates during times pump is suspended will be added." = "Mặc định là False. Mọi mức cơ bản tạm thời hiện có trong thời gian máy bơm bị tạm dừng sẽ bị xóa và mức Liều cơ bản tạm thời 0 để phủ nhận tốc độ cơ bản của hồ sơ trong thời gian máy bơm bị tạm dừng sẽ được thêm vào.";
+"Default is false. Any existing temp basals during times the pump was suspended will be deleted and 0 temp basals to negate the profile basal rates during times pump is suspended will be added." = "Mặc định là False. Mọi mức Temp Basals hiện có trong thời gian máy bơm bị tạm dừng sẽ bị xóa và mức Temp Basals 0 để phủ nhận tốc độ cơ bản của hồ sơ trong thời gian máy bơm bị tạm dừng sẽ được thêm vào.";
 
 /* Headline "Max IOB" */
 "Max IOB" = "IOB tối đa";
 
 /* "Max IOB" */
-"Max IOB is the maximum amount of insulin on board from all sources – both basal (or SMB correction) and bolus insulin – that your loop is allowed to accumulate to treat higher-than-target BG. Unlike the other two OpenAPS safety settings (max_daily_safety_multiplier and current_basal_safety_multiplier), max_iob is set as a fixed number of units of insulin. As of now manual boluses are NOT limited by this setting. \n\n To test your basal rates during nighttime, you can modify the Max IOB setting to zero while in Closed Loop. This will enable low glucose suspend mode while testing your basal rates settings\n\n(Tip from https://www.loopandlearn.org/freeaps-x/#open-loop)." = "IOB Max là lượng insulin tối đa được cung cấp từ tất cả các nguồn – cả insulin cơ bản (hoặc hiệu chỉnh SMB) và insulin bolus – mà vòng lặp của bạn được phép tích lũy để điều trị BG cao hơn mục tiêu. Không giống như hai cài đặt an toàn OpenAPS khác (Hệ số tối đa an toàn hàng ngày và Hệ số an toàn cơ bản hiện tại), Tối đa IOB được đặt thành số lượng đơn vị insulin cố định. Tính đến thời điểm hiện tại, việc tiêm liều thủ công KHÔNG bị giới hạn bởi cài đặt này. \n\n Để kiểm tra liều cơ bản của bạn vào ban đêm, bạn có thể sửa đổi cài đặt IOB tối đa thành 0 khi ở Vòng kín. Điều này sẽ kích hoạt chế độ tạm ngưng lượng glucose thấp trong khi kiểm tra cài đặt tốc độ cơ bản của bạn\n\n(Mẹo từ https://www.loopandlearn.org/freeaps-x/#open-loop).";
+"Max IOB is the maximum amount of insulin on board from all sources – both basal (or SMB correction) and bolus insulin – that your loop is allowed to accumulate to treat higher-than-target BG. Unlike the other two OpenAPS safety settings (max_daily_safety_multiplier and current_basal_safety_multiplier), max_iob is set as a fixed number of units of insulin. As of now manual boluses are NOT limited by this setting. \n\n To test your basal rates during nighttime, you can modify the Max IOB setting to zero while in Closed Loop. This will enable low glucose suspend mode while testing your basal rates settings\n\n(Tip from https://www.loopandlearn.org/freeaps-x/#open-loop)." = "IOB Max là lượng insulin tối đa được cung cấp từ tất cả các nguồn – cả insulin cơ bản (hoặc hiệu chỉnh SMB) và insulin bolus – mà vòng lặp của bạn được phép tích lũy để điều trị BG cao hơn mục tiêu. Không giống như hai cài đặt an toàn OpenAPS khác (Hệ số tối đa an toàn hàng ngày và Hệ số an toàn cơ bản hiện tại), Tối đa IOB được đặt thành số lượng đơn vị insulin cố định. Tính đến thời điểm hiện tại, việc tiêm liều thủ công KHÔNG bị giới hạn bởi cài đặt này. \n\n Để kiểm tra lãi suất cơ bản của bạn vào ban đêm, bạn có thể sửa đổi cài đặt IOB tối đa thành 0 khi ở Vòng kín. Điều này sẽ kích hoạt chế độ tạm ngưng lượng glucose thấp trong khi kiểm tra cài đặt tốc độ cơ bản của bạn\n\n(Mẹo từ https://www.loopandlearn.org/freeaps-x/#open-loop).";
 
 /* Headline "Max Daily Safety Multiplier" */
 "Max Daily Safety Multiplier" = "Hệ số tối đa an toàn hàng ngày";
@@ -2251,7 +1940,7 @@ Enact a temp Basal or a temp target */
 "This is an important OpenAPS safety limit. The default setting (which is unlikely to need adjusting) is 3. This means that OpenAPS will never be allowed to set a temporary basal rate that is more than 3x the highest hourly basal rate programmed in a user’s pump, or, if enabled, determined by autotune." = "Đây là giới hạn an toàn quan trọng của OpenAPS. Cài đặt mặc định (có thể không cần điều chỉnh) là 3. Điều này có nghĩa là OpenAPS sẽ không bao giờ được phép đặt tốc độ cơ bản tạm thời cao hơn 3 lần tốc độ cơ bản hàng giờ cao nhất được lập trình trong máy bơm của người dùng hoặc, nếu được bật, sẽ được xác định bằng autotune.";
 
 /* Headline "Current Basal Safety Multiplier" */
-"Current Basal Safety Multiplier" = "Hệ số an toàn liều cơ bản hiện tại";
+"Current Basal Safety Multiplier" = "Hệ số an toàn cơ bản hiện tại";
 
 /* "Current Basal Safety Multiplier" */
 "This is another important OpenAPS safety limit. The default setting (which is also unlikely to need adjusting) is 4. This means that OpenAPS will never be allowed to set a temporary basal rate that is more than 4x the current hourly basal rate programmed in a user’s pump, or, if enabled, determined by autotune." = "Đây là một giới hạn an toàn quan trọng khác của OpenAPS. Cài đặt mặc định (cũng khó có thể cần điều chỉnh) là 4. Điều này có nghĩa là OpenAPS sẽ không bao giờ được phép đặt tốc độ cơ bản tạm thời cao hơn 4 lần tốc độ cơ bản hàng giờ hiện tại được lập trình trong máy bơm của người dùng hoặc, nếu được bật, được xác định bằng autotune.";
@@ -2272,20 +1961,20 @@ Enact a temp Basal or a temp target */
 "Half Basal Exercise Target" = "Mục tiêu tập thể dục 1/2 liều cơ bản";
 
 /* "Half Basal Exercise Target" */
-"Set to a number, e.g. 160, which means when temp target is 160 mg/dL and exercise_mode=true, run 50% basal at this level (120 = 75%; 140 = 60%). This can be adjusted, to give you more control over your exercise modes." = "Đặt thành một số, ví dụ: 160, có nghĩa là khi mục tiêu tạm thời là 160 mg/dL và tập exercise_mode=true, hãy chạy 50% cơ bản ở mức này (120 = 75%; 140 = 60%). Điều này có thể được điều chỉnh để giúp bạn kiểm soát nhiều hơn các chế độ tập luyện của mình.
-\"Mục tiêu tập thể dục 1/2 liều cơ bản\".";
+"Set to a number, e.g. 160, which means when temp target is 160 mg/dL and exercise_mode=true, run 50% basal at this level (120 = 75%; 140 = 60%). This can be adjusted, to give you more control over your exercise modes." = "Đặt thành một số, ví dụ: 160, có nghĩa là khi mục tiêu tạm thời là 160 mg/dL và tập thể dục_mode=true, hãy chạy 50% cơ bản ở mức này (120 = 75%; 140 = 60%). Điều này có thể được điều chỉnh để giúp bạn kiểm soát nhiều hơn các chế độ tập luyện của mình.
+\"Mục tiêu tập thể dục nửa cơ bản\".";
 
 /* Headline "Max COB" */
 "Max COB" = "COB tối đa";
 
 /* "Max COB" */
-"The default of maxCOB is 120. (If someone enters more carbs in one or multiple entries, iAPS will cap COB to maxCOB and keep it at maxCOB until the carbs entered above maxCOB have shown to be absorbed. Essentially, this just limits UAM as a safety cap against weird COB calculations due to fluky data.)" = "Giá trị mặc định của COB tối đa là 120. (Nếu ai đó nạp nhiều carbs hơn vào một hoặc nhiều mục, iAPS sẽ giới hạn COB ở mức COB tối đa và giữ nó ở mức COB tối đa cho đến khi lượng carb nhập vào trên COB tối đa cho thấy đã được hấp thụ. Về cơ bản, điều này chỉ giới hạn UAM như một giới hạn an toàn chống lại các phép tính COB kỳ lạ do dữ liệu không ổn định.)";
+"The default of maxCOB is 120. (If someone enters more carbs in one or multiple entries, Trio will cap COB to maxCOB and keep it at maxCOB until the carbs entered above maxCOB have shown to be absorbed. Essentially, this just limits UAM as a safety cap against weird COB calculations due to fluky data.)" = "Giá trị mặc định của maxCOB là 120. (Nếu ai đó nạp nhiều carbs hơn vào một hoặc nhiều mục, Trio sẽ giới hạn COB ở mức maxCOB và giữ nó ở mức maxCOB cho đến khi lượng carb nhập vào trên maxCOB cho thấy đã được hấp thụ. Về cơ bản, điều này chỉ giới hạn UAM như một giới hạn an toàn chống lại các phép tính COB kỳ lạ do dữ liệu không ổn định.)";
 
 /* Headline "Bolus Snooze DIA Divisor" */
 "Bolus Snooze DIA Divisor" = "Chế độ báo lại bolus";
 
 /* "Bolus Snooze DIA Divisor" */
-"Bolus snooze is enacted after you do a meal bolus, so the loop won’t counteract with low temps when you’ve just eaten. The example here and default is 2; so a 3 hour DIA means that bolus snooze will be gradually phased out over 1.5 hours (3DIA/2)." = "Chế độ báo lại bolus được kích hoạt sau khi bạn thực hiện một bữa ăn nhanh, vì vậy vòng lặp sẽ không phản tác dụng với liều tạm thời thấp khi bạn vừa ăn. Ví dụ ở đây và mặc định là 2; vì vậy DIA 3 giờ có nghĩa là thời gian báo lại bolus sẽ giảm dần trong 1,5 giờ (3DIA/2).";
+"Bolus snooze is enacted after you do a meal bolus, so the loop won’t counteract with low temps when you’ve just eaten. The example here and default is 2; so a 3 hour DIA means that bolus snooze will be gradually phased out over 1.5 hours (3DIA/2)." = "Chế độ báo lại bolus được kích hoạt sau khi bạn thực hiện một bữa ăn nhanh, vì vậy vòng lặp sẽ không phản tác dụng với nhiệt độ thấp khi bạn vừa ăn. Ví dụ ở đây và mặc định là 2; vì vậy DIA 3 giờ có nghĩa là thời gian báo lại bolus sẽ giảm dần trong 1,5 giờ (3DIA/2).";
 
 /* Headline "Min 5m Carbimpact" */
 "Min 5m Carbimpact" = "Tác động tối thiểu 5 phút";
@@ -2297,7 +1986,7 @@ Enact a temp Basal or a temp target */
 "Autotune ISF Adjustment Fraction" = "Phân số (AF) điều chỉnh ISF tự động điều chỉnh";
 
 /* "Autotune ISF Adjustment Fraction" */
-"The default of 0.5 for this value keeps autotune ISF closer to pump ISF via a weighted average of fullNewISF and pumpISF. 1.0 allows full adjustment, 0 is no adjustment from pump ISF." = "Giá trị mặc định là 0,5 cho giá trị này giữ cho ISF tự động điều chỉnh gần hơn với ISF bơm thông qua mức trung bình có trọng số của ISF điều chỉnh hoàn toàn và ISF điều chỉnh từ bơm (1.0 cho phép điều chỉnh hoàn toàn, 0 là không điều chỉnh từ bơm ISF).";
+"The default of 0.5 for this value keeps autotune ISF closer to pump ISF via a weighted average of fullNewISF and pumpISF. 1.0 allows full adjustment, 0 is no adjustment from pump ISF." = "Giá trị mặc định là 0,5 cho giá trị này giữ cho ISF tự động điều chỉnh gần hơn với ISF bơm thông qua mức trung bình có trọng số của fullNewISF và PumpISF. 1.0 cho phép điều chỉnh hoàn toàn, 0 là không điều chỉnh từ bơm ISF.";
 
 /* Headline "Remaining Carbs Fraction" */
 "Remaining Carbs Fraction" = "Phần carb còn lại";
@@ -2306,7 +1995,7 @@ Enact a temp Basal or a temp target */
 "This is the fraction of carbs we’ll assume will absorb over 4h if we don’t yet see carb absorption." = "Đây là tỷ lệ carbs mà chúng tôi cho rằng sẽ hấp thụ trong 4 giờ nếu chúng tôi chưa thấy sự hấp thụ carb.";
 
 /* Headline "Remaining Carbs Cap" */
-"Remaining Carbs Cap" = "Giới hạn lượng carb còn lại";
+"Remaining Carbs Cap" = "Phần carb còn lại";
 
 /* "Remaining Carbs Cap" */
 "This is the amount of the maximum number of carbs we’ll assume will absorb over 4h if we don’t yet see carb absorption." = "Đây là lượng carb tối đa mà chúng tôi cho rằng sẽ hấp thụ trong 4 giờ nếu chúng tôi chưa thấy khả năng hấp thụ carb.";
@@ -2315,7 +2004,7 @@ Enact a temp Basal or a temp target */
 "Max SMB Basal Minutes" = "Số phút cơ bản SMB tối đa";
 
 /* ”Max SMB Basal Minutes" */
-"Defaults to start at 30. This is the maximum minutes of basal that can be delivered as a single SMB with uncovered COB. This gives the ability to make SMB more aggressive if you choose. It is recommended that the value is set to start at 30, in line with the default, and if you choose to increase this value, do so in no more than 15 minute increments, keeping a close eye on the effects of the changes. It is not recommended to set this value higher than 90 mins, as this may affect the ability for the algorithm to safely zero temp. It is also recommended that pushover is used when setting the value to be greater than default, so that alerts are generated for any predicted lows or highs." = "Mặc định bắt đầu từ 30. Đây là số phút cơ bản tối đa có thể được phân phối dưới dạng một SMB duy nhất không có COB. Điều này mang lại khả năng làm cho SMB trở nên hung hãn hơn nếu bạn chọn. Bạn nên đặt giá trị này để bắt đầu ở mức 30, phù hợp với giá trị mặc định và nếu bạn chọn tăng giá trị này, hãy thực hiện với khoảng tăng không quá 15 phút, đồng thời theo dõi chặt chẽ tác động của các thay đổi. Không nên đặt giá trị này cao hơn 90 phút vì điều này có thể ảnh hưởng đến khả năng thuật toán về liều tạm thời bằng 0 một cách an toàn. Chúng tôi cũng khuyên bạn nên sử dụng tính năng đẩy khi đặt giá trị lớn hơn giá trị mặc định để cảnh báo được tạo ra cho bất kỳ mức thấp hoặc mức cao được dự đoán nào.";
+"Defaults to start at 30. This is the maximum minutes of basal that can be delivered as a single SMB with uncovered COB. This gives the ability to make SMB more aggressive if you choose. It is recommended that the value is set to start at 30, in line with the default, and if you choose to increase this value, do so in no more than 15 minute increments, keeping a close eye on the effects of the changes. It is not recommended to set this value higher than 90 mins, as this may affect the ability for the algorithm to safely zero temp. It is also recommended that pushover is used when setting the value to be greater than default, so that alerts are generated for any predicted lows or highs." = "Mặc định bắt đầu từ 30. Đây là số phút cơ bản tối đa có thể được phân phối dưới dạng một SMB duy nhất không có COB. Điều này mang lại khả năng làm cho SMB trở nên hung hãn hơn nếu bạn chọn. Bạn nên đặt giá trị này để bắt đầu ở mức 30, phù hợp với giá trị mặc định và nếu bạn chọn tăng giá trị này, hãy thực hiện với khoảng tăng không quá 15 phút, đồng thời theo dõi chặt chẽ tác động của các thay đổi. Không nên đặt giá trị này cao hơn 90 phút vì điều này có thể ảnh hưởng đến khả năng thuật toán về nhiệt độ bằng 0 một cách an toàn. Chúng tôi cũng khuyên bạn nên sử dụng tính năng đẩy khi đặt giá trị lớn hơn giá trị mặc định để cảnh báo được tạo ra cho bất kỳ mức thấp hoặc mức cao được dự đoán nào.";
 
 /* Headline "Max UAM SMB Basal Minutes" */
 "Max UAM SMB Basal Minutes" = "Số phút cơ bản UAM SMB tối đa";
@@ -2339,7 +2028,7 @@ Enact a temp Basal or a temp target */
 "Insulin Peak Time" = "Thời gian đỉnh của Insulin";
 
 /* "Insulin Peak Time" */
-"Time of maximum blood glucose lowering effect of insulin, in minutes. Beware: Oref assumes for ultra-rapid (Lyumjev) & rapid-acting (Fiasp) curves minimal (35 & 50 min) and maximal (100 & 120 min) applicable insulinPeakTimes. Using a custom insulinPeakTime outside these bounds will result in issues with iAPS, longer loop calculations and possible red loops." = "Thời gian tác dụng hạ đường huyết tối đa của insulin, tính bằng phút. Lưu ý: Oref giả định đường cong cực nhanh (Lyumjev) và tác dụng nhanh (Fiasp) tối thiểu (35 & 50 phút) và tối đa (100 & 120 phút) áp dụng đỉnh insulin. Việc sử dụng đỉnh insulin tùy chỉnh ngoài các giới hạn này sẽ dẫn đến sự cố với iAPS, tính toán vòng lặp dài hơn và có thể xảy ra vòng lặp màu đỏ.";
+"Time of maximum blood glucose lowering effect of insulin, in minutes. Beware: Oref assumes for ultra-rapid (Lyumjev) & rapid-acting (Fiasp) curves minimal (35 & 50 min) and maximal (100 & 120 min) applicable insulinPeakTimes. Using a custom insulinPeakTime outside these bounds will result in issues with Trio, longer loop calculations and possible red loops." = "Thời gian tác dụng hạ đường huyết tối đa của insulin, tính bằng phút. Lưu ý: Oref giả định đường cong cực nhanh (Lyumjev) và tác dụng nhanh (Fiasp) tối thiểu (35 & 50 phút) và tối đa (100 & 120 phút) áp dụng đỉnh insulin. Việc sử dụng đỉnh insulin tùy chỉnh ngoài các giới hạn này sẽ dẫn đến sự cố với Trio, tính toán vòng lặp dài hơn và có thể xảy ra vòng lặp màu đỏ.";
 
 /* Headline "Carbs Req Threshold" */
 "Carbs Req Threshold" = "Ngưỡng yêu cầu của lượng Carbs";
@@ -2351,7 +2040,7 @@ Enact a temp Basal or a temp target */
 "Noisy CGM Target Multiplier" = "Hệ số mục tiêu CGM Noisy";
 
 /* "Noisy CGM Target Multiplier" */
-"Defaults to 1.3. Increase target by this amount when looping off raw/noisy CGM data" = "Mặc định là 1.3. Tăng mục tiêu lên số lượng này khi lặp lại dữ liệu CGM raw/noisy";
+"Defaults to 1.3. Increase target by this amount when looping off raw/noisy CGM data" = "Mặc định là 1.3. Tăng mục tiêu lên số lượng này khi lặp lại dữ liệu CGM thô/noisy";
 
 /* Headline "SMB DeliveryRatio" */
 "SMB DeliveryRatio" = "Tỷ lệ phân phối SMB";
@@ -2374,7 +2063,7 @@ Enact a temp Basal or a temp target */
 "Enable Dynamic ISF" = "Kích hoạt ISF động";
 
 /* Enable Dynamic ISF */
-"Calculate a new Insulin Sensitivity Setting (ISF) upon every loop cycle. The new ISF will be based on your current Glucose, total daily dose of insulin (TDD, past 24 hours of all delivered insulin) and an individual Adjustment Factor (recommendation to start with is 0.5 if using Sigmoid Function and 0.8 if not).\n\nAll of the Dynamic ISF and CR adjustments will be limited by your autosens.min/max limits." = "Tính toán Cài đặt độ nhạy Insulin (ISF) mới sau mỗi chu kỳ vòng lặp. ISF mới sẽ dựa trên Glucose hiện tại của bạn, tổng liều insulin hàng ngày (TDD: tổng lượng insulin được cung cấp trong 24 giờ qua) và Hệ số Điều chỉnh riêng lẻ (khuyến nghị bắt đầu là 0,5 nếu sử dụng Chức năng Sigmoid và 0,8 nếu không sử dụng).\\ n\nTất cả các điều chỉnh ISF động và CR sẽ bị giới hạn bởi autosens.min của bạn.";
+"Calculate a new ISF with every loop cycle. New ISF will be based on current BG, TDD of insulin (past 24 hours or a weighted average) and an Adjustment Factor (default is 1).\n\nDynamic ISF and CR ratios will be limited by your autosens.min/max limits.\n\nDynamic ratio replaces the autosens.ratio: New ISF = Static ISF / Dynamic ratio,\nDynamic ratio = profile.sens * adjustmentFactor * tdd * Math.log(BG/insulinFactor+1) / 1800,\ninsulinFactor = 120 - InsulinPeakTimeInMinutes" = "Tính toán ISF mới với mỗi chu kỳ vòng lặp. ISF mới sẽ dựa trên BG, TDD hiện tại của insulin (24 giờ qua hoặc mức trung bình có trọng số) và Hệ số điều chỉnh (mặc định là 1).\n\nTỷ lệ ISF và CR động sẽ bị giới hạn bởi giới hạn autosens.min/max của bạn.\n\nTỷ lệ động thay thế tỷ lệ autosens: ISF mới = ISF tĩnh / Tỷ lệ động,\nTỷ lệ động = profile.sens * adjustmentFactor * tdd * Math.log(BG/insulinFactor+1) / 1800,\ninsulinFactor = 120 - InsulinPeakTimeInMinutes";
 
 /* Headline Enable Dynamic CR */
 "Enable Dynamic CR" = "Kích hoạt CR động";
@@ -2392,7 +2081,7 @@ Enact a temp Basal or a temp target */
 "Adjust Dynamic ISF constant" = "Điều chỉnh hằng số ISF động";
 
 /* Adjust Dynamic ISF constant */
-"Individual adjustment of the computed dynamic ratios. Default is 0.5. The higher the value, the larger the correction of your ISF/CR will be for a high or a low blood glucose. Maximum/minumum correction is determined by the Autosens min/max settings.\n\nFor Sigmoid function an adjustment factor of 0.4 - 0.5 is recommended to begin with.\n\nFor the logaritmic formula there is less consensus, but starting around 0.8 is probably appropiate for most adult users. For younger users it's recommended to start even lower when using logaritmic formula, to avoid overly aggressive treatment." = "Điều chỉnh riêng các tỷ lệ động được tính toán. Mặc định là 0,5. Giá trị càng cao thì mức điều chỉnh ISF/CR của bạn đối với mức đường huyết cao hay thấp càng lớn. Hiệu chỉnh tối đa/tối thiểu được xác định bởi cài đặt tối thiểu/tối đa của Autosens.\n\nĐối với hàm Sigmoid, hệ số điều chỉnh được khuyến nghị là 0,4 - 0,5 để bắt đầu.\n\nĐối với công thức logarit, có ít sự đồng thuận hơn, nhưng bắt đầu từ khoảng 0,8 là có lẽ phù hợp với hầu hết người dùng trưởng thành. Đối với người dùng trẻ tuổi, nên bắt đầu ở mức thấp hơn nữa khi sử dụng công thức logarit để tránh điều trị quá tích cực.";
+"Adjust Dynamic ratios by a constant. Default is 0.5. The higher the value, the larger the correction of your ISF will be for a high or a low BG. Maximum correction is determined by the Autosens min/max settings. For Sigmoid function an adjustment factor of 0.4 - 0.5 is recommended to begin with. For the logaritmic formula there is less consensus, but starting with 0.5 - 0.8 is more appropiate for most users" = "Điều chỉnh tỷ lệ động theo một hằng số. Mặc định là 0,5. Giá trị càng cao thì mức điều chỉnh ISF của bạn sẽ càng lớn đối với BG cao hay thấp. Hiệu chỉnh tối đa được xác định bởi cài đặt tối thiểu/tối đa của Autosens. Đối với hàm Sigmoid, hệ số điều chỉnh được khuyến nghị là 0,4 - 0,5 để bắt đầu. Đối với công thức logarit, thre có ít sự đồng thuận hơn, nhưng bắt đầu bằng 0,5 - 0,8 thì phù hợp hơn với hầu hết người dùng";
 
 /* Headline Use Sigmoid Function */
 "Use Sigmoid Function" = "Sử dụng hàm Sigmoid (SF)";
@@ -2407,43 +2096,13 @@ Enact a temp Basal or a temp target */
 "Use a sigmoid function for ISF (and for CR, when enabled), instead of the default Logarithmic formula. Requires the Dynamic ISF setting to be enabled in settings\n\nThe Adjustment setting adjusts the slope of the curve (Y: Dynamic ratio, X: Blood Glucose). A lower value ==> less steep == less aggressive.\n\nThe autosens.min/max settings determines both the max/min limits for the dynamic ratio AND how much the dynamic ratio is adjusted. If AF is the slope of the curve, the autosens.min/max is the height of the graph, the Y-interval, where Y: dynamic ratio. The curve will always have a sigmoid shape, no matter which autosens.min/max settings are used, meaning these settings have big consequences for the outcome of the computed dynamic ISF. Please be careful setting a too high autosens.max value. With a proper profile ISF setting, you will probably never need it to be higher than 1.5\n\nAn Autosens.max limit > 1.5 is not advisable when using the sigmoid function." = "Sử dụng hàm sigmoid cho ISF (và cho CR, khi được bật), thay vì công thức logarit mặc định. Yêu cầu bật cài đặt ISF động trong cài đặt\n\nCài đặt Điều chỉnh điều chỉnh độ dốc của đường cong (Y: Tỷ lệ động, X: Đường huyết). Giá trị thấp hơn ==> ít dốc hơn == ít linh hoạt hơn.\n\nCài đặt autosens.min/max xác định cả giới hạn tối đa/phút cho tỷ lệ động VÀ mức độ điều chỉnh tỷ lệ động. Nếu AF là độ dốc của đường cong thì autosens.min/max là chiều cao của biểu đồ, khoảng Y, trong đó Y: tỷ lệ động. Đường cong sẽ luôn có dạng sigmoid, bất kể cài đặt autosens.min/max nào được sử dụng, nghĩa là những cài đặt này có hậu quả lớn đối với kết quả của ISF động được tính toán. Hãy cẩn thận khi đặt giá trị autosens.max quá cao. Với cài đặt ISF cấu hình phù hợp, bạn có thể sẽ không bao giờ cần nó cao hơn 1,5\n\nGiới hạn Autosens.max > 1,5 là không nên khi sử dụng chức năng sigmoid.";
 
 /* Headline Threshold Setting */
-"Threshold Setting" = "Cài đặt ngưỡng";
+"Minimum Safety Threshold (mg/dL)" = "Minimum Safety Threshold (mg/dL)";
 
-/* Dynamic ISF Setting Title */
-"Minimum Threshold Setting" = "Cài đặt ngưỡng tối thiểu";
-
-/* Minimum Threshold Setting, Part 1 */
-"This setting lets you choose a level below which no insulin will be given.\n\nThe threshold is using the largest amount of your threshold setting and the computed threshold:\n\nTarget Glucose - (Target Glucose - 40) / 2\n, here using mg/dl as glucose unit.\n\nFor example, if your Target Glucose is " = "Cài đặt này cho phép bạn chọn mức dưới đó sẽ không cung cấp insulin.\n\nNgưỡng này sử dụng lượng lớn nhất trong cài đặt ngưỡng của bạn và ngưỡng được tính toán:\n\nGlucose mục tiêu - (Glucose mục tiêu - 40) ";
-
-/* Minimum Threshold Setting, Part 2 */
-"the threshold will be " = "ngưỡng sẽ là ";
-
-/* Minimum Threshold Setting, Part 3 */
-"unless your threshold setting is set higher:" = "trừ khi cài đặt ngưỡng của bạn được đặt cao hơn:";
-
-/* Threshold Table Columns Title */
-"Setting" = "Cài đặt";
-
-/* Threshold Table Columns Title */
-"Threshold" = "Ngưỡng";
+/* Minimum Safety Threshold */
+"All insulin will be suspended if your glucose is predicted to drop below the safety threshold.\n\nMust be set between 60-120 mg/dL.\nTo convert from mmol/L, multiply by 18.\n\nNote: Basal may be resumed if there's negative IOB and glucose is rising faster than predicted." = "All insulin will be suspended if your glucose is predicted to drop below the safety threshold.\n\nMust be set between 60-120 mg/dL.\nTo convert from mmol/L, multiply by 18.\n\nNote: Basal may be resumed if there's negative IOB and glucose is rising faster than predicted.";
 
 /* Header */
-"Calculator settings" = "Cài đặt tính toán";
-
-/* Bolus Calculator Setting */
-"Use alternate Bolus Calculator" = "Sử dụng Máy tính Bolus thay thế";
-
-/* Bolus Calculator Setting */
-"Fatty Meals" = "Bữa ăn nhiều chất béo";
-
-/* Bolus Calculator Setting */
-"Apply factor for fatty meals" = "Áp dụng hệ số cho bữa ăn nhiều chất béo";
-
-/* Bolus Calculator Footer */
-"The new alternate bolus calculator is another approach to the default bolus calculator in iAPS. If the toggle is on you use this bolus calculator and not the original iAPS calculator. At the end of the calculation a custom factor is applied as it is supposed to be when using smbs (default 0.8).\n\nYou can also add the option in your bolus calculator to apply another (!) customizable factor at the end of the calculation which could be useful for fatty meals, e.g Pizza (default 0.7)." = "Công cụ tính bolus thay thế mới là một cách tiếp cận khác với công cụ tính bolus mặc định trong iAPS. Nếu bật nút này, bạn sẽ sử dụng máy tính bolus này chứ không phải máy tính iAPS gốc. Khi kết thúc phép tính, một hệ số tùy chỉnh sẽ được áp dụng như lẽ ra phải như vậy khi sử dụng smbs (mặc định là 0,8).\n\nBạn cũng có thể thêm tùy chọn trong máy tính bolus của mình để áp dụng một hệ số tùy chỉnh (!) khác ở cuối phép tính, phép tính có thể hữu ích cho các bữa ăn nhiều chất béo, ví dụ: Pizza (mặc định là 0,7).";
-
-/* Settings Section */
-"Extra Features" = "Tính năng bổ sung";
+"Calculator settings" = "Thiết lập tính toán";
 
 /* UI/UX option */
 "Display Predictions" = "Hiển thị dự đoán";
@@ -2463,15 +2122,6 @@ Enact a temp Basal or a temp target */
 /* UI/UX option */
 "Home View Button Panel " = "Bảng nút xem trang chủ ";
 
-/* UI/UX title */
-"Home Chart settings " = "Trang chủ Cài đặt biểu đồ ";
-
-/* UI/UX title */
-"Statistics settings " = "Cài đặt thống kê ";
-
-/* UI/UX title */
-"Override HbA1c Unit" = "Override HbA1c Unit";
-
 /* UI/UX option */
 "In case you're using both profiles and temp targets" = "Trong trường hợp bạn đang sử dụng cả hồ sơ và mục tiêu tạm thời";
 
@@ -2486,29 +2136,14 @@ Enact a temp Basal or a temp target */
 /* UI/UX option */
 "Horizontal Scroll View Visible hours" = "Chế độ xem cuộn ngang Giờ hiển thị";
 
-/* UI/UX option */
-"Display Time Interval Setting Button" = "Nút cài đặt khoảng thời gian hiển thị";
-
-/* Setting title */
-"Bolus Calculator" = "Tính toán Bolus";
-
-/* Setting title */
-"Dynamic ISF" = "Độ nhạy Insulin (ISF) động";
-
 /* Notification option */
 "Live Activity" = "Hoạt động trực tiếp";
 
 /* Notification option */
-"Live activity displays blood glucose live on the lock screen and on the dynamic island (if available)" = "Hiển thị hoạt động trực tiếp đường huyết trên màn hình khóa";
+"Live activity displays blood glucose live on the lock screen and on the dynamic island (if available)" = "Hoạt động trực tiếp hiển thị đường huyết trực tiếp trên màn hình khóa và trên đảo động (nếu có)";
 
 /* Notification option */
-"Show Live activity" = "Hiển thị hoạt động trực tiếp";
-
-/* Live Activity Footer */
-"Live activity displays blood glucose live on the lock screen and on the dynamic island (if available)" = "Hoạt động trực tiếp hiển thị đường huyết trực tiếp trên màn hình khóa và động (nếu có)";
-
-/* Live Activity Footer when off */
-"Live activities are turned OFF in system settings. To enable live activities, go to Settings app -> iAPS -> Turn live Activities ON.\n\n" = "Các hoạt động trực tiếp được TẮT trong cài đặt hệ thống. Để bật các hoạt động trực tiếp, hãy đi tới ứng dụng Cài đặt -> iAPS -> BẬT Hoạt động trực tiếp.\n\n";
+"Show live activity" = "Hiển thị hoạt động trực tiếp";
 
 /* Headline "Weighted Average of TDD. Weight of past 24 hours:" */
 "Weighted Average of TDD. Weight of past 24 hours:" = "Trung bình có trọng số của TDD. Trọng lượng trong 24 giờ qua:";
@@ -2518,7 +2153,7 @@ Enact a temp Basal or a temp target */
 ​.";
 
 /* Headline "Adjust basal" */
-"Adjust basal" = "Điều chỉnh mức cơ bản";
+"Adjust basal" = "Mức cơ bản";
 
 /* Enable adjustment of basal profile */
 "Enable adjustment of basal based on the ratio of current TDD / 7 day average TDD" = "Cho phép điều chỉnh mức cơ bản dựa trên tỷ lệ TDD hiện tại/TDD trung bình 7 ngày";
@@ -2542,7 +2177,7 @@ Enact a temp Basal or a temp target */
 "Enable SMBs when a high BG is detected, based on the high BG target (adjusted or profile)" = "Kích hoạt SMB khi phát hiện BG cao, dựa trên mục tiêu BG cao (đã điều chỉnh hoặc cấu hình)";
 
 /* Headline "Dynamic settings" */
-"Dynamic settings" = "Dynamic Settings";
+"Dynamic settings" = "Cài đặt Dynamic";
 
 /* Insulin curve */
 "Insulin curve" = "Chủng loại insulin";

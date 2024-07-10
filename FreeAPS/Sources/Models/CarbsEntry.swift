@@ -1,9 +1,9 @@
 import Foundation
+import LoopKit
 
 struct CarbsEntry: JSON, Equatable, Hashable {
     let id: String?
-    var createdAt: Date
-    let actualDate: Date?
+    let createdAt: Date
     let carbs: Decimal
     let fat: Decimal?
     let protein: Decimal?
@@ -12,8 +12,7 @@ struct CarbsEntry: JSON, Equatable, Hashable {
     let isFPU: Bool?
     let fpuID: String?
 
-    static let manual = "iAPS"
-    static let remote = "Nightscout operator"
+    static let manual = "Trio"
     static let appleHealth = "applehealth"
 
     static func == (lhs: CarbsEntry, rhs: CarbsEntry) -> Bool {
@@ -29,7 +28,6 @@ extension CarbsEntry {
     private enum CodingKeys: String, CodingKey {
         case id = "_id"
         case createdAt = "created_at"
-        case actualDate
         case carbs
         case fat
         case protein
@@ -37,5 +35,27 @@ extension CarbsEntry {
         case enteredBy
         case isFPU
         case fpuID
+    }
+}
+
+extension CarbsEntry {
+    func convertSyncCarb(operation: LoopKit.Operation = .create) -> SyncCarbObject {
+        SyncCarbObject(
+            absorptionTime: nil,
+            createdByCurrentApp: true,
+            foodType: nil,
+            grams: Double(carbs),
+            startDate: createdAt,
+            uuid: UUID(uuidString: id!),
+            provenanceIdentifier: enteredBy ?? "",
+            syncIdentifier: id,
+            syncVersion: nil,
+            userCreatedDate: nil,
+            userUpdatedDate: nil,
+            userDeletedDate: nil,
+            operation: operation,
+            addedDate: nil,
+            supercededDate: nil
+        )
     }
 }

@@ -28,7 +28,7 @@ extension Stat {
             var id: Self { self }
         }
 
-        @State private var selectedDuration: Duration = .Today
+        @State private var selectedDuration: Duration = .Day
         @State var paddingAmount: CGFloat? = 10
         @State var headline: Color = .secondary
         @State var days: Double = 0
@@ -146,11 +146,10 @@ extension Stat {
                 .pickerStyle(.segmented).background(.cyan.opacity(0.2))
                 stats()
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .onAppear(perform: configureView)
             .navigationBarTitle("Statistics")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: Button("Close", action: state.hideModal))
+            .navigationBarTitleDisplayMode(.automatic)
+            .navigationBarItems(leading: Button("Close", action: state.hideModal))
         }
     }
 }

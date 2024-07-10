@@ -1,4 +1,6 @@
 import Foundation
+import HealthKit
+import LoopKit
 
 struct BloodGlucose: JSON, Identifiable, Hashable {
     enum Direction: String, JSON {
@@ -29,7 +31,9 @@ struct BloodGlucose: JSON, Identifiable, Hashable {
     let filtered: Decimal?
     let noise: Int?
     var glucose: Int?
+
     let type: String?
+
     var activationDate: Date? = nil
     var sessionStartDate: Date? = nil
     var transmitterID: String? = nil
@@ -87,5 +91,16 @@ extension BloodGlucose: SavitzkyGolaySmoothable {
             glucose = Int(newValue)
             sgv = Int(newValue)
         }
+    }
+}
+
+extension BloodGlucose {
+    func convertStoredGlucoseSample(device: HKDevice?) -> StoredGlucoseSample {
+        StoredGlucoseSample(
+            syncIdentifier: id,
+            startDate: dateString.date,
+            quantity: HKQuantity(unit: .milligramsPerDeciliter, doubleValue: Double(glucose!)),
+            device: device
+        )
     }
 }

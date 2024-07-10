@@ -13,7 +13,6 @@ struct Glucose: JSON {
 enum GlucoseType: String, JSON {
     case sgv
     case cal
-    case manual = "Manual"
 }
 
 enum Direction: String, JSON {

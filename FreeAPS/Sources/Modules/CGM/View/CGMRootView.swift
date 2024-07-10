@@ -5,6 +5,7 @@ import Swinject
 extension CGM {
     struct RootView: BaseView {
         let resolver: Resolver
+        let displayClose: Bool
         @StateObject var state = StateModel()
         @State private var setupCGM = false
 
@@ -14,28 +15,78 @@ extension CGM {
             NavigationView {
                 Form {
                     Section(header: Text("CGM")) {
-                        Picker("Type", selection: $state.cgm) {
-                            ForEach(CGMType.allCases) { type in
+                        Picker("Type", selection: $state.cgmCurrent) {
+                            ForEach(state.listOfCGM) { type in
                                 VStack(alignment: .leading) {
                                     Text(type.displayName)
                                     Text(type.subtitle).font(.caption).foregroundColor(.secondary)
                                 }.tag(type)
                             }
                         }
-                        if let link = state.cgm.externalLink {
+                        if let link = state.cgmCurrent.type.externalLink {
                             Button("About this source") {
                                 UIApplication.shared.open(link, options: [:], completionHandler: nil)
                             }
                         }
                     }
-                    if [.dexcomG5, .dexcomG6, .dexcomG7].contains(state.cgm) {
+
+                    if let appURL = state.urlOfApp()
+                    {
+                        Section {
+                            Button {
+                                UIApplication.shared.open(appURL, options: [:]) { success in
+                                    if !success {
+                                        self.router.alertMessage
+                                            .send(MessageContent(content: "Unable to open the app", type: .warning))
+                                    }
+                                }
+                            }
+
+                            label: {
+                                Label(state.displayNameOfApp() ?? "-", systemImage: "waveform.path.ecg.rectangle").font(.title3) }
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .buttonStyle(.bordered)
+                        }
+                        .listRowBackground(Color.clear)
+                    } else if state.cgmCurrent.type == .nightscout {
+                        if let url = state.url {
+                            Section {
+                                Button {
+                                    UIApplication.shared.open(url, options: [:]) { success in
+                                        if !success {
+                                            self.router.alertMessage
+                                                .send(MessageContent(content: "No URL available", type: .warning))
+                                        }
+                                    }
+                                }
+                                label: { Label("Open URL", systemImage: "waveform.path.ecg.rectangle").font(.title3) }
+                                    .frame(maxWidth: .infinity, alignment: .center)
+                                    .buttonStyle(.bordered)
+                            }
+                            .listRowBackground(Color.clear)
+                        } else {
+                            Section {
+                                Button {
+                                    state.showModal(for: .nighscoutConfigDirect)
+                                    // router.mainSecondaryModalView.send(router.view(for: .nighscoutConfigDirect))
+                                }
+                                label: { Label("Config Nightscout", systemImage: "waveform.path.ecg.rectangle").font(.title3)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .buttonStyle(.bordered)
+                            }
+                            .listRowBackground(Color.clear)
+                        }
+                    }
+
+                    if state.cgmCurrent.type == .plugin {
                         Section {
                             Button("CGM Configuration") {
                                 setupCGM.toggle()
                             }
                         }
                     }
-                    if state.cgm == .xdrip {
+                    if state.cgmCurrent.type == .xdrip {
                         Section(header: Text("Heartbeat")) {
                             VStack(alignment: .leading) {
                                 if let cgmTransmitterDeviceAddress = state.cgmTransmitterDeviceAddress {
@@ -47,33 +98,20 @@ extension CGM {
                             }
                         }
                     }
-                    if state.cgm == .libreTransmitter {
-                        Button("Configure Libre Transmitter") {
-                            state.showModal(for: .libreConfig)
+                    if state.cgmCurrent.type == .plugin && state.cgmCurrent.id.contains("Libre") {
+                        Section(header: Text("Calibrations")) {
+                            Text("Calibrations").navigationLink(to: .calibrations, from: self)
                         }
-                        Text("Calibrations").navigationLink(to: .calibrations, from: self)
                     }
+
+                    // }
+
                     Section(header: Text("Calendar")) {
-                        Toggle("Create Events in Calendar", isOn: $state.createCalendarEvents)
+                        Toggle("Create events in calendar", isOn: $state.createCalendarEvents)
                         if state.calendarIDs.isNotEmpty {
                             Picker("Calendar", selection: $state.currentCalendarID) {
                                 ForEach(state.calendarIDs, id: \.self) {
                                     Text($0).tag($0)
-                                }
-                            }
-                            Toggle("Display Emojis as Labels", isOn: $state.displayCalendarEmojis)
-                            Toggle("Display IOB and COB", isOn: $state.displayCalendarIOBandCOB)
-                        } else if state.createCalendarEvents {
-                            if #available(iOS 17.0, *) {
-                                Text(
-                                    "If you are not seeing calendars to choose here, please go to Settings -> iAPS -> Calendars and change permissions to \"Full Access\""
-                                ).font(.footnote)
-
-                                Button("Open Settings") {
-                                    // Get the settings URL and open it
-                                    if let url = URL(string: UIApplication.openSettingsURLString) {
-                                        UIApplication.shared.open(url)
-                                    }
                                 }
                             }
                         }
@@ -83,27 +121,31 @@ extension CGM {
                         Toggle("Smooth Glucose Value", isOn: $state.smoothGlucose)
                     }
                 }
-                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+
                 .onAppear(perform: configureView)
                 .navigationTitle("CGM")
-                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.automatic)
+                .navigationBarItems(leading: displayClose ? Button("Close", action: state.hideModal) : nil)
                 .sheet(isPresented: $setupCGM) {
-                    if let cgmFetchManager = state.cgmManager, cgmFetchManager.glucoseSource.cgmType == state.cgm,
-                       let cmgManager = cgmFetchManager.glucoseSource.cgmManager
+                    if let cgmFetchManager = state.cgmManager,
+                       let cgmManager = cgmFetchManager.cgmManager,
+                       state.cgmCurrent.type == cgmFetchManager.cgmGlucoseSourceType,
+                       state.cgmCurrent.id == cgmFetchManager.cgmGlucosePluginId
                     {
                         CGMSettingsView(
-                            cgmManager: cmgManager,
+                            cgmManager: cgmManager,
                             bluetoothManager: state.provider.apsManager.bluetoothManager!,
                             unit: state.settingsManager.settings.units,
                             completionDelegate: state
                         )
                     } else {
                         CGMSetupView(
-                            CGMType: state.cgm,
+                            CGMType: state.cgmCurrent,
                             bluetoothManager: state.provider.apsManager.bluetoothManager!,
                             unit: state.settingsManager.settings.units,
                             completionDelegate: state,
-                            setupDelegate: state
+                            setupDelegate: state,
+                            pluginCGMManager: self.state.pluginCGMManager
                         )
                     }
                 }

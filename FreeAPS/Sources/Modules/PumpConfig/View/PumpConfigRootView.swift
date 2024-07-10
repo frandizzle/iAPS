@@ -4,6 +4,7 @@ import Swinject
 extension PumpConfig {
     struct RootView: BaseView {
         let resolver: Resolver
+        let displayClose: Bool
         @StateObject var state = StateModel()
 
         var body: some View {
@@ -24,6 +25,7 @@ extension PumpConfig {
                                 Button("Acknowledge all alerts") { state.ack() }
                             }
                         } else {
+                            Button("Add Dana-i/RS") { state.addPump(.dana) }
                             Button("Add Medtronic") { state.addPump(.minimed) }
                             Button("Add Omnipod") { state.addPump(.omnipod) }
                             Button("Add Omnipod Dash") { state.addPump(.omnipodBLE) }
@@ -31,10 +33,10 @@ extension PumpConfig {
                         }
                     }
                 }
-                .dynamicTypeSize(...DynamicTypeSize.xxLarge)
                 .onAppear(perform: configureView)
                 .navigationTitle("Pump config")
-                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.automatic)
+                .navigationBarItems(leading: displayClose ? Button("Close", action: state.hideModal) : nil)
                 .sheet(isPresented: $state.setupPump) {
                     if let pumpManager = state.provider.apsManager.pumpManager {
                         PumpSettingsView(

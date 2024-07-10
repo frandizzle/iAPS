@@ -22,12 +22,19 @@ extension PreferencesEditor {
 
         var body: some View {
             Form {
-                Section {
+                Section(header: Text("Trio").textCase(nil)) {
                     Picker("Glucose units", selection: $state.unitsIndex) {
                         Text("mg/dL").tag(0)
                         Text("mmol/L").tag(1)
                     }
-                } header: { Text("iAPS").textCase(nil) }
+                    HStack {
+                        Text("Recommended Bolus Percentage")
+                        DecimalTextField("", value: $state.insulinReqPercentage, formatter: formatter)
+                    }
+
+                    Toggle("Skip Bolus screen after carbs", isOn: $state.skipBolusScreenAfterCarbs)
+                }
+
                 ForEach(state.sections.indexed(), id: \.1.id) { sectionIndex, section in
                     Section(header: Text(section.displayName)) {
                         ForEach(section.fields.indexed(), id: \.1.id) { fieldIndex, field in
@@ -74,16 +81,14 @@ extension PreferencesEditor {
                         }
                     }
                 }
-                Section {} footer: { Text("").padding(.bottom, 300) }
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .onAppear(perform: configureView)
             .navigationTitle("Preferences")
             .navigationBarTitleDisplayMode(.automatic)
             .navigationBarItems(
                 trailing:
                 Button {
-                    let lang = Locale.current.language.languageCode?.identifier ?? "en"
+                    let lang = Locale.current.languageCode ?? "en"
                     if lang == "en" {
                         UIApplication.shared.open(
                             URL(

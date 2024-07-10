@@ -7,7 +7,6 @@ extension DataTable {
         @Injected() var unlockmanager: UnlockManager!
         @Injected() private var storage: FileStorage!
         @Injected() var pumpHistoryStorage: PumpHistoryStorage!
-        @Injected() var healthKitManager: HealthKitManager!
 
         let coredataContext = CoreDataStack.shared.persistentContainer.viewContext
 
@@ -18,9 +17,6 @@ extension DataTable {
         @Published var maxBolus: Decimal = 0
         @Published var externalInsulinAmount: Decimal = 0
         @Published var externalInsulinDate = Date()
-        @Published var tdd: (Decimal, Decimal, Double) = (0, 0, 0)
-        @Published var insulinToday: (Decimal, Decimal, Double) = (0, 0, 0)
-        @Published var basalInsulin: Decimal = 0
 
         var units: GlucoseUnits = .mmolL
 
@@ -36,18 +32,10 @@ extension DataTable {
             broadcaster.register(GlucoseObserver.self, observer: self)
         }
 
-        private let processQueue =
-            DispatchQueue(label: "setupTreatments.processQueue") // Ensure that only one instance of this function can execute at a time
-
         private func setupTreatments() {
-            // Log that the function is starting for testing purposes
-            debug(.service, "setupTreatments() started")
-
-            // DispatchQueue.global().async { // Original code with global concurrent queue
-
-            // Ensure that only one instance of this function can execute at a time by using a serial queue
-            processQueue.async {
+            DispatchQueue.global().async {
                 let units = self.settingsManager.settings.units
+
                 let carbs = self.provider.carbs()
                     .filter { !($0.isFPU ?? false) }
                     .map {
@@ -55,17 +43,16 @@ extension DataTable {
                             return Treatment(
                                 units: units,
                                 type: .carbs,
-                                date: $0.actualDate ?? $0.createdAt,
+                                date: $0.createdAt,
                                 amount: $0.carbs,
                                 id: id,
-                                fpuID: $0.fpuID,
                                 note: $0.note
                             )
                         } else {
                             return Treatment(
                                 units: units,
                                 type: .carbs,
-                                date: $0.actualDate ?? $0.createdAt,
+                                date: $0.createdAt,
                                 amount: $0.carbs,
                                 note: $0.note
                             )
@@ -78,7 +65,7 @@ extension DataTable {
                         Treatment(
                             units: units,
                             type: .fpus,
-                            date: $0.actualDate ?? $0.createdAt,
+                            date: $0.createdAt,
                             amount: $0.carbs,
                             id: $0.id,
                             isFPU: $0.isFPU,
@@ -97,7 +84,7 @@ extension DataTable {
                             amount: $0.amount,
                             idPumpEvent: $0.id,
                             isSMB: $0.isSMB,
-                            isExternal: $0.isExternal
+                            isExternal: $0.isExternalInsulin
                         )
                     }
 
@@ -147,12 +134,6 @@ extension DataTable {
                         .flatMap { $0 }
                         .sorted { $0.date > $1.date }
                 }
-
-                DispatchQueue.main.async {
-                    let increments = self.settingsManager.preferences.bolusIncrement
-                    self.tdd = TotalDailyDose().totalDailyDose(self.provider.pumpHistory(), increment: Double(increments))
-                    self.insulinToday = TotalDailyDose().insulinToday(self.provider.pumpHistory(), increment: Double(increments))
-                }
             }
         }
 
@@ -194,15 +175,13 @@ extension DataTable {
                         into: [coredataContext]
                     )
                 }
-            } catch { /* To do: handle any thrown errors. */ }
-
-            // Deletes Manual Glucose
-            if (glucose.glucose.type ?? "") == GlucoseType.manual.rawValue {
-                provider.deleteManualGlucose(date: glucose.glucose.dateString)
+            } catch {
+                // To do: handle any thrown errors.
             }
+            // try? coredataContext.save()
         }
 
-        func addManualGlucose() {
+        func logManualGlucose() {
             let glucose = units == .mmolL ? manualGlucose.asMgdL : manualGlucose
             let now = Date()
             let id = UUID().uuidString
@@ -216,16 +195,13 @@ extension DataTable {
                 filtered: nil,
                 noise: nil,
                 glucose: Int(glucose),
-                type: GlucoseType.manual.rawValue
+                type: "Manual"
             )
             provider.glucoseStorage.storeGlucose([saveToJSON])
             debug(.default, "Manual Glucose saved to glucose.json")
-            // Save to Health
-            var saveToHealth = [BloodGlucose]()
-            saveToHealth.append(saveToJSON)
         }
 
-        func addExternalInsulin() {
+        func logExternalInsulin() {
             guard externalInsulinAmount > 0 else {
                 showModal(for: nil)
                 return
@@ -247,13 +223,13 @@ extension DataTable {
                                 rate: nil,
                                 temp: nil,
                                 carbInput: nil,
-                                isExternal: true
+                                isExternalInsulin: true
                             )
                         ]
                     )
                     debug(.default, "External insulin saved to pumphistory.json")
 
-                    // Reset amount to 0 for next entry.
+                    // Reset amount to 0 for next entry
                     externalInsulinAmount = 0
                 }
                 .store(in: &lifetime)

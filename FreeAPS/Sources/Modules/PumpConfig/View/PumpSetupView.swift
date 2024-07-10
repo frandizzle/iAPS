@@ -1,3 +1,4 @@
+import DanaKit
 import LoopKit
 import LoopKitUI
 import MinimedKit
@@ -37,7 +38,8 @@ extension PumpConfig {
                     initialSettings: initialSettings,
                     bluetoothProvider: bluetoothManager,
                     colorPalette: .default,
-                    allowDebugFeatures: false,
+                    allowDebugFeatures: true,
+                    prefersToSkipUserInteraction: false,
                     allowedInsulinTypes: [.apidra, .humalog, .novolog, .fiasp, .lyumjev]
                 )
             case .omnipod:
@@ -45,7 +47,8 @@ extension PumpConfig {
                     initialSettings: initialSettings,
                     bluetoothProvider: bluetoothManager,
                     colorPalette: .default,
-                    allowDebugFeatures: false,
+                    allowDebugFeatures: true,
+                    prefersToSkipUserInteraction: false,
                     allowedInsulinTypes: [.apidra, .humalog, .novolog, .fiasp, .lyumjev]
                 )
             case .omnipodBLE:
@@ -53,15 +56,25 @@ extension PumpConfig {
                     initialSettings: initialSettings,
                     bluetoothProvider: bluetoothManager,
                     colorPalette: .default,
-                    allowDebugFeatures: false,
+                    allowDebugFeatures: true,
                     allowedInsulinTypes: [.apidra, .humalog, .novolog, .fiasp, .lyumjev]
                 )
+            case .dana:
+                setupViewController = DanaKitPumpManager.setupViewController(
+                    initialSettings: initialSettings,
+                    bluetoothProvider: bluetoothManager,
+                    colorPalette: .default,
+                    allowDebugFeatures: true, prefersToSkipUserInteraction: true,
+                    allowedInsulinTypes: [.apidra, .humalog, .novolog, .fiasp, .lyumjev]
+                )
+
             case .simulator:
                 setupViewController = MockPumpManager.setupViewController(
                     initialSettings: initialSettings,
                     bluetoothProvider: bluetoothManager,
                     colorPalette: .default,
-                    allowDebugFeatures: false,
+                    allowDebugFeatures: true,
+                    prefersToSkipUserInteraction: false,
                     allowedInsulinTypes: [.apidra, .humalog, .novolog, .fiasp, .lyumjev]
                 )
             }

@@ -738,6 +738,19 @@ extension Home {
             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
         }
 
+        private var historyButton: some View {
+            Button {
+                state.showModal(for: .history)
+            } label: {
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.system(size: 16))
+                    .foregroundStyle(.blue)
+                    .padding(6)
+            }
+            .buttonStyle(.borderless)
+            .offset(x: -130) // mirror of ISF tile
+        }
+
         var timeSetting: some View {
             let hourLabel = NSLocalizedString("\(state.hours) hours", comment: "") + "   "
 
@@ -820,6 +833,7 @@ extension Home {
                                 chart
                                 // Adjust hours visible (X-Axis) and ratio display
                                 timeSetting
+                                    .overlay(alignment: .leading) { historyButton }
                                     .overlay { isfView }
                                 // TIR Chart
                                 if !state.data.glucose.isEmpty {

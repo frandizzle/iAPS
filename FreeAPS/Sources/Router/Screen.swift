@@ -6,6 +6,7 @@ enum Screen: Identifiable, Hashable {
     case loading
     case home
     case settings
+    case history
     case configEditor(file: String)
     case nighscoutConfig
     case pumpConfig
@@ -64,6 +65,8 @@ extension Screen {
             ISFEditor.RootView(resolver: resolver)
         case .crEditor:
             CREditor.RootView(resolver: resolver)
+        case .history:
+            AutoDIAHistoryView(entries: AutoCurveManager.shared.history)
         case .targetsEditor:
             TargetsEditor.RootView(resolver: resolver)
         case .preferencesEditor:

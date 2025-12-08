@@ -2,6 +2,134 @@ import Combine
 import CoreData
 import Foundation
 import JavaScriptCore
+import LoopKit
+
+// ========================================
+// AutoDIA Learning State (file-local)
+// ========================================
+
+private struct AutoDIALearningState {
+    var lastAppliedDIA: Double = 5.0
+    var lastAppliedPeak: Double = 35.0
+
+    var smoothedDIA: Double? = nil
+    var smoothedPeak: Double? = nil
+    var lastUpdate: Date = .distantPast
+    var lastDoseTimestamp: Date = .distantPast
+    var lastSeenGlucoseCount: Int = 0
+    var lastSeenDoseCount: Int = 0
+
+    // Learning baselines
+    var lastLearningTimestamp: Date = .distantPast
+    var lastLearningGlucoseValue: Int = -1
+    var lastLearningGlucoseCount: Int = 0
+    var lastLearningDoseCount: Int = 0
+
+    // Latest CGM timestamp seen
+    var lastSeenGlucoseTimestamp: Date = .distantPast
+
+    // ========================================
+    // NEW FIELD — Option A: Loop-based CGM counter
+    // ========================================
+    var cgmsSinceLastLearning: Int = 0
+
+    // ========================================
+    // SAVE STATE
+    // ========================================
+
+    func save(to storage: FileStorage) {
+        let data: [String: Any] = [
+            "lastAppliedDIA": lastAppliedDIA,
+            "lastAppliedPeak": lastAppliedPeak,
+
+            "smoothedDIA": smoothedDIA ?? 0.0,
+            "smoothedPeak": smoothedPeak ?? 0.0,
+
+            "lastUpdate": lastUpdate.timeIntervalSince1970,
+
+            "lastLearningTimestamp": lastLearningTimestamp.timeIntervalSince1970,
+            "lastLearningGlucoseValue": lastLearningGlucoseValue,
+            "lastLearningGlucoseCount": lastLearningGlucoseCount,
+            "lastLearningDoseCount": lastLearningDoseCount,
+
+            "lastSeenGlucoseTimestamp": lastSeenGlucoseTimestamp.timeIntervalSince1970,
+            "lastSeenGlucoseCount": lastSeenGlucoseCount,
+            "lastSeenDoseCount": lastSeenDoseCount,
+
+            // NEW FIELD
+            "cgmsSinceLastLearning": cgmsSinceLastLearning
+        ]
+
+        if let jsonData = try? JSONSerialization.data(withJSONObject: data, options: []),
+           let jsonString = String(data: jsonData, encoding: .utf8)
+        {
+            storage.save(RawJSON(jsonString), as: "autodia_state.json")
+            debug(.openAPS, "💾 AutoDIA state saved to disk")
+        }
+    }
+
+    // ========================================
+    // LOAD STATE
+    // ========================================
+
+    static func load(from storage: FileStorage) -> AutoDIALearningState {
+        guard let rawJSON = storage.retrieveRaw("autodia_state.json"),
+              let data = rawJSON.data(using: .utf8),
+              let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+        else {
+            debug(.openAPS, "📂 No saved AutoDIA state found, using defaults")
+            return AutoDIALearningState()
+        }
+
+        var state = AutoDIALearningState()
+
+        state.lastAppliedDIA = dict["lastAppliedDIA"] as? Double ?? 5.0
+        state.lastAppliedPeak = dict["lastAppliedPeak"] as? Double ?? 35.0
+
+        if let smoothed = dict["smoothedDIA"] as? Double, smoothed != 0.0 {
+            state.smoothedDIA = smoothed
+        }
+        if let smoothed = dict["smoothedPeak"] as? Double, smoothed != 0.0 {
+            state.smoothedPeak = smoothed
+        }
+
+        state.lastUpdate = Date(timeIntervalSince1970: dict["lastUpdate"] as? Double ?? 0)
+
+        state.lastLearningTimestamp = Date(timeIntervalSince1970: dict["lastLearningTimestamp"] as? Double ?? 0)
+        state.lastLearningGlucoseValue = dict["lastLearningGlucoseValue"] as? Int ?? -1
+        state.lastLearningGlucoseCount = dict["lastLearningGlucoseCount"] as? Int ?? 0
+        state.lastLearningDoseCount = dict["lastLearningDoseCount"] as? Int ?? 0
+
+        state.lastSeenGlucoseTimestamp = Date(timeIntervalSince1970: dict["lastSeenGlucoseTimestamp"] as? Double ?? 0)
+        state.lastSeenGlucoseCount = dict["lastSeenGlucoseCount"] as? Int ?? 0
+        state.lastSeenDoseCount = dict["lastSeenDoseCount"] as? Int ?? 0
+
+        // ============================
+        // NEW FIELD — flawlessly backward-compatible
+        // ============================
+        state.cgmsSinceLastLearning = dict["cgmsSinceLastLearning"] as? Int ?? 0
+
+        debug(.openAPS, "📂 AutoDIA state loaded from disk:")
+        debug(.openAPS, "   lastLearningTimestamp: \(state.lastLearningTimestamp)")
+        debug(.openAPS, "   lastLearningGlucoseCount: \(state.lastLearningGlucoseCount)")
+        debug(.openAPS, "   cgmsSinceLastLearning: \(state.cgmsSinceLastLearning)")
+
+        return state
+    }
+}
+
+// Global file-local state
+private var autoDIAState = AutoDIALearningState()
+
+// Helper function to save AutoDIA state
+private func saveAutoDIAState(storage: FileStorage) {
+    autoDIAState.save(to: storage)
+}
+
+// EMA smoothing helper
+private func ema(previous: Double, new: Double, alpha: Double) -> Double {
+    alpha * new + (1.0 - alpha) * previous
+}
 
 final class OpenAPS {
     private let jsWorker = JavaScriptWorker()
@@ -26,6 +154,9 @@ final class OpenAPS {
         self.nightscout = nightscout
         self.pumpStorage = pumpStorage
         self.scriptExecutor = scriptExecutor
+
+        // 🔧 LOAD AutoDIA state from disk
+        autoDIAState = AutoDIALearningState.load(from: storage)
     }
 
     func determineBasal(currentTemp: TempBasal, clock: Date = Date(), temporary: TemporaryData) -> Future<Suggestion?, Never> {
@@ -62,11 +193,68 @@ final class OpenAPS {
                         self.reservoirHistory(),
                         self.profileHistory()
                     )
+                    debug(.openAPS, "🔍 PREFERENCES RAW: \(preferences)")
 
                     let preferencesData = Preferences(from: preferences)
-                    let settings = FreeAPSSettings(from: data)
-                    var profile = storedProfile
+                    let typedSettings = FreeAPSSettings(from: data)
+                    let storedDict: [String: Any]
+
+                    if let jsonString = storedProfile as? String,
+                       let data = jsonString.data(using: .utf8),
+                       let dict = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+                    {
+                        storedDict = dict
+                    } else if let dict = storedProfile as? [String: Any] {
+                        storedDict = dict
+                    } else {
+                        storedDict = [:]
+                    }
+
+                    debug(.openAPS, "StoredProfile DICT (parsed): \(storedDict)")
+                    debug(.openAPS, "StoredProfile RAW: \(storedProfile)")
+                    debug(.openAPS, "StoredProfile DICT: \(storedDict)")
+
+                    let jsonData = try? JSONSerialization.data(withJSONObject: storedDict, options: [])
+                    let jsonString = String(data: jsonData ?? Data(), encoding: .utf8) ?? "{}"
+                    debug(.openAPS, "Initial profile JSON: \(jsonString)")
+                    var profile = RawJSON(jsonString)
                     print("Time for Loading files \(-1 * now.timeIntervalSinceNow) seconds")
+
+                    // =====================================
+                    // APPLY AUTO-DIA + PEAK INTO PROFILE
+                    // =====================================
+
+                    let autoDIAEnabledProfile = (preferencesData?.autoDIALearning ?? false)
+
+                    if autoDIAEnabledProfile {
+                        let learnedDIA = autoDIAState.lastAppliedDIA
+                        let learnedPeak = autoDIAState.lastAppliedPeak
+
+                        let diaSeconds = Int(learnedDIA * 3600)
+                        let peakSeconds = Int(learnedPeak * 60)
+
+                        debug(.openAPS, "🔥 Applying AutoDIA to profile: DIA=\(diaSeconds)s peak=\(peakSeconds)s")
+
+                        guard let data = profile.data(using: .utf8),
+                              var dict = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: Any]
+                        else {
+                            debug(.openAPS, "⚠️ AutoDIA: Failed to parse profile JSON")
+                            return
+                        }
+
+                        dict["dia"] = diaSeconds
+                        dict["insulinPeakTime"] = peakSeconds
+                        dict["insulinModel"] = "exponential"
+
+                        if let updatedData = try? JSONSerialization.data(withJSONObject: dict, options: []),
+                           let updatedString = String(data: updatedData, encoding: .utf8)
+                        {
+                            profile = RawJSON(updatedString)
+                            debug(.openAPS, "✅ AutoDIA profile updated successfully")
+                        } else {
+                            debug(.openAPS, "⚠️ AutoDIA: Failed to serialize updated profile JSON")
+                        }
+                    }
 
                     now = Date.now
                     let tdd = CoreDataStorage()
@@ -101,7 +289,6 @@ final class OpenAPS {
                         "Time for Meal and IOB module \(-1 * now.timeIntervalSinceNow) seconds, total: \(-1 * start.timeIntervalSinceNow)"
                     )
 
-                    // The Middleware layer.
                     now = Date.now
                     let alteredProfile = await self.middleware(
                         glucose: glucose,
@@ -115,8 +302,7 @@ final class OpenAPS {
                     )
 
                     now = Date.now
-                    // Auto ISF Layer
-                    if let freeAPSSettings = settings, freeAPSSettings.autoisf {
+                    if let freeAPSSettings = typedSettings, freeAPSSettings.autoisf {
                         now = Date.now
                         profile = await self.autosisf(
                             glucose: glucose,
@@ -130,8 +316,247 @@ final class OpenAPS {
                         )
                     } else { profile = alteredProfile }
 
-                    now = Date.now
-                    // The OpenAPS layer
+                    // ==========================
+                    // AUTO-DIA + PEAK LEARNING
+                    // (PURE COUNT + VALUE BASED)
+                    // ==========================
+
+                    debug(.openAPS, "\n\n============== AUTO-DIA LEARNING ==============")
+                    debug(.openAPS, "AutoDIA: entering learning block")
+
+                    let autoDIAEnabled: Bool = preferencesData?.autoDIALearning ?? false
+                    debug(.openAPS, "AutoDIA: enabled = \(autoDIAEnabled)")
+
+                    // If feature is off → just log and fall through
+                    if !autoDIAEnabled {
+                        debug(.openAPS, "AutoDIA: disabled — skipping estimator")
+                        debug(.openAPS, "============== END AUTO-DIA LEARNING ==============\n")
+                    } else {
+                        // ------------------------------------------------------------
+                        // STEP 1 — NORMALIZE & READ CGM DATA
+                        // ------------------------------------------------------------
+                        let sortedGlucose = glucose.sorted { $0.date < $1.date }
+                        let currentGlucoseCount = sortedGlucose.count
+
+                        // Latest CGM value (sgv or glucose)
+                        let newestValue: Int = {
+                            guard let g = sortedGlucose.last else { return -1 }
+                            return g.glucose ?? g.sgv ?? -1
+                        }()
+
+                        // Old baselines
+                        let lastCount = autoDIAState.lastLearningGlucoseCount
+                        let lastValue = autoDIAState.lastLearningGlucoseValue
+
+                        // Detect NEW CGM (still useful for safety/logging)
+                        let hasNewCGM = (currentGlucoseCount > lastCount) || (newestValue != lastValue)
+
+                        debug(
+                            .openAPS,
+                            "AutoDIA NEW-CGM CHECK: currCount=\(currentGlucoseCount) lastCount=\(lastCount) " +
+                                "currValue=\(newestValue) lastValue=\(lastValue) → hasNewCGM=\(hasNewCGM)"
+                        )
+
+                        // Update baseline + increment CGM-loop counter
+                        if hasNewCGM {
+                            autoDIAState.lastLearningGlucoseCount = currentGlucoseCount
+                            autoDIAState.lastLearningGlucoseValue = newestValue
+
+                            // 🔑 Option A: we treat each new CGM as ONE new "sample"
+                            autoDIAState.cgmsSinceLastLearning += 1
+
+                            debug(
+                                .openAPS,
+                                "AutoDIA: ✔ Updated CGM baseline → count=\(currentGlucoseCount) value=\(newestValue); " +
+                                    "cgmsSinceLastLearning=\(autoDIAState.cgmsSinceLastLearning)"
+                            )
+
+                            saveAutoDIAState(storage: self.storage)
+                        }
+
+                        // ------------------------------------------------------------
+                        // STEP 2 — DECODE PUMP HISTORY → STRUCTURED DOSES
+                        // (Used only for the estimator, not for readiness gating)
+                        // ------------------------------------------------------------
+                        var doseEntries: [DoseEntry] = []
+
+                        struct RawPumpEvent: Decodable {
+                            let _type: String
+                            let timestamp: String
+                            let rate: Double?
+                            let durationMin: Int?
+                            let duration: Double?
+                            let amount: Double?
+                            let isSMB: Bool?
+
+                            private enum CodingKeys: String, CodingKey {
+                                case _type
+                                case timestamp
+                                case rate
+                                case durationMin = "duration (min)"
+                                case duration
+                                case amount
+                                case isSMB
+                            }
+                        }
+
+                        let iso: ISO8601DateFormatter = {
+                            let f = ISO8601DateFormatter()
+                            f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                            return f
+                        }()
+
+                        let historyData: Data? = {
+                            if let arr = pumpHistory as? [Any] {
+                                return try? JSONSerialization.data(withJSONObject: arr)
+                            }
+                            if let str = pumpHistory as? String {
+                                return str.data(using: .utf8)
+                            }
+                            return nil
+                        }()
+
+                        if let data = historyData,
+                           let events = try? JSONDecoder().decode([RawPumpEvent].self, from: data)
+                        {
+                            var tempBasals: [Date: (rate: Double?, dur: Int?)] = [:]
+
+                            for e in events {
+                                guard let date = iso.date(from: e.timestamp) else { continue }
+
+                                switch e._type {
+                                case "TempBasal":
+                                    if tempBasals[date] == nil { tempBasals[date] = (nil, nil) }
+                                    tempBasals[date]?.rate = e.rate
+
+                                case "TempBasalDuration":
+                                    if tempBasals[date] == nil { tempBasals[date] = (nil, nil) }
+                                    tempBasals[date]?.dur = e.durationMin
+
+                                case "Bolus":
+                                    if let amount = e.amount {
+                                        doseEntries.append(
+                                            DoseEntry(
+                                                type: .bolus,
+                                                startDate: date,
+                                                endDate: date.addingTimeInterval(e.duration ?? 0),
+                                                value: amount,
+                                                unit: .units
+                                            )
+                                        )
+                                    }
+
+                                default:
+                                    break
+                                }
+                            }
+
+                            // Pair temp basal rates and durations
+                            for (start, pair) in tempBasals {
+                                guard let rate = pair.rate, let dur = pair.dur else { continue }
+                                let end = start.addingTimeInterval(Double(dur) * 60)
+
+                                doseEntries.append(
+                                    DoseEntry(
+                                        type: .tempBasal,
+                                        startDate: start,
+                                        endDate: end,
+                                        value: rate,
+                                        unit: .unitsPerHour
+                                    )
+                                )
+                            }
+                        }
+
+                        debug(.openAPS, "AutoDIA: decoded doses = \(doseEntries.count)")
+
+                        // ------------------------------------------------------------
+                        // STEP 3 — READINESS CHECK (CGM-ONLY, DOSES NOT REQUIRED)
+                        // ------------------------------------------------------------
+                        let minCGMRequired = 48 // number of loops/CGM events since last learn
+
+                        let cgmProgress = autoDIAState.cgmsSinceLastLearning
+                        let enoughCGM = cgmProgress >= minCGMRequired
+
+                        // For now, do NOT gate on doses to avoid fragile history issues
+                        let enoughDoses = true
+
+                        let shouldLearnNow = enoughCGM && enoughDoses
+
+                        debug(
+                            .openAPS,
+                            "AutoDIA READINESS (Option A): CGM \(cgmProgress)/\(minCGMRequired), " +
+                                "Doses OK (decoded=\(doseEntries.count)) → learnNow=\(shouldLearnNow)"
+                        )
+
+                        if !shouldLearnNow {
+                            debug(.openAPS, "AutoDIA: skipping estimator — insufficient new data")
+                            debug(.openAPS, "============== END AUTO-DIA LEARNING ==============\n")
+                        } else {
+                            // ------------------------------------------------------------
+                            // STEP 4 — RUN ESTIMATOR
+                            // ------------------------------------------------------------
+                            debug(.openAPS, "AutoDIA: attempting estimator…")
+
+                            let glucoseValues = sortedGlucose.compactMap { g -> SimpleGlucoseValue? in
+                                guard let mgdl = g.glucose ?? g.sgv else { return nil }
+                                let date = Date(timeIntervalSince1970: Double(g.date) / 1000.0)
+                                return SimpleGlucoseValue(date: date, glucose: Double(mgdl))
+                            }
+
+                            let hasEnoughStructure = glucoseValues.count >= 60 && doseEntries.count >= 10
+
+                            if !hasEnoughStructure {
+                                debug(
+                                    .openAPS,
+                                    "AutoDIA: ❌ insufficient structured data (glucose=\(glucoseValues.count), doses=\(doseEntries.count))"
+                                )
+                                debug(.openAPS, "============== END AUTO-DIA LEARNING ==============\n")
+                            } else {
+                                let estimator = AutoInsulinCurveEstimator()
+
+                                if let learned = estimator.calculate(glucose: glucoseValues, doses: doseEntries) {
+                                    debug(.openAPS, "AutoDIA estimator:")
+                                    debug(.openAPS, "  raw DIA  = \(learned.diaHours)")
+                                    debug(.openAPS, "  raw Peak = \(learned.peakMinutes)")
+
+                                    // Clamp to safe ranges
+                                    let dia = min(max(learned.diaHours, 5.0), 11.0)
+                                    let peak = min(max(learned.peakMinutes, 35.0), 120.0)
+
+                                    // APPLY IN MEMORY
+                                    autoDIAState.lastAppliedDIA = dia
+                                    autoDIAState.lastAppliedPeak = peak
+
+                                    // SAVE PERSISTENTLY (<< THE IMPORTANT FIX)
+                                    let learnedCurve = LearnedCurve(diaHours: dia, peakMinutes: peak)
+                                    AutoCurveManager.shared.update(curve: LearnedCurve(diaHours: dia, peakMinutes: peak))
+                                    debug(.openAPS, "💾 Saved AutoDIA learned curve to history")
+
+                                    // Reset counters
+                                    autoDIAState.cgmsSinceLastLearning = 0
+                                    autoDIAState.lastLearningGlucoseCount = currentGlucoseCount
+                                    autoDIAState.lastLearningDoseCount = doseEntries.count
+
+                                    saveAutoDIAState(storage: self.storage)
+
+                                    debug(.openAPS, "🌟 AutoDIA APPLIED → DIA=\(dia)h Peak=\(peak)m")
+                                    debug(.openAPS, "💾 Saved AutoDIA learned curve")
+                                    debug(.openAPS, "============== END AUTO-DIA LEARNING ==============\n")
+                                } else {
+                                    debug(.openAPS, "AutoDIA: ❌ estimator failed to produce model")
+                                    debug(.openAPS, "============== END AUTO-DIA LEARNING ==============\n")
+                                }
+                            }
+                        }
+                    }
+
+                    // =============================
+                    // DEBUG PROFILE BEFORE JS INPUT
+                    // =============================
+                    debug(.openAPS, "PROFILE JSON BEFORE JS:\n\(profile)")
+
+                    // The OpenAPS layer – JS call
                     let suggested = await self.determineBasal(
                         glucose: glucose,
                         currentTemp: tempBasal,
@@ -143,6 +568,7 @@ final class OpenAPS {
                         reservoir: reservoir,
                         pumpHistory: pumpHistory
                     )
+
                     print(
                         "Time for Determine Basal module \(-1 * now.timeIntervalSinceNow) seconds, total: \(-1 * start.timeIntervalSinceNow)"
                     )
@@ -150,10 +576,8 @@ final class OpenAPS {
 
                     // Update Suggestion, when applicable (middleware / dynamic ISF / Auto ISF)
                     if var suggestion = Suggestion(from: suggested) {
-                        now = Date.now
-
                         // Auto ISF
-                        if let mySettings = settings, mySettings.autoisf, let iob = suggestion.iob {
+                        if let mySettings = typedSettings, mySettings.autoisf, let iob = suggestion.iob {
                             // If IOB < one hour of negative insulin and keto protection is active, then enact a small keto protection basal rate
                             if mySettings.ketoProtect, iob < 0,
                                let rate = suggestion.rate, rate <= 0,
@@ -175,14 +599,75 @@ final class OpenAPS {
                             preferences: preferencesData,
                             profile: profile,
                             tdd: tdd,
-                            settings: settings
+                            settings: typedSettings,
+                            glucose: glucose
                         )
+
+                        // =====================================
+                        // INJECT AUTO-DIA + PEAK INTO SUGGESTION MODEL
+                        // =====================================
+                        let autoDIAEnabledProfile = (preferencesData?.autoDIALearning ?? false)
+
+                        if autoDIAEnabledProfile {
+                            let diaHours = autoDIAState.lastAppliedDIA
+                            let peakMinutes = autoDIAState.lastAppliedPeak
+
+                            debug(.openAPS, "📡 Adding AutoDIA fields to Suggestion: DIA=\(diaHours)h Peak=\(peakMinutes)m")
+
+                            // Write directly into Suggestion
+                            suggestion.autoDIA = Decimal(diaHours)
+                            suggestion.autoPeak = Decimal(peakMinutes)
+                        } else {
+                            debug(.openAPS, "📡 AutoDIA disabled — not adding fields to Suggestion")
+                        }
+
+                        // Timestamp & save as usual
+                        suggestion.timestamp = suggestion.deliverAt ?? clock
+                        self.storage.save(suggestion, as: Enact.suggested)
+                        promise(.success(suggestion))
+
+                        func autosense() -> Future<Autosens?, Never> {
+                            Future { promise in
+                                self.processQueue.async {
+                                    debug(.openAPS, "Start autosens")
+                                    let pumpHistory = self.loadFileFromStorage(name: OpenAPS.Monitor.pumpHistory)
+                                    let carbs = self.loadFileFromStorage(name: Monitor.carbHistory)
+                                    let glucose = self.glucoseStorage.retrieveFiltered()
+                                    let profile = self.loadFileFromStorage(name: Settings.profile)
+                                    let basalProfile = self.loadFileFromStorage(name: Settings.basalProfile)
+                                    let tempTargets = self.loadFileFromStorage(name: Settings.tempTargets)
+
+                                    Task {
+                                        let autosensResult = await self.autosense(
+                                            glucose: glucose,
+                                            pumpHistory: pumpHistory,
+                                            basalprofile: basalProfile,
+                                            profile: profile,
+                                            carbs: carbs,
+                                            temptargets: tempTargets
+                                        )
+
+                                        debug(.openAPS, "AUTOSENS: \(autosensResult)")
+                                        if var autosens = Autosens(from: autosensResult) {
+                                            autosens.timestamp = Date()
+                                            self.storage.save(autosens, as: Settings.autosense)
+                                            promise(.success(autosens))
+                                        } else {
+                                            promise(.success(nil))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         // Update time
                         suggestion.timestamp = suggestion.deliverAt ?? clock
+
                         // Save
                         self.storage.save(suggestion, as: Enact.suggested)
 
                         promise(.success(suggestion))
+
                     } else {
                         promise(.success(nil))
                     }
@@ -456,7 +941,8 @@ final class OpenAPS {
         preferences: Preferences?,
         profile: RawJSON,
         tdd: InsulinDistribution?,
-        settings: FreeAPSSettings?
+        settings: FreeAPSSettings?,
+        glucose _: [BloodGlucose]
     ) -> String {
         var reasonString = reason
         let startIndex = reasonString.startIndex
@@ -475,6 +961,60 @@ final class OpenAPS {
                 let bolus = Int(((tdd.bolus ?? 0) as Decimal) * 100 / (total != 0 ? total : 1))
                 tddString = ", Insulin 24h: \(round) U, \(bolus) % Bolus"
             }
+
+            // ------------------------------------------------------------
+            // AUTO-DIA SUMMARY + READINESS TILE (RESPECTS TOGGLE)
+            // ------------------------------------------------------------
+
+            let autoDIAEnabled = preferences?.autoDIALearning ?? false
+
+            if autoDIAEnabled {
+                // -------------------------------
+                // READINESS TILE (CGM-ONLY LOGIC)
+                // -------------------------------
+                let cgmProgress = autoDIAState.cgmsSinceLastLearning
+                let minCGMRequired = 48
+                let remainingCGM = max(0, minCGMRequired - cgmProgress)
+
+                let autoDIAReadinessTile =
+                    "AutoDIA: Readings until recalibration:\(remainingCGM)"
+
+                // -------------------------------
+                // SUMMARY TILE (CURRENT DIA/PEAK)
+                // -------------------------------
+                let currentDIAHours = autoDIAState.lastAppliedDIA
+                let currentPeakMinutes = autoDIAState.lastAppliedPeak
+
+                let autoDIASummaryTile =
+                    "AutoDIA: DIA:\(Int(currentDIAHours))h Peak:\(Int(currentPeakMinutes))m"
+
+                // Insert summary FIRST, then readiness
+                reasonString.insert(
+                    contentsOf: autoDIASummaryTile + ", ",
+                    at: reasonString.startIndex
+                )
+                reasonString.insert(
+                    contentsOf: autoDIAReadinessTile + ", ",
+                    at: reasonString.startIndex
+                )
+
+                debug(.openAPS, "🧪 AutoDIA SUMMARY TILE → \(autoDIASummaryTile)")
+                debug(.openAPS, "🧪 AutoDIA READINESS TILE → \(autoDIAReadinessTile)")
+
+            } else {
+                // -------------------------------
+                // AUTO-DIA DISABLED TILE
+                // -------------------------------
+                let disabledTile = "AutoDIA: Off"
+
+                reasonString.insert(
+                    contentsOf: disabledTile + ", ",
+                    at: reasonString.startIndex
+                )
+
+                debug(.openAPS, "🧪 AutoDIA SUMMARY TILE → AutoDIA: Off")
+            }
+
             // Auto ISF
             if let freeAPSSettings = settings, freeAPSSettings.autoisf {
                 let reasons = profile.autoISFreasons ?? ""

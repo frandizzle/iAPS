@@ -36,6 +36,7 @@ struct Preferences: JSON {
     var bolusIncrement: Decimal = 0.1
     var curve: InsulinCurve = .rapidActing
     var useCustomPeakTime: Bool = false
+    var autoDIALearning: Bool = false
     var insulinPeakTime: Decimal = 75
     var carbsReqThreshold: Decimal = 1.0
     var noisyCGMTargetMultiplier: Decimal = 1.3
@@ -92,6 +93,7 @@ extension Preferences {
         case curve
         case useCustomPeakTime
         case insulinPeakTime
+        case autoDIALearning
         case carbsReqThreshold
         case noisyCGMTargetMultiplier
         case suspendZerosIOB = "suspend_zeros_iob"

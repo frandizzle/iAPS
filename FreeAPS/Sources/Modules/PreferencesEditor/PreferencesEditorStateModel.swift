@@ -286,7 +286,8 @@ extension PreferencesEditor {
                     displayName: NSLocalizedString("Use Custom Peak Time", comment: "Use Custom Peak Time"),
                     type: .boolean(keypath: \.useCustomPeakTime),
                     infoText: NSLocalizedString(
-                        "Defaults to false. Setting to true allows changing insulinPeakTime", comment: "Use Custom Peak Time"
+                        "Defaults to false. Setting to true allows changing insulinPeakTime",
+                        comment: "Use Custom Peak Time"
                     ),
                     settable: self
                 ),
@@ -299,6 +300,17 @@ extension PreferencesEditor {
                     ),
                     settable: self
                 ),
+                /// 👇👇 NEW TOGGLE HERE 👇👇
+                Field(
+                    displayName: NSLocalizedString("Auto DIA + Peak Learning", comment: "Auto DIA + Peak Learning"),
+                    type: .boolean(keypath: \.autoDIALearning),
+                    infoText: NSLocalizedString(
+                        "When enabled, iAPS will automatically learn and adjust your insulin duration and peak time using recent glucose and insulin activity. This improves prediction accuracy over time. Recommended for advanced users.",
+                        comment: "Auto DIA + Peak Learning"
+                    ),
+                    settable: self
+                ),
+                /// 👆👆 NEW TOGGLE ENDS HERE 👆👆
                 Field(
                     displayName: NSLocalizedString("Skip Neutral Temps", comment: "Skip Neutral Temps"),
                     type: .boolean(keypath: \.skipNeutralTemps),

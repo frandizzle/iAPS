@@ -1,6 +1,8 @@
 import Foundation
 
 struct Suggestion: JSON, Equatable {
+    // MARK: - Core Suggestion Fields
+
     var reason: String
     var units: Decimal?
     let insulinReq: Decimal?
@@ -19,6 +21,11 @@ struct Suggestion: JSON, Equatable {
     var timestamp: Date?
     var recieved: Bool?
     var targetBG: Decimal?
+
+    // MARK: - AutoDIA Learning Output
+
+    var autoDIA: Decimal? // learned DIA (hours)
+    var autoPeak: Decimal? // learned peak time (minutes)
 }
 
 struct Predictions: JSON, Equatable {
@@ -27,6 +34,8 @@ struct Predictions: JSON, Equatable {
     let cob: [Int]?
     let uam: [Int]?
 }
+
+// MARK: - Coding Keys
 
 extension Suggestion {
     private enum CodingKeys: String, CodingKey {
@@ -48,6 +57,10 @@ extension Suggestion {
         case timestamp
         case recieved
         case targetBG = "target_bg"
+
+        // Auto-DIA fields
+        case autoDIA = "auto_dia"
+        case autoPeak = "auto_peak"
     }
 }
 
@@ -60,19 +73,15 @@ extension Predictions {
     }
 }
 
-protocol SuggestionObserver {
-    func suggestionDidUpdate(_ suggestion: Suggestion)
-}
-
-protocol EnactedSuggestionObserver {
-    func enactedSuggestionDidUpdate(_ suggestion: Suggestion)
-}
+// MARK: - Helpers
 
 extension Suggestion {
+    /// List version for UI display (ISF, COB, IOB, etc)
     var reasonParts: [String] {
         reason.components(separatedBy: "; ").first?.components(separatedBy: ", ") ?? []
     }
 
+    /// Final conclusion line
     var reasonConclusion: String {
         reason.components(separatedBy: "; ").last ?? ""
     }

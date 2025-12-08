@@ -1381,7 +1381,353 @@ Enact a temp Basal or a temp target */
 /* Food Type / Meal Note */
 "Note" = "Примітка";
 
+"Servings" = "Порції";
+
+"Kilo Calories" = "Кіло Калорія";
+
+"Meals" = "Страви";
+
+"Today's Meals" = "Сьогоднішні Страви";
+
+// --------- AI ---------
 /* */
+"📝 Notes" = "📝 Примітка";
+
+/* */
+"💉 Diabetes recommendations" = "💉 Рекомендації щодо діабету";
+
+/* */
+"🍽️ Separate Foods" = "🍽️ Роздільне харчування";
+
+/* */
+"Add all" = "Додати усі";
+
+/* */
+"🧠 AI Food analysis" = "🧠 Аналіз продуктів харчування за допомогою штучного інтелекту";
+
+/* */
+"📊 Total nutritional values of the meal" = "📊 Загальна харчова цінність страви";
+
+/* */
+"Confidence level:" = "Рівень впевненості:";
+
+/* */
+"Notes: %@" = "Примітки: %@";
+
+/* */
+"Visual Cues: %@" = "Візуальні підказки: %@";
+
+/* */
+"Preparation: %@" = "Підготовка: %@";
+
+/* */
+"Preparation" = "Підготовка";
+
+/* */
+"Multiplicator" = "Множник";
+
+/* */
+"Accept quantity" = "Прийняти кількість";
+
+/* */
+"Enter desired quantity" = "Введіть бажану кількість";
+
+/* */
+"AI Food Search" = "Пошук їжі зі штучним інтелектом";
+
+/* Title */
+"Food Search" = "Пошук їжі";
+
+/* Food Search input */
+"Food Search..." = "Пошук їжі...";
+
+/* */
+"Search Food Database" = "Пошук у базі даних продуктів харчування";
+
+"Models Used:" = "Використані моделі:";
+
+"Current Mode: %@" = "Поточний режим: %@";
+
+"Analysis Mode" = "Режим аналізу";
+
+"This AI provider requires an API key. Please enter your API key in the settings below." = "Цей постачальник штучного інтелекту вимагає ключ API. Будь ласка, введіть свій ключ API у налаштуваннях нижче.";
+"API Key Required" = "Потрібен ключ API";
+
+"Food Search Settings" = "Налаштування пошуку їжі";
+
+"AI nutritional estimates are approximations only. Always consult with your healthcare provider for medical decisions. Verify nutritional information whenever possible. Use at your own risk." = "Оцінки харчової цінності, отримані за допомогою штучного інтелекту, є лише приблизними. Завжди консультуйтеся зі своїм лікарем щодо прийняття медичних рішень. Перевіряйте інформацію про харчову цінність, коли це можливо. Використовуйте на свій страх і ризик.";
+
+"Medical Disclaimer" = "Медична відмова від відповідальності";
+
+"Google (Gemini API) → OpenAI (ChatGPT API) → Anthropic (Claude API)" = "Google (Gemini API) → OpenAI (ChatGPT API) → Anthropic (Claude API)";
+
+"**AI Image Analysis:**" = "**Аналіз зображень за допомогою штучного інтелекту**:";
+
+"OpenFoodFacts" = "OpenFoodFacts (Відкриті факти про їжу)";
+
+"**Barcode Scanning:**" = "**Сканування штрих-кодів:**";
+
+"USDA FoodData Central → OpenFoodFacts" = "Центр даних про харчові продукти Міністерства сільського господарства США → Відкриті факти про харчові продукти";
+
+"**Text/Voice Search:**" = "**Текстовий/голосовий пошук:**";
+"Search Type Recommendations" = "Рекомендації щодо типу пошуку";
+
+"• **USDA FoodData Central**: Free, official nutrition database. Superior nutrition data for non-packaged foods like fruits, vegetables, and meat." = "• **USDA FoodData Central**: Безкоштовна офіційна база даних про харчування. Чудові дані про харчування нефасованих продуктів, таких як фрукти, овочі та м’ясо.";
+
+"• **OpenFoodFacts**: Free, open database with extensive barcode coverage and text search for packaged foods. Default for text and barcode searches." = "• **OpenFoodFacts**: Безкоштовна, відкрита база даних із широким охопленням штрих-кодів та текстовим пошуком для упакованих продуктів. За замовчуванням для пошуку тексту та штрих-кодів.";
+
+"• **OpenAI (ChatGPT API)**: Most accurate AI analysis using GPT-4 Vision. Requires API key (~$0.01 per image). Excellent at image analysis and natural language queries." = "• **OpenAI (ChatGPT API)**: Найточніший аналіз за допомогою ШІ з використанням GPT-4 Vision. Потрібен ключ API (~$0.01 за зображення). Відмінно підходить для аналізу зображень та запитів природною мовою.";
+
+"• **Google (Gemini API)**: Free AI with generous limits (1500/day). Excellent food recognition using Google's Vision AI. Perfect balance of quality and cost." = "• **Google (Gemini API)**: Безкоштовний штучний інтелект зі щедрими лімітами (1500/день). Відмінне розпізнавання їжі за допомогою штучного інтелекту Vision від Google. Ідеальний баланс якості та вартості.";
+
+"• **Anthropic (Claude API)**: Advanced AI with detailed reasoning. Excellent at food analysis and portion estimation. Requires API key (~$0.25 per million tokens)." = "• **Anthropic (Claude API)**: Розширений ШІ з детальним мисленням. Відмінно аналізує їжу та оцінює порції. Потрібен ключ API (~$0,25 за мільйон токенів).";
+
+"Available Search Providers:" = "Доступні пошукові системи:";
+
+"Provider Information" = "Інформація про постачальника";
+
+"❌ If you select 'OpenFoodFacts' or 'USDA', camera analysis will use basic estimation instead of AI" = "❌ Якщо ви оберете «OpenFoodFacts» або «USDA», аналіз камери використовуватиме базову оцінку замість штучного інтелекту";
+
+"✅ Select 'Anthropic (Claude API)', 'Google (Gemini API)', or 'OpenAI (ChatGPT API)' for AI Image Analysis to use your paid keys" = "✅ Виберіть «Anthropic (Claude API)», «Google (Gemini API)» або «OpenAI (ChatGPT API)» для аналізу зображень за допомогою штучного інтелекту, щоб використовувати ваші платні ключі";
+
+"When you take a photo of food, the app uses the provider selected in 'AI Image Analysis' above." = "Коли ви фотографуєте їжу, додаток використовує постачальника, вибраного в розділі «Аналіз зображень зі штучним інтелектом» вище.";
+
+"Camera Food Analysis" = "Аналіз харчових продуктів камерою";
+
+"To use your paid API keys, make sure to select the corresponding provider in 'AI Image Analysis' above. The provider you select for AI Image Analysis is what will be used when you take photos of food." = "Щоб використовувати платні ключі API, переконайтеся, що ви вибрали відповідного постачальника в розділі «Аналіз зображень зі штучним інтелектом» вище. Постачальник, якого ви оберете для аналізу зображень зі штучним інтелектом, буде використовуватися під час фотографування їжі.";
+
+"Important: How to Use Your API Keys" = "Важливо: Як використовувати ключі API";
+
+"Break down this meal into individual components with complete macronutrient profiles (carbs, protein, fat, calories) per item and combined totals." = "Розбийте цю страву на окремі компоненти з повними профілями макронутрієнтів (вуглеводи, білки, жири, калорії) для кожного елемента та їх загальною кількістю";
+
+"Identify all food items in this image with focus on carbohydrate content for diabetes management. Provide detailed carb counts for each component and total meal carbohydrates." = "Визначте всі продукти харчування на цьому зображенні, зосереджуючись на вмісті вуглеводів для контролю діабету. Надайте детальну кількість вуглеводів для кожного компонента та загальну кількість вуглеводів у страві.";
+
+"Diabetes Focus" = "Фокус на Діабет";
+
+"Provide extremely detailed visual analysis of this food image. Describe every element you can see: food colors, textures, cooking methods (grilled marks, browning, steaming), plate type and size, utensils present, garnishes, sauces, cooking oils visible, food arrangement, and background elements. Use these visual details to estimate precise portion sizes and calculate accurate nutrition values for diabetes management." = "Надайте надзвичайно детальний візуальний аналіз цього зображення їжі. Опишіть кожен елемент, який ви бачите: кольори їжі, текстури, способи приготування (сліди гриля, підрум'янення, приготування на пару), тип і розмір тарілки, наявний посуд, гарніри, соуси, видимі кулінарні олії, розташування їжі та елементи фону. Використовуйте ці візуальні деталі, щоб оцінити точний розмір порцій та розрахувати точну харчову цінність для контролю діабету.";
+
+"Analyze this food image for diabetes management. Describe exactly what you see in detail: colors, textures, cooking methods, plate type, utensils, and food arrangement. Identify each food item with specific preparation details, estimate precise portion sizes using visual references, and provide carbohydrates, protein, fat, and calories for each component. Focus on accurate carbohydrate estimation for insulin dosing." = "Проаналізуйте це зображення їжі для контролю діабету. Точно опишіть те, що ви бачите, детально: кольори, текстури, способи приготування, тип тарілки, посуд та розташування їжі. Визначте кожен продукт харчування з конкретними деталями приготування, оцініть точний розмір порцій за допомогою візуальних орієнтирів та вкажіть вуглеводи, білки, жири та калорії для кожного компонента. Зосередьтеся на точній оцінці вуглеводів для дозування інсуліну.";
+
+"AI Prompt for Enhanced Results" = "Підказки ШІ для Покращених Результатів";
+
+"Enter your OpenAI API key" = "Введіть свій ключ API OpenAI";
+
+"ChatGPT (OpenAI) API Key" = "ChatGPT (OpenAI) API Key";
+
+"Get an API key from platform.openai.com. Customize the analysis prompt to get specific meal component breakdowns and nutrition totals. (~$0.01 per image)" = "Отримайте ключ API з platform.openai.com. Налаштуйте запит на аналіз, щоб отримати розподіл компонентів страв та загальну харчову цінність. (~$0.01 за зображення)";
+
+"OpenAI (ChatGPT API) Configuration" = "Конфігурація OpenAI (ChatGPT API)";
+
+"Macro Tracking" = "Відстеження Макросів";
+
+"Identify all food items in this image with focus on carbohydrate content for diabetes management. Provide detailed carb counts for each component and total meal carbohydrates." = "Визначте всі продукти харчування на цьому зображенні, зосереджуючись на вмісті вуглеводів для контролю діабету. Надайте детальну кількість вуглеводів для кожного компонента та загальну кількість вуглеводів у страві.";
+
+"Detailed Visual Analysis" = "Детальний Візуальний Аналіз";
+
+"Enter your Google Gemini API key" = "Введіть свій ключ API Google Gemini";
+
+"Google Gemini API Key" = "Ключ API Google Gemini";
+
+"Get a free API key from ai.google.dev. Google Gemini provides excellent food recognition with generous free tier (1500 requests per day)." = "Отримайте безкоштовний ключ API від ai.google.dev. Google Gemini забезпечує чудове розпізнавання їжі завдяки щедрому безкоштовному плану (1500 запитів на день).";
+
+"Google (Gemini API) Configuration" = "Конфігурація Google (Gemini API)";
+
+"Your AI provider quota has been exceeded. Please check your usage limits or try a different provider." = "Квоту вашого постачальника штучного інтелекту перевищено. Перевірте ліміти використання або спробуйте скористатися послугами іншого постачальника.";
+
+"Your AI provider has run out of credits. Please check your account billing or try a different provider." = "Ваш постачальник послуг штучного інтелекту вичерпав свої кредити. Перевірте рахунки свого облікового запису або спробуйте скористатися послугами іншого постачальника.";
+
+"Reset to Default" = "Скинути до Заводських Налаштувань";
+
+"Retake Photo" = "Перезняти фото";
+
+"Retry Analysis" = "Аналіз Повторних спроб";
+
+"Try Different Provider" = "Спробуйте Іншого Постачальника";
+
+"Check Account" = "Перевірте Рахунок";
+
+"Analysis Error" = "Помилка Аналізу";
+
+"AI Food Analysis" = "Аналіз Харчових Продуктів зі ШІ";
+
+"Use Cancel to retake photo" = "Натисніть кнопку «Скасувати», щоб повторно зробити фото";
+
+"Analyzing food with AI..." = "Аналіз їжі за допомогою ШІ...";
+
+"Choose from Library" = "Виберіть з Бібліотеки";
+
+"Take a Photo" = "Зробіть Фотографію";
+
+"Keep the camera level to reduce distortion and keep portions proportional." = "Тримайте камеру рівно, щоб зменшити спотворення та зберегти пропорції фрагментів.";
+
+"Shoot from slightly above" = "Тримайте трохи зверху";
+
+"Forks, cups, or hands help AI calculate realistic portions." = "Виделки, чашки або руки допомагають штучному інтелекту розраховувати реалістичні порції.";
+
+"Add a size reference" = "Додати посилання на розмір";
+
+"Make sure every food item is in the frame." = "Переконайтеся, що кожен продукт харчування знаходиться в кадрі.";
+
+"Frame the full meal" = "Створіть повну страву в рамці";
+
+"Remove napkins, lids, or packaging that may be misidentified as food." = "Зніміть серветки, кришки або упаковку, які можна помилково ідентифікувати як харчові продукти.";
+
+"Clear the area" = "Очистіть простір";
+
+"Harsh shadows confuse the AI and dim light can hide textures." = "Різкі тіні заплутують ШІ, а тьмяне світло може приховувати текстури.";
+
+"Use bright, even light" = "Використовуйте яскраве, рівномірне світло";
+
+"Better photos = better estimates" = "Кращі фотографії = кращі оцінки";
+
+"Scan failed" = "Помилка сканування";
+
+"Looking up product..." = "Пошук товару...";
+
+"Code detected!" = "Виявлено Код!";
+
+"Position camera over barcode or QR code" = "Розмістіть камеру над штрих-кодом або QR-кодом";
+
+"Validating format..." = "Перевірка формату...";
+
+"Scanning for barcode or QR code..." = "Сканування штрих-коду або QR-коду...";
+
+"Initializing camera..." = "Ініціалізація камери...";
+
+"Scan failed" = "Помилка сканування";
+
+"iAPS needs camera access to scan barcodes. Please enable camera access in Settings." = "iAPS потрібен доступ до камери для сканування штрих-кодів. Будь ласка, увімкніть доступ до камери в налаштуваннях.";
+
+"Camera Access Required" = "Потрібен Доступ до Камери";
+
+"Check Permissions" = "Перевірити Дозволи";
+
+"Supports traditional barcodes and QR codes" = "Підтримує традиційні штрих-коди та QR-коди";
+
+"Hold steady for best results" = "Тримайте рівно для найкращих результатів";
+
+"Retry" = "Спробувати знову";
+
+"Scan Barcode" = "Сканування штрих-коду";
+
+"📦 Database Results" = "📦 Результати бази даних";
+
+"🤖 AI Search Results" = "🤖 Результати пошуку за допомогою штучного інтелекту";
+
+"• Use the barcode scanner for packaged foods" = "• Використовуйте сканер штрих-кодів для упакованих продуктів";
+
+"• Check spelling carefully" = "• Уважно перевіряйте орфографію";
+
+"• Use simple, common food names" = "• Використовуйте прості, поширені назви продуктів харчування";
+
+"• Try brand names (e.g., \"Cheerios\")" = "• Спробуйте назви брендів (наприклад, «Cheerios»)";
+
+"💡 Search Tips:" = "💡 Поради щодо пошуку:";
+
+"Try simpler terms like \"bread\" or \"apple\", or scan a barcode" = "Спробуйте простіші терміни, такі як «хліб» або «яблуко», або проскануйте штрих-код";
+
+"Check your spelling and try again" = "Перевірте орфографію та спробуйте ще раз";
+
+"No Foods Found" = "Продуктів не знайдено";
+
+"Search Error" = "Помилка пошуку";
+
+"Finding the best matches for you" = "Пошук найкращих варіантів для вас";
+
+"Searching foods" = "Пошук продуктів";
+
+"AI Analysis" = "Аналіз ШІ";
+
+"Analysis Status" = "Стан аналізу";
+
+"❌ Analysis failed" = "❌ Аналіз не вдався";
+
+"⚠️ Connection interrupted..." = "⚠️ З'єднання перервано...";
+
+"✅ Analysis complete!" = "✅ Аналіз завершено!";
+
+"🍽️ Generating nutrition summary..." = "🍽️ Генерування зведення про харчування...";
+
+"📊 Processing analysis results..." = "📊 Обробка результатів аналізу...";
+
+"🤖 Running AI vision analysis..." = "🤖 Виконання аналізу зору зі штучним інтелектом...";
+
+"⚖️ Comparing to USDA standards..." = "⚖️ Порівняно зі стандартами USDA (Міністерства сільського господарства США)...";
+
+"📏 Calculating serving sizes..." = "📏 Розрахунок розмірів порцій...";
+
+"🔬 Identifying food portions..." = "🔬 Визначення порцій їжі...";
+
+"📊 Analyzing nutritional content..." = "📊 Аналіз харчової цінності...";
+
+"📡 Uploading image for analysis..." = "📡 Завантаження зображення для аналізу...";
+
+"🧠 Connecting to AI provider..." = "🧠 Підключення до постачальника послуг штучного інтелекту...";
+
+"💼 Optimizing image quality..." = "💼 Оптимізація якості зображення...";
+
+"📱 Processing image data..." = "📱 Обробка даних зображення...";
+
+"🔍 Initializing AI food analysis..." = "🔍 Ініціалізація аналізу їжі за допомогою штучного інтелекту...";
+
+"⚡ Processing AI analysis results..." = "⚡ Обробка результатів аналізу ШІ...";
+
+"📥 Received response from Claude..." = "📥 Отримав відповідь від Claude...";
+
+"⏳ AI is cooking up results..." = "⏳ Штучний інтелект підробляє результати...";
+
+"🌐 Sending request to Claude..." = "🌐 Надсилання запиту Claude...";
+
+"📡 Preparing API request..." = "📡 Підготовка запиту API...";
+
+"🔄 Encoding image data..." = "🔄 Кодування даних зображення...";
+
+"🖼️ Optimizing your image..." = "🖼️ Оптимізація вашого зображення...";
+
+"⚙️ Configuring Claude parameters..." = "⚙️ Налаштування параметрів Claude...";
+
+"⚙️ Processing analysis results..." = "⚙️ Обробка результатів аналізу...";
+
+"📊 Calculating nutrition estimates..." = "📊 Розрахунок оцінок поживності...";
+
+"🍽️ Identifying food characteristics..." = "🍽️ Визначення характеристик їжі...";
+
+"📱 Analyzing image properties..." = "📱 Аналіз властивостей зображення...";
+
+"📊 Initializing basic analysis..." = "📊 Ініціалізація базового аналізу...";
+
+"🤖 Connecting to Google Gemini..." = "🤖 Підключення до Google Gemini...";
+
+"📥 Received response from Gemini..." = "📥 Отримано відповідь від Gemini....";
+
+"🌐 Sending request to Google Gemini..." = "🌐 Надсилання запиту до Google Gemini...";
+
+"🔄 Encoding image data..." = "🔄 Кодування даних зображення...";
+
+"⚙️ Configuring Gemini parameters..." = "⚙️ Налаштування параметрів Gemini...";
+
+"📥 Received response from OpenAI..." = "📥 Отримано відповідь від OpenAI...";
+
+"💾 Caching analysis result..." = "💾 Результат аналізу кешування...";
+
+"⏳ Doing a deep analysis (may take a bit)..." = "⏳ Проведення глибокого аналізу (може зайняти трохи часу)...";
+
+"🎯 Selecting optimal AI provider..." = "🎯 Вибір оптимального постачальника ШІ...";
+
+"⚡ Starting parallel provider analysis..." = "⚡ Початок паралельного аналізу постачальників...";
+
+"Amount:" = "Сума:";
+
+"Take Over" = "Захопити";
+
+"kcal" = "ккал";
+
+"Cal" = "Кал";
+
+
+// --------- End of AI ---------
+/* */
+
 "Temp Basal" = "Тимчасовий  Базал";
 
 /* */
@@ -3287,3 +3633,15 @@ Enact a temp Basal or a temp target */
 
 /* message displayed in pump settings screen when the pump manager reports uncertain delivery */
 "Pump delivery uncertain" = "Невизначена подача помпи";
+
+/* message displayed on home screen when the pump is added but not fully onboarded */
+"Re-connect pump!" = "Знову підключіть Помпу!";
+
+/* 'fetch' toggle label in nightscout settings */
+"Fetch" = "Отримати";
+
+/* 'fetch' section header in nightscout settings */
+"Allow Fetching" = "Дозволити Отримання";
+
+/* 'fetch' scection footer in nightscout settings */
+"iAPS will fetch announcements, carbs and temp targets from Nightscout" = "iAPS отримуватиме оголошення, інформацію про вуглеводи та тимчасові цілі від Nightscout";

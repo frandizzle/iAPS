@@ -46,14 +46,15 @@ function aisf(iob, profile, autosens_data, dynamicVariables, glucose_status, cur
     autoISFReasons = [];
     profile.microbolusAllowed = true;
 
-    // Turn Auto ISF off when exercising and an exercise setting is enabled, like with dynamic ISF.
+    // Turn Auto ISF off when exercising and an exercise setting is enabled
     if (exercising(profile, dynamicVariables)) {
         profile.autoISFreasons = "Auto ISF Disabled by Exercise";
         profile.iaps.autoisf = false;
-        return
-    } else {
-        console.log("Starting Auto ISF.");
+        return;
     }
+
+    console.log("Starting Auto ISF.");
+
 
     // B30
     if (profile.iaps.use_B30) {
@@ -187,6 +188,24 @@ function aisf_ratio(profile, glucose_status, currentTime, autosens_data, normalT
     let pp_ISF = 1;
     let dura_ISF = 1;
     let final_ISF = 1;
+    
+    // ----------------------------------------------------
+    // Steps-based AutoISF trigger (injected by Swift)
+    // ----------------------------------------------------
+    const stepsRed =
+        profile &&
+        profile.iaps &&
+        typeof profile.iaps.steps_isf_reduction === "number"
+            ? profile.iaps.steps_isf_reduction
+            : 0;
+
+    console.log("steps_isf_reduction seen by JS:", stepsRed);
+
+    if (stepsRed > 0) {
+        sens_modified = true;
+        addMessage("AutoISF triggered by steps activity");
+    }
+
     
     // Log the glucose-get-last-autoisf.js output
     console.log("AutoISF bg_acceleration: " + round(bg_acce, 2) + ", PF-minutes: " + parabola_fit_minutes + ", PF-corr: " + round(parabola_fit_correlation, 4) + ", PF-nextDelta: " + convert_bg(parabola_fit_next_delta, profile) + ", PF-lastDelta: " + convert_bg(parabola_fit_last_delta, profile) +  ", regular Delta: " + convert_bg(glucose_status.delta, profile));
@@ -335,11 +354,41 @@ function aisf_ratio(profile, glucose_status, currentTime, autosens_data, normalT
             liftISF *= acce_ISF; // brakes on for otherwise stronger or stable ISF
         }
         final_ISF = withinISFlimits(liftISF, profile, 100);
-        autoISFsens = round(final_ISF, 2);
-        console.log("Auto ISF: new Ratio: " + round(final_ISF, 2) + ", final ISF: " + convert_bg(profile.sens, profile) + "\u2192" + convert_bg(profile.sens / autoISFsens, profile));
-        
-        return round(final_ISF, 2)
-    }
+
+        console.log("steps_isf_reduction seen by JS:", stepsRed);
+
+        // Allow steps alone to trigger AutoISF
+        // Apply steps reduction (stepsRed is available from outer scope)
+            if (stepsRed > 0) {
+                const before = liftISF;
+                liftISF = before - stepsRed;
+
+                console.log(
+                    "AutoISF+Steps: auto=" + round(before, 2) +
+                    " stepsRed=" + round(stepsRed, 2) +
+                    " preClamp=" + round(liftISF, 2)
+                );
+
+                addMessage(
+                    "AutoISF+Steps: auto " + round(before, 2) +
+                    " - steps " + round(stepsRed, 2) +
+                    " = " + round(liftISF, 2)
+                );
+            }
+
+            // NOW clamp ONCE
+            final_ISF = withinISFlimits(liftISF, profile, 100);
+            autoISFsens = round(final_ISF, 2);
+
+            console.log(
+                "Auto ISF: new Ratio: " + round(final_ISF, 2) +
+                ", final ISF: " + convert_bg(profile.sens, profile) +
+                "→" + convert_bg(profile.sens / autoISFsens, profile)
+            );
+
+            return round(final_ISF, 2);
+        }
+    
     console.log("autoISF does not modify");
     addMessage("Auto ISF does not modify");
     return 1

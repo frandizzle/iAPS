@@ -21,6 +21,19 @@ extension AutoISF {
         @Published var bgAccelISFweight: Decimal = 0
         @Published var bgBrakeISFweight: Decimal = 0.10
         @Published var iobThresholdPercent: Decimal = 100
+        @Published var stepsISFEnabled: Bool = true
+
+        @Published var stepsMinThreshold15: Decimal = 150
+
+        @Published var stepsLightSPMThreshold5: Decimal = 10
+        @Published var stepsModerateSPMThreshold5: Decimal = 40
+        @Published var stepsHighSPMThreshold5: Decimal = 70
+
+        @Published var stepsLightReductionDelta: Decimal = 0.2
+        @Published var stepsModerateReductionDelta: Decimal = 0.3
+        @Published var stepsHighReductionDelta: Decimal = 0.5
+
+        @Published var stepsHoldLoops: Decimal = 3
 
         // B30
         @Published var iTime_Start_Bolus: Decimal = 1.5
@@ -43,6 +56,20 @@ extension AutoISF {
         override func subscribe() {
             subscribeSetting(\.autoisf, on: $autoisf) { autoisf = $0 }
             subscribeSetting(\.enableBGacceleration, on: $enableBGacceleration) { enableBGacceleration = $0 }
+            // Steps / Activity → AutoISF
+            subscribeSetting(\.stepsISFEnabled, on: $stepsISFEnabled) { stepsISFEnabled = $0 }
+
+            subscribeSetting(\.stepsMinThreshold15, on: $stepsMinThreshold15) { stepsMinThreshold15 = $0 }
+
+            subscribeSetting(\.stepsLightSPMThreshold5, on: $stepsLightSPMThreshold5) { stepsLightSPMThreshold5 = $0 }
+            subscribeSetting(\.stepsModerateSPMThreshold5, on: $stepsModerateSPMThreshold5) { stepsModerateSPMThreshold5 = $0 }
+            subscribeSetting(\.stepsHighSPMThreshold5, on: $stepsHighSPMThreshold5) { stepsHighSPMThreshold5 = $0 }
+
+            subscribeSetting(\.stepsLightReductionDelta, on: $stepsLightReductionDelta) { stepsLightReductionDelta = $0 }
+            subscribeSetting(\.stepsModerateReductionDelta, on: $stepsModerateReductionDelta) { stepsModerateReductionDelta = $0 }
+            subscribeSetting(\.stepsHighReductionDelta, on: $stepsHighReductionDelta) { stepsHighReductionDelta = $0 }
+
+            subscribeSetting(\.stepsHoldLoops, on: $stepsHoldLoops) { stepsHoldLoops = $0 }
             subscribeSetting(\.smbDeliveryRatioBGrange, on: $smbDeliveryRatioBGrange) { smbDeliveryRatioBGrange = $0 }
 
             subscribeSetting(\.autoisf_min, on: $autoisf_min) { autoisf_min = $0 }

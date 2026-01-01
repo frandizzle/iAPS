@@ -38,10 +38,12 @@ final class ActivityManager {
     private init() {}
 
     // MARK: HealthKit
+
     private let healthStore = HKHealthStore()
     private let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
 
     // MARK: State
+
     private(set) var cachedISFReduction: Double = 0.0
     private(set) var snapshot: ActivitySnapshot?
     private(set) var state: ActivityState = .rest
@@ -165,7 +167,7 @@ final class ActivityManager {
             let predicate = HKQuery.predicateForSamples(
                 withStart: start,
                 end: now,
-                options: .strictStartDate
+                options: []
             )
 
             let query = HKStatisticsQuery(

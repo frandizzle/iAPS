@@ -235,7 +235,7 @@ extension AutoISF {
                         }
 
                         HStack {
-                            Text("ISF weight for higher BG")
+                            Text(NSLocalizedString("ISF weight for higher BG", comment: "") + " (bg)")
                                 .onTapGesture {
                                     info(
                                         header: "ISF weight for higher BG",
@@ -249,7 +249,7 @@ extension AutoISF {
                         }
 
                         HStack {
-                            Text("Duration Weight")
+                            Text(NSLocalizedString("Duration Weight", comment: "") + " (dura)")
                                 .onTapGesture {
                                     info(
                                         header: "Duration Weight",
@@ -277,7 +277,7 @@ extension AutoISF {
                         }
 
                         HStack {
-                            Text("ISF weight for postprandial BG rise")
+                            Text(NSLocalizedString("ISF weight for postprandial BG rise", comment: "") + " (pp)")
                                 .onTapGesture {
                                     info(
                                         header: "ISF weight for postprandial BG rise",
@@ -291,7 +291,7 @@ extension AutoISF {
                         }
 
                         HStack {
-                            Text("ISF weight while BG accelerates")
+                            Text(NSLocalizedString("ISF weight while BG accelerates", comment: "") + " (acce)")
                                 .onTapGesture {
                                     info(
                                         header: "ISF weight while BG accelerates",

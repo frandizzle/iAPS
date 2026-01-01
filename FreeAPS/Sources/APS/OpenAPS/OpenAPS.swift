@@ -27,47 +27,53 @@ final class OpenAPS {
         self.scriptExecutor = scriptExecutor
     }
 
-    // MARK: - JSON helpers
+// MARK: - JSON helpers
 
-    func upsertStepsISFReduction(json: RawJSON, value: Double) -> RawJSON {
-        let key = "steps_isf_reduction"
+func upsertStepsISFReduction(json: RawJSON, value: Double) -> RawJSON {
+    let key = "steps_isf_reduction"
 
-        // If key already exists, replace it
-        if json.contains("\"\(key)\"") {
-            let pattern = "\"\(key)\"\\s*:\\s*([-0-9.]+)"
-            let replacement = "\"\(key)\": \(value)"
+    // If key already exists, replace it
+    if json.contains("\"\(key)\"") {
+        let pattern = "\"\(key)\"\\s*:\\s*([-0-9.]+)"
+        let replacement = "\"\(key)\": \(value)"
 
-            let result = RawJSON(
-                json.replacingOccurrences(
-                    of: pattern,
-                    with: replacement,
-                    options: .regularExpression
-                )
+        let result = RawJSON(
+            json.replacingOccurrences(
+                of: pattern,
+                with: replacement,
+                options: .regularExpression
             )
+        )
 
-            debug(.openAPS, "Replaced existing \(key) with value \(value)")
-            return result
-        }
-
-        // Otherwise insert into profile.iaps object
-        let iapsPattern = "\"iaps\"\\s*:\\s*\\{"
-        guard let matchRange = json.range(of: iapsPattern, options: .regularExpression) else {
-            debug(.openAPS, "ERROR: Could not find 'iaps' object in profile JSON!")
-            return json
-        }
-
-        let insertIndex = matchRange.upperBound
-        let insertion = "\"\(key)\": \(value), "
-
-        var modified = json
-        modified.insert(contentsOf: insertion, at: insertIndex)
-
-        debug(.openAPS, "Inserted new \(key) with value \(value) at position \(insertIndex)")
-        return RawJSON(modified)
+        debug(.openAPS, "Replaced existing \(key) with value \(value)")
+        return result
     }
 
-    func determineBasal(currentTemp: TempBasal, clock: Date = Date(), temporary: TemporaryData) -> Future<Suggestion?, Never> {
-        Future { promise in
+    // Otherwise insert into profile.iaps object
+    let iapsPattern = "\"iaps\"\\s*:\\s*\\{"
+    guard let matchRange = json.range(of: iapsPattern, options: .regularExpression) else {
+        debug(.openAPS, "ERROR: Could not find 'iaps' object in profile JSON!")
+        return json
+    }
+
+    let insertIndex = matchRange.upperBound
+    let insertion = "\"\(key)\": \(value), "
+
+    var modified = json
+    modified.insert(contentsOf: insertion, at: insertIndex)
+
+    debug(.openAPS, "Inserted new \(key) with value \(value) at position \(insertIndex)")
+    return RawJSON(modified)
+}
+
+func determineBasal(
+    currentTemp: TempBasal,
+    clock: Date = Date(),
+    temporary: TemporaryData,
+    override: Override?
+) -> Future<Suggestion?, Never> {
+    Future {
+promise in
             self.processQueue.async {
                 Task {
                     let start = Date.now
@@ -278,7 +284,9 @@ final class OpenAPS {
 
                     now = Date.now
                     // Auto ISF Layer
-                    if let freeAPSSettings = settings, freeAPSSettings.autoisf {
+                    if let freeAPSSettings = settings, freeAPSSettings.autoisf || self.autoISF(override: override),
+                       self.notDisabled(override: override)
+                    {
                         now = Date.now
                         profile = await self.autosisf(
                             glucose: glucose,
@@ -341,7 +349,8 @@ final class OpenAPS {
                             preferences: preferencesData,
                             profile: profile,
                             tdd: tdd,
-                            settings: settings
+                            settings: settings,
+                            override: override
                         )
 
                         // Update time
@@ -546,6 +555,20 @@ final class OpenAPS {
 
     // MARK: - Private
 
+    private func autoISF(override: Override?) -> Bool {
+        guard let current = override, current.enabled else { return false }
+        guard current.overrideAutoISF, let settings = OverrideStorage().fetchLatestAutoISFsettings().first,
+              settings.autoisf else { return false }
+        return true
+    }
+
+    private func notDisabled(override: Override?) -> Bool {
+        guard let current = override, current.enabled else { return true }
+        guard current.overrideAutoISF, let settings = OverrideStorage().fetchLatestAutoISFsettings().first,
+              settings.autoisf else { return true }
+        return true
+    }
+
     private func pumpHistory() async -> RawJSON {
         await loadFileFromStorageAsync(name: OpenAPS.Monitor.pumpHistory)
     }
@@ -625,13 +648,13 @@ final class OpenAPS {
         preferences: Preferences?,
         profile: RawJSON,
         tdd: InsulinDistribution?,
-        settings: FreeAPSSettings?
+        settings: FreeAPSSettings?,
+        override: Override?
     ) -> String {
         var reasonString = reason
         let startIndex = reasonString.startIndex
         var aisf = false
         var totalDailyDose: Decimal?
-        let or = OverrideStorage().fetchLatestOverride().first
 
         // Autosens.ratio / Dynamic Ratios
         if let isf = suggestion.sensitivityRatio {
@@ -704,7 +727,9 @@ final class OpenAPS {
             }
 
             // Auto ISF
-            if let freeAPSSettings = settings, freeAPSSettings.autoisf {
+            if let freeAPSSettings = settings, freeAPSSettings.autoisf || autoISF(override: override),
+               self.notDisabled(override: override)
+            {
                 let reasons = profile.autoISFreasons ?? ""
                 // If disabled in middleware or Auto ISF layer
                 if let disabled = readAndExclude(json: profile, variable: "autoisf", exclude: "autoisf_m"),
@@ -771,7 +796,7 @@ final class OpenAPS {
 
         // Display either Target or Override (where target is included).
         let targetGlucose = suggestion.targetBG
-        if targetGlucose != nil, let override = or, override.enabled {
+        if targetGlucose != nil, let override = override, override.enabled {
             var orString = ", Override: "
             if override.percentage != 100 {
                 orString += (formatter.string(from: override.percentage as NSNumber) ?? "")
@@ -843,7 +868,7 @@ final class OpenAPS {
                 saveSuggestion.glucose = (suggestion.bg ?? 0) as NSDecimalNumber
                 saveSuggestion.ratio = (suggestion.sensitivityRatio ?? 1) as NSDecimalNumber
 
-                if let override = or, override.enabled {
+                if let override = override, override.enabled {
                     saveSuggestion.override = true
                 }
 

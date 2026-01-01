@@ -164,8 +164,12 @@ final class ActivityManager {
         let t60 = now.addingTimeInterval(-60 * 60)
 
         func sumSteps(from start: Date, completion: @escaping (Int) -> Void) {
+
+            // ⏱ Buffer the start time to avoid HK boundary issues
+            let bufferedStart = start.addingTimeInterval(-60)
+
             let predicate = HKQuery.predicateForSamples(
-                withStart: start,
+                withStart: bufferedStart,
                 end: now,
                 options: []
             )

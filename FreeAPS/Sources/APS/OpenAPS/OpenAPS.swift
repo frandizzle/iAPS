@@ -27,11 +27,49 @@ final class OpenAPS {
         self.scriptExecutor = scriptExecutor
     }
 
+    // MARK: - JSON helpers
+
+    func upsertStepsISFReduction(json: RawJSON, value: Double) -> RawJSON {
+        let key = "steps_isf_reduction"
+
+        // If key already exists, replace it
+        if json.contains("\"\(key)\"") {
+            let pattern = "\"\(key)\"\\s*:\\s*([-0-9.]+)"
+            let replacement = "\"\(key)\": \(value)"
+
+            let result = RawJSON(
+                json.replacingOccurrences(
+                    of: pattern,
+                    with: replacement,
+                    options: .regularExpression
+                )
+            )
+
+            debug(.openAPS, "Replaced existing \(key) with value \(value)")
+            return result
+        }
+
+        // Otherwise insert into profile.iaps object
+        let iapsPattern = "\"iaps\"\\s*:\\s*\\{"
+        guard let matchRange = json.range(of: iapsPattern, options: .regularExpression) else {
+            debug(.openAPS, "ERROR: Could not find 'iaps' object in profile JSON!")
+            return json
+        }
+
+        let insertIndex = matchRange.upperBound
+        let insertion = "\"\(key)\": \(value), "
+
+        var modified = json
+        modified.insert(contentsOf: insertion, at: insertIndex)
+
+        debug(.openAPS, "Inserted new \(key) with value \(value) at position \(insertIndex)")
+        return RawJSON(modified)
+    }
+
     func determineBasal(currentTemp: TempBasal, clock: Date = Date(), temporary: TemporaryData) -> Future<Suggestion?, Never> {
         Future { promise in
             self.processQueue.async {
                 Task {
-                    // For debugging
                     let start = Date.now
                     var now = Date.now
 
@@ -61,11 +99,136 @@ final class OpenAPS {
                         self.reservoirHistory(),
                         self.profileHistory()
                     )
-
                     let preferencesData = Preferences(from: preferences)
                     let settings = FreeAPSSettings(from: data)
                     var profile = storedProfile
                     print("Time for Loading files \(-1 * now.timeIntervalSinceNow) seconds")
+
+                    // ────────────────────────────────────────────────
+                    // Apply Steps settings from FreeAPSSettings (UI writes to this)
+                    // ────────────────────────────────────────────────
+                    if let s = settings {
+                        ActivityManager.shared.applySettings(s)
+                    } else {
+                        // If settings is nil, be safe: disable steps to avoid stale reduction
+                        ActivityManager.shared.enabled = false
+                        ActivityManager.shared.updateISFReduction(rawReduction: 0)
+                    }
+
+                    // ────────────────────────────────────────────────
+                    // Apply Steps settings, then refresh activity + update hold/decay
+                    // ────────────────────────────────────────────────
+
+                    // ✅ THIS is what makes the UI toggle actually affect ActivityManager.enabled
+                    if let s = settings {
+                        ActivityManager.shared.applySettings(s)
+                        debug(.openAPS, "Steps UI toggle (stepsISFEnabled) = \(s.stepsISFEnabled)")
+                    } else {
+                        debug(.openAPS, "⚠️ FreeAPSSettings(from: data) returned nil — forcing steps OFF")
+                        ActivityManager.shared.enabled = false
+                        ActivityManager.shared.updateISFReduction(rawReduction: 0.0)
+                    }
+
+                    let semaphore = DispatchSemaphore(value: 0)
+                    var rawReduction: Double = 0.0
+                    var stepsReduction: Double = 0.0
+
+                    debug(
+                        .openAPS,
+                        "🔍 Before steps logic: enabled=\(ActivityManager.shared.enabled), cached=\(ActivityManager.shared.cachedISFReduction)"
+                    )
+
+                    if ActivityManager.shared.enabled == false {
+                        // OFF means: clear everything and skip
+                        ActivityManager.shared.clearReduction()
+                        stepsReduction = 0.0
+                        debug(.openAPS, "Steps DISABLED → cleared, stepsReduction = 0")
+                    } else {
+                        debug(.openAPS, "Steps ENABLED → refreshing activity...")
+                        ActivityManager.shared.refreshActivity { snap in
+                            if let snap = snap {
+                                debug(
+                                    .openAPS,
+                                    "Activity refreshed at loop START: steps15=\(snap.steps15), state=\(ActivityManager.shared.state)"
+                                )
+                            }
+
+                            // 1️⃣ raw = instantaneous reduction from the freshly-updated snapshot/state
+                            rawReduction = ActivityManager.shared.cachedISFReduction
+
+                            // 2️⃣ held/decayed
+                            ActivityManager.shared.updateISFReduction(rawReduction: rawReduction)
+
+                            semaphore.signal()
+                        }
+
+                        let timeout = DispatchTime.now() + .seconds(5)
+                        if semaphore.wait(timeout: timeout) == .timedOut {
+                            debug(.openAPS, "Activity refresh timed out, using cached value")
+                        }
+
+                        stepsReduction = ActivityManager.shared.cachedISFReduction
+                    }
+
+                    debug(
+                        .openAPS,
+                        "🔍 After steps logic: enabled=\(ActivityManager.shared.enabled), stepsReduction=\(stepsReduction)"
+                    )
+
+                    // ────────────────────────────────────────────────
+                    // Inject / clear steps reduction into profile for JS
+                    // ────────────────────────────────────────────────
+
+                    // ✅ Always ensure JS sees the correct value (prevents stale 0.5 sticking around)
+                    let jsStepsValue: Double = (ActivityManager.shared.enabled && stepsReduction > 0) ? stepsReduction : 0.0
+
+                    profile = self.upsertStepsISFReduction(
+                        json: profile,
+                        value: jsStepsValue
+                    )
+
+                    if ActivityManager.shared.enabled {
+                        if stepsReduction > 0 {
+                            debug(
+                                .openAPS,
+                                "Injected iaps.steps_isf_reduction=\(stepsReduction) into profile for JS"
+                            )
+                        } else {
+                            debug(.openAPS, "Steps enabled but reduction=0 → cleared steps_isf_reduction for JS")
+                        }
+                    } else {
+                        debug(.openAPS, "Steps DISABLED → cleared steps_isf_reduction for JS")
+                    }
+
+                    debug(
+                        .openAPS,
+                        "Profile contains 'steps_isf_reduction': \(profile.contains("steps_isf_reduction"))"
+                    )
+
+                    if let range = profile.range(
+                        of: "\"steps_isf_reduction\"[^,}]+",
+                        options: .regularExpression
+                    ) {
+                        debug(
+                            .openAPS,
+                            "Injection found in JSON: \(profile[range])"
+                        )
+                    } else {
+                        debug(
+                            .openAPS,
+                            "ERROR: steps_isf_reduction NOT found in profile JSON after upsert/clear!"
+                        )
+                    }
+
+                    if let iapsRange = profile.range(
+                        of: "\"iaps\"\\s*:\\s*\\{[^}]{0,200}",
+                        options: .regularExpression
+                    ) {
+                        debug(
+                            .openAPS,
+                            "iaps section (first 200 chars): \(profile[iapsRange])"
+                        )
+                    }
 
                     now = Date.now
                     let tdd = CoreDataStorage()
@@ -131,7 +294,7 @@ final class OpenAPS {
 
                     now = Date.now
                     // The OpenAPS layer
-                    let suggested = await self.determineBasal(
+                    var suggested = await self.determineBasal(
                         glucose: glucose,
                         currentTemp: tempBasal,
                         iob: iob,
@@ -151,12 +314,12 @@ final class OpenAPS {
                     if var suggestion = Suggestion(from: suggested) {
                         now = Date.now
 
-                        // Auto ISF
+                        // Auto ISF (existing logic)
                         if let mySettings = settings, mySettings.autoisf, let iob = suggestion.iob {
-                            // If IOB < one hour of negative insulin and keto protection is active, then enact a small keto protection basal rate
                             if mySettings.ketoProtect, iob < 0,
                                let rate = suggestion.rate, rate <= 0,
-                               let basal = self.readBasal(alteredProfile), iob < -basal, (suggestion.units ?? 0) <= 0,
+                               let basal = self.readBasal(alteredProfile), iob < -basal,
+                               (suggestion.units ?? 0) <= 0,
                                let basalRate = self.aisfBasal(mySettings, basal, oref0Suggestion: suggestion)
                             {
                                 suggestion = basalRate
@@ -164,9 +327,13 @@ final class OpenAPS {
                         }
 
                         // Process any eventual middleware/B30 basal rate
-                        if let newSuggestion = self.overrideBasal(alteredProfile: profile, oref0Suggestion: suggestion) {
+                        if let newSuggestion = self.overrideBasal(
+                            alteredProfile: profile,
+                            oref0Suggestion: suggestion
+                        ) {
                             suggestion = newSuggestion
                         }
+
                         // Add reasons, when needed
                         suggestion.reason = self.reasons(
                             reason: suggestion.reason,
@@ -176,11 +343,14 @@ final class OpenAPS {
                             tdd: tdd,
                             settings: settings
                         )
+
                         // Update time
                         suggestion.timestamp = suggestion.deliverAt ?? clock
+
                         // Save
                         self.storage.save(suggestion, as: Enact.suggested)
 
+                        // Resolve loop result
                         promise(.success(suggestion))
                     } else {
                         promise(.success(nil))
@@ -474,6 +644,65 @@ final class OpenAPS {
                 let bolus = Int(((tdd.bolus ?? 0) as Decimal) * 100 / (total != 0 ? total : 1))
                 tddString = ", Insulin 24h: \(round) U, \(bolus) % Bolus"
             }
+
+            // ------------------------------------------------------------
+            // STEPS ACTIVITY TILE (5m / 10m / 15m) + ACTIVITY REDUCTION/HOLD
+            // ------------------------------------------------------------
+
+            if ActivityManager.shared.enabled == false {
+                // OFF tile
+                let stepsTile = "Steps: OFF"
+                reasonString.insert(contentsOf: stepsTile + ", ", at: reasonString.startIndex)
+                debug(.openAPS, "🚶 STEPS TILE → \(stepsTile)")
+
+                // ✅ hard stop: do NOT show reduction/hold even if cached values exist
+            } else if let snap = ActivityManager.shared.snapshot {
+                let steps5 = snap.steps5
+                let steps10 = snap.steps10
+                let steps15 = snap.steps15
+
+                // ---- Steps tile (movement only) ----
+                let stepsTile = "Steps: 5m=\(steps5) 10m=\(steps10) 15m=\(steps15)"
+                reasonString.insert(contentsOf: stepsTile + ", ", at: reasonString.startIndex)
+                debug(.openAPS, "🚶 STEPS TILE → \(stepsTile)")
+
+                // ------------------------------------------------------------
+                // REDUCTION + HOLD TILES (ACTIVITY) — ONLY WHEN ENABLED
+                // ------------------------------------------------------------
+
+                let reduction = ActivityManager.shared.cachedISFReduction
+                if reduction > 0 {
+                    let percent = Int((reduction * 100).rounded())
+
+                    // Friendly activity label based on state
+                    let activityLabel: String = {
+                        switch ActivityManager.shared.state {
+                        case .light: return "Light activity"
+                        case .moderate: return "Moderate activity"
+                        case .high: return "High activity"
+                        case .rest: return "Activity"
+                        }
+                    }()
+
+                    // Insert hold tile first so it appears AFTER the reduction tile
+                    let holdLeft = ActivityManager.shared.holdLoopsRemaining
+                    if holdLeft > 0 {
+                        let holdTile = "Hold loops: \(holdLeft)"
+                        reasonString.insert(contentsOf: holdTile + ", ", at: reasonString.startIndex)
+                        debug(.openAPS, "⏳ HOLD TILE → \(holdTile)")
+                    }
+
+                    let reductionTile = "\(activityLabel): −\(percent)%"
+                    reasonString.insert(contentsOf: reductionTile + ", ", at: reasonString.startIndex)
+                    debug(.openAPS, "🧮 REDUCTION TILE → \(reductionTile)")
+                }
+            } else {
+                // enabled, but no snapshot yet (first loop / HK not ready)
+                let stepsTile = "Steps: —"
+                reasonString.insert(contentsOf: stepsTile + ", ", at: reasonString.startIndex)
+                debug(.openAPS, "🚶 STEPS TILE → \(stepsTile)")
+            }
+
             // Auto ISF
             if let freeAPSSettings = settings, freeAPSSettings.autoisf {
                 let reasons = profile.autoISFreasons ?? ""

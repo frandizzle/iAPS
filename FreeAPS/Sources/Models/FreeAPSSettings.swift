@@ -125,6 +125,21 @@ struct FreeAPSSettings: JSON, Equatable {
     var iobThresholdPercent: Decimal = 100
     var autoisf_max: Decimal = 1.2
     var autoisf_min: Decimal = 0.8
+    // Steps / Activity → AutoISF
+    var stepsISFEnabled: Bool = true
+
+    var stepsMinThreshold15: Decimal = 150
+
+    var stepsLightSPMThreshold5: Decimal = 10
+    var stepsModerateSPMThreshold5: Decimal = 40
+    var stepsHighSPMThreshold5: Decimal = 70
+
+    var stepsLightReductionDelta: Decimal = 0.2
+    var stepsModerateReductionDelta: Decimal = 0.3
+    var stepsHighReductionDelta: Decimal = 0.5
+
+    var stepsHoldLoops: Decimal = 3
+
     // B30
     var use_B30 = false
     var iTime_Start_Bolus: Decimal = 1.5
@@ -671,6 +686,46 @@ extension FreeAPSSettings: Decodable {
 
         if let autoisf_min = try? container.decode(Decimal.self, forKey: .autoisf_min) {
             settings.autoisf_min = autoisf_min
+        }
+
+        // Add this section to your FreeAPSSettings init(from decoder:) method
+        // Place it after the AutoISF section (after autoisf_min decoding)
+
+        // Steps / Activity → AutoISF
+        if let stepsISFEnabled = try? container.decode(Bool.self, forKey: .stepsISFEnabled) {
+            settings.stepsISFEnabled = stepsISFEnabled
+        }
+
+        if let stepsMinThreshold15 = try? container.decode(Decimal.self, forKey: .stepsMinThreshold15) {
+            settings.stepsMinThreshold15 = stepsMinThreshold15
+        }
+
+        if let stepsLightSPMThreshold5 = try? container.decode(Decimal.self, forKey: .stepsLightSPMThreshold5) {
+            settings.stepsLightSPMThreshold5 = stepsLightSPMThreshold5
+        }
+
+        if let stepsModerateSPMThreshold5 = try? container.decode(Decimal.self, forKey: .stepsModerateSPMThreshold5) {
+            settings.stepsModerateSPMThreshold5 = stepsModerateSPMThreshold5
+        }
+
+        if let stepsHighSPMThreshold5 = try? container.decode(Decimal.self, forKey: .stepsHighSPMThreshold5) {
+            settings.stepsHighSPMThreshold5 = stepsHighSPMThreshold5
+        }
+
+        if let stepsLightReductionDelta = try? container.decode(Decimal.self, forKey: .stepsLightReductionDelta) {
+            settings.stepsLightReductionDelta = stepsLightReductionDelta
+        }
+
+        if let stepsModerateReductionDelta = try? container.decode(Decimal.self, forKey: .stepsModerateReductionDelta) {
+            settings.stepsModerateReductionDelta = stepsModerateReductionDelta
+        }
+
+        if let stepsHighReductionDelta = try? container.decode(Decimal.self, forKey: .stepsHighReductionDelta) {
+            settings.stepsHighReductionDelta = stepsHighReductionDelta
+        }
+
+        if let stepsHoldLoops = try? container.decode(Decimal.self, forKey: .stepsHoldLoops) {
+            settings.stepsHoldLoops = stepsHoldLoops
         }
 
         if let glucoseOverrideThreshold = try? container.decode(Decimal.self, forKey: .glucoseOverrideThreshold) {

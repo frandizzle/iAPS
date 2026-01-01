@@ -31,7 +31,11 @@ final class BaseHealthKitManager: HealthKitManager, Injectable {
     private enum Config {
         // unwraped HKObjects
         static var readPermissions: Set<HKSampleType> {
-            Set([healthBGObject].compactMap { $0 }) }
+            Set([
+                healthBGObject,
+                healthStepsObject // ⭐ add steps here
+            ].compactMap { $0 })
+        }
 
         static var writePermissions: Set<HKSampleType> {
             Set([healthBGObject, healthCarbObject, healthInsulinObject].compactMap { $0 }) }
@@ -40,6 +44,7 @@ final class BaseHealthKitManager: HealthKitManager, Injectable {
         static let healthBGObject = HKObjectType.quantityType(forIdentifier: .bloodGlucose)
         static let healthCarbObject = HKObjectType.quantityType(forIdentifier: .dietaryCarbohydrates)
         static let healthInsulinObject = HKObjectType.quantityType(forIdentifier: .insulinDelivery)
+        static let healthStepsObject = HKObjectType.quantityType(forIdentifier: .stepCount)
 
         // Meta-data key of iAPS data in HealthStore
         static let freeAPSMetaKey = "From iAPS"

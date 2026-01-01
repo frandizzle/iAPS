@@ -88,6 +88,77 @@ extension AutoISF {
                         }
                     } header: { Text("Toggles") }
 
+                    // Steps / Activity
+
+                    Section(header: Text("Steps / Activity")) {
+                        Toggle(isOn: $state.stepsISFEnabled) {
+                            Text("Enable Steps / Activity scaling")
+                        }
+                        .disabled(isPresented)
+
+                        HStack {
+                            Text("Min steps (15 min)")
+                            Spacer()
+                            DecimalTextField("0", value: $state.stepsMinThreshold15, formatter: formatter)
+                                .disabled(isPresented)
+                        }
+                    }
+
+                    Section {
+                        HStack {
+                            Text("Light SPM (5 min)")
+                            Spacer()
+                            DecimalTextField("0", value: $state.stepsLightSPMThreshold5, formatter: formatter)
+                                .disabled(isPresented)
+                        }
+                        HStack {
+                            Text("Moderate SPM (5 min)")
+                            Spacer()
+                            DecimalTextField("0", value: $state.stepsModerateSPMThreshold5, formatter: formatter)
+                                .disabled(isPresented)
+                        }
+                        HStack {
+                            Text("High SPM (5 min)")
+                            Spacer()
+                            DecimalTextField("0", value: $state.stepsHighSPMThreshold5, formatter: formatter)
+                                .disabled(isPresented)
+                        }
+                    } header: { Text("Intensity thresholds") }
+
+                    Section {
+                        HStack {
+                            Text("Light ISF delta")
+                            Spacer()
+                            DecimalTextField("0", value: $state.stepsLightReductionDelta, formatter: formatter)
+                                .disabled(isPresented)
+                        }
+                        HStack {
+                            Text("Moderate ISF delta")
+                            Spacer()
+                            DecimalTextField("0", value: $state.stepsModerateReductionDelta, formatter: formatter)
+                                .disabled(isPresented)
+                        }
+                        HStack {
+                            Text("High ISF delta")
+                            Spacer()
+                            DecimalTextField("0", value: $state.stepsHighReductionDelta, formatter: formatter)
+                                .disabled(isPresented)
+                        }
+                    } header: { Text("AutoISF deltas") }
+
+                    Section {
+                        HStack {
+                            Text("Hold loops")
+                            Spacer()
+                            DecimalTextField("0", value: $state.stepsHoldLoops, formatter: formatter)
+                                .disabled(isPresented)
+                        }
+
+                        Text("Uses SPM (steps/min) over 5 min, gated by steps over 15 min. Values are AutoISF deltas, not %.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+
                     Section {
                         HStack {
                             Text("Auto ISF Max")

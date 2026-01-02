@@ -52,6 +52,7 @@ final class ActivityManager {
     private(set) var snapshot: ActivitySnapshot?
     private(set) var state: ActivityState = .rest
     private var originalReduction: Double = 0.0
+    private var lastRawReduction: Double = 0.0
 
     // MARK: Settings-backed knobs
 
@@ -253,13 +254,14 @@ final class ActivityManager {
 
         // LIVE PEDOMETER path (preferred)
         if livePedometerEnabled, pedometerActive {
-            // IMPORTANT: do this synchronously so snapshot/state/reduction are updated
-            // before the caller continues (matches old HealthKit behavior).
             timelineQueue.sync {
                 let now = Date()
                 if !self.stepTimeline.isEmpty {
                     self.refreshActivityFromTimeline(now: now)
                 }
+                // Apply hold ONCE per loop refresh
+                let raw = self.lastRawReduction
+                self.updateISFReduction(rawReduction: raw)
             }
 
             completion?(self.snapshot)
@@ -312,8 +314,9 @@ final class ActivityManager {
         snapshot = snap
         state = classify(snapshot: snap)
 
-        let raw = autoISFReductionRaw()
-        updateISFReduction(rawReduction: raw)
+        // Store raw reduction from current state/snapshot,
+        // but DO NOT consume hold here (this is called many times per minute).
+        lastRawReduction = autoISFReductionRaw()
     }
 
     // MARK: - ISF reduction hold / decay (edge-detect)
@@ -322,7 +325,6 @@ final class ActivityManager {
         let isActiveNow = rawReduction > 0
 
         if isActiveNow {
-            // Active → keep resetting hold
             cachedISFReduction = rawReduction
             originalReduction = rawReduction
             holdCounter = holdLoops
@@ -330,23 +332,36 @@ final class ActivityManager {
             return
         }
 
-        // Inactive now
+        // Transition: active -> inactive
         if wasActiveLastLoop {
-            // Activity JUST stopped → start hold countdown once
-            holdCounter = holdLoops
             wasActiveLastLoop = false
+            // Start hold, but DON'T decrement yet this loop
+            holdCounter = holdLoops
+            if holdCounter > 0 {
+                cachedISFReduction = originalReduction
+            } else {
+                cachedISFReduction = 0.0
+                originalReduction = 0.0
+                state = .rest
+            }
+            return
         }
 
+        // Still inactive: count down
         if holdCounter > 0 {
             holdCounter -= 1
-            cachedISFReduction = originalReduction
+            cachedISFReduction = (holdCounter > 0) ? originalReduction : 0.0
+            if holdCounter == 0 {
+                originalReduction = 0.0
+                state = .rest
+            }
         } else {
             cachedISFReduction = 0.0
             originalReduction = 0.0
-            holdCounter = 0
             state = .rest
         }
     }
+
 
     /// Clear all cached reduction and reset state (used when feature is disabled)
     func clearReduction() {

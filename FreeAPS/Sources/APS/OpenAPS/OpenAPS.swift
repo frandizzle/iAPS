@@ -694,7 +694,8 @@ final class OpenAPS {
                 // ------------------------------------------------------------
 
                 let reduction = ActivityManager.shared.cachedISFReduction
-                if reduction > 0 {
+                let holdLeft = ActivityManager.shared.holdLoopsRemaining
+                if reduction > 0 || holdLeft > 0 {
                     let percent = Int((reduction * 100).rounded())
 
                     // Friendly activity label based on state

@@ -106,19 +106,19 @@ extension AutoISF {
 
                     Section {
                         HStack {
-                            Text("Light SPM (5 min)")
+                            Text("Light activity (5 min)")
                             Spacer()
                             DecimalTextField("0", value: $state.stepsLightSPMThreshold5, formatter: formatter)
                                 .disabled(isPresented)
                         }
                         HStack {
-                            Text("Moderate SPM (5 min)")
+                            Text("Moderate activity (5 min)")
                             Spacer()
                             DecimalTextField("0", value: $state.stepsModerateSPMThreshold5, formatter: formatter)
                                 .disabled(isPresented)
                         }
                         HStack {
-                            Text("High SPM (5 min)")
+                            Text("High activity (5 min)")
                             Spacer()
                             DecimalTextField("0", value: $state.stepsHighSPMThreshold5, formatter: formatter)
                                 .disabled(isPresented)
@@ -127,34 +127,34 @@ extension AutoISF {
 
                     Section {
                         HStack {
-                            Text("Light ISF delta")
+                            Text("Light reduction")
                             Spacer()
                             DecimalTextField("0", value: $state.stepsLightReductionDelta, formatter: formatter)
                                 .disabled(isPresented)
                         }
                         HStack {
-                            Text("Moderate ISF delta")
+                            Text("Moderate reduction")
                             Spacer()
                             DecimalTextField("0", value: $state.stepsModerateReductionDelta, formatter: formatter)
                                 .disabled(isPresented)
                         }
                         HStack {
-                            Text("High ISF delta")
+                            Text("High reduction")
                             Spacer()
                             DecimalTextField("0", value: $state.stepsHighReductionDelta, formatter: formatter)
                                 .disabled(isPresented)
                         }
-                    } header: { Text("AutoISF deltas") }
+                    } header: { Text("Reduction amount") }
 
                     Section {
                         HStack {
-                            Text("Hold loops")
+                            Text("How many loops to hold reduction")
                             Spacer()
                             DecimalTextField("0", value: $state.stepsHoldLoops, formatter: formatter)
                                 .disabled(isPresented)
                         }
 
-                        Text("Uses SPM (steps/min) over 5 min, gated by steps over 15 min. Values are AutoISF deltas, not %.")
+                        Text("Holds the activity reduction for x amount of loops, useful for sporadic activity.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }

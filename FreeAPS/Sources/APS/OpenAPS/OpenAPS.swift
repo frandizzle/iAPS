@@ -27,53 +27,53 @@ final class OpenAPS {
         self.scriptExecutor = scriptExecutor
     }
 
-// MARK: - JSON helpers
+    // MARK: - JSON helpers
 
-func upsertStepsISFReduction(json: RawJSON, value: Double) -> RawJSON {
-    let key = "steps_isf_reduction"
+    func upsertStepsISFReduction(json: RawJSON, value: Double) -> RawJSON {
+        let key = "steps_isf_reduction"
 
-    // If key already exists, replace it
-    if json.contains("\"\(key)\"") {
-        let pattern = "\"\(key)\"\\s*:\\s*([-0-9.]+)"
-        let replacement = "\"\(key)\": \(value)"
+        // If key already exists, replace it
+        if json.contains("\"\(key)\"") {
+            let pattern = "\"\(key)\"\\s*:\\s*([-0-9.]+)"
+            let replacement = "\"\(key)\": \(value)"
 
-        let result = RawJSON(
-            json.replacingOccurrences(
-                of: pattern,
-                with: replacement,
-                options: .regularExpression
+            let result = RawJSON(
+                json.replacingOccurrences(
+                    of: pattern,
+                    with: replacement,
+                    options: .regularExpression
+                )
             )
-        )
 
-        debug(.openAPS, "Replaced existing \(key) with value \(value)")
-        return result
+            debug(.openAPS, "Replaced existing \(key) with value \(value)")
+            return result
+        }
+
+        // Otherwise insert into profile.iaps object
+        let iapsPattern = "\"iaps\"\\s*:\\s*\\{"
+        guard let matchRange = json.range(of: iapsPattern, options: .regularExpression) else {
+            debug(.openAPS, "ERROR: Could not find 'iaps' object in profile JSON!")
+            return json
+        }
+
+        let insertIndex = matchRange.upperBound
+        let insertion = "\"\(key)\": \(value), "
+
+        var modified = json
+        modified.insert(contentsOf: insertion, at: insertIndex)
+
+        debug(.openAPS, "Inserted new \(key) with value \(value) at position \(insertIndex)")
+        return RawJSON(modified)
     }
 
-    // Otherwise insert into profile.iaps object
-    let iapsPattern = "\"iaps\"\\s*:\\s*\\{"
-    guard let matchRange = json.range(of: iapsPattern, options: .regularExpression) else {
-        debug(.openAPS, "ERROR: Could not find 'iaps' object in profile JSON!")
-        return json
-    }
-
-    let insertIndex = matchRange.upperBound
-    let insertion = "\"\(key)\": \(value), "
-
-    var modified = json
-    modified.insert(contentsOf: insertion, at: insertIndex)
-
-    debug(.openAPS, "Inserted new \(key) with value \(value) at position \(insertIndex)")
-    return RawJSON(modified)
-}
-
-func determineBasal(
-    currentTemp: TempBasal,
-    clock: Date = Date(),
-    temporary: TemporaryData,
-    override: Override?
-) -> Future<Suggestion?, Never> {
-    Future {
-promise in
+    func determineBasal(
+        currentTemp: TempBasal,
+        clock: Date = Date(),
+        temporary: TemporaryData,
+        override: Override?
+    ) -> Future<Suggestion?, Never> {
+        Future {
+            promise in
             self.processQueue.async {
                 Task {
                     let start = Date.now

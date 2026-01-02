@@ -319,27 +319,26 @@ final class ActivityManager {
 
     func updateISFReduction(rawReduction: Double) {
         if rawReduction > 0 {
-            // New or continued activity → reset hold
+            // Activity detected → reset hold
             cachedISFReduction = rawReduction
             originalReduction = rawReduction
             holdCounter = holdLoops
-        } else if holdCounter > 0 {
-            // No new activity, but still holding
+            return
+        }
+
+        // No activity
+        if holdCounter > 0 {
             holdCounter -= 1
-            
-            // Keep full reduction value during hold period
-            if holdCounter > 0 {
-                cachedISFReduction = originalReduction
-            } else {
-                cachedISFReduction = 0.0
+            cachedISFReduction = holdCounter > 0 ? originalReduction : 0.0
+            if holdCounter == 0 {
                 originalReduction = 0.0
             }
         } else {
-            // Fully expired
             cachedISFReduction = 0.0
             originalReduction = 0.0
         }
     }
+
 
 
     /// Clear all cached reduction and reset state (used when feature is disabled)

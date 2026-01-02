@@ -42,6 +42,8 @@ final class ActivityManager {
 
     private let healthStore = HKHealthStore()
     private let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+
+    // Edge-detect for hold logic
     private var wasActiveLastLoop: Bool = false
 
     // MARK: State
@@ -58,12 +60,13 @@ final class ActivityManager {
     // Gate: minimum steps in last 15 minutes before ANY effect
     var minStepsForAnyEffect: Int = 0
 
-    // Defaults expressed as "steps in 5 minutes"
-    var lightSPMThreshold: Double = 60.0 / 5.0 // 12 spm
-    var moderateSPMThreshold: Double = 200.0 / 5.0 // 40 spm
-    var highSPMThreshold: Double = 350.0 / 5.0 // 70 spm
+    // Defaults expressed as "steps in 5 minutes" (UI), internally stored as SPM
+    // 60 steps / 5 min = 12 spm, 200/5=40 spm, 350/5=70 spm
+    var lightSPMThreshold: Double = 60.0 / 5.0
+    var moderateSPMThreshold: Double = 200.0 / 5.0
+    var highSPMThreshold: Double = 350.0 / 5.0
 
-    // Reduction DELTAS
+    // Reduction DELTAS (subtracted from AutoISF ratio)
     var lightReductionDelta: Double = 0.2
     var moderateReductionDelta: Double = 0.3
     var highReductionDelta: Double = 0.5
@@ -75,6 +78,7 @@ final class ActivityManager {
 
     // MARK: - LIVE PEDOMETER (CoreMotion)
 
+    /// Toggle live pedometer feed (CMPedometer). Keep this true unless you want HK-only.
     var livePedometerEnabled: Bool = true
 
     private let pedometer = CMPedometer()
@@ -110,12 +114,8 @@ final class ActivityManager {
             if let v = any as? Int { return v }
             if let v = any as? NSNumber { return v.intValue }
             if let v = any as? Double { return Int(v.rounded()) }
-            if let v = any as? Decimal {
-                return NSDecimalNumber(decimal: v).intValue
-            }
-            if let v = any as? String, let d = Double(v) {
-                return Int(d.rounded())
-            }
+            if let v = any as? Decimal { return NSDecimalNumber(decimal: v).intValue }
+            if let v = any as? String, let d = Double(v) { return Int(d.rounded()) }
             return fallback
         }
 
@@ -123,9 +123,7 @@ final class ActivityManager {
             if let v = any as? Double { return v }
             if let v = any as? NSNumber { return v.doubleValue }
             if let v = any as? Int { return Double(v) }
-            if let v = any as? Decimal {
-                return NSDecimalNumber(decimal: v).doubleValue
-            }
+            if let v = any as? Decimal { return NSDecimalNumber(decimal: v).doubleValue }
             if let v = any as? String, let d = Double(v) { return d }
             return fallback
         }
@@ -138,18 +136,25 @@ final class ActivityManager {
             stopLivePedometer()
         }
 
+        // Gate
         minStepsForAnyEffect = int(s.stepsMinThreshold15, minStepsForAnyEffect)
 
-        lightSPMThreshold = dbl(s.stepsLightSPMThreshold5, lightSPMThreshold) / 5.0
-        moderateSPMThreshold = dbl(s.stepsModerateSPMThreshold5, moderateSPMThreshold) / 5.0
-        highSPMThreshold = dbl(s.stepsHighSPMThreshold5, highSPMThreshold) / 5.0
+        // Thresholds:
+        // UI fields are "steps in 5 minutes", but classifier uses SPM (steps per minute),
+        // so we convert: stepsPer5Min / 5.0 = SPM
+        lightSPMThreshold = dbl(s.stepsLightSPMThreshold5, lightSPMThreshold * 5.0) / 5.0
+        moderateSPMThreshold = dbl(s.stepsModerateSPMThreshold5, moderateSPMThreshold * 5.0) / 5.0
+        highSPMThreshold = dbl(s.stepsHighSPMThreshold5, highSPMThreshold * 5.0) / 5.0
 
+        // Reductions
         lightReductionDelta = dbl(s.stepsLightReductionDelta, lightReductionDelta)
         moderateReductionDelta = dbl(s.stepsModerateReductionDelta, moderateReductionDelta)
         highReductionDelta = dbl(s.stepsHighReductionDelta, highReductionDelta)
 
+        // Hold
         holdLoops = max(0, int(s.stepsHoldLoops, holdLoops))
 
+        // Ensure live pedometer if enabled
         if enabled, livePedometerEnabled {
             startLivePedometer()
         }
@@ -158,18 +163,20 @@ final class ActivityManager {
     // MARK: Permissions
 
     func requestAuthorization(completion: ((Bool) -> Void)? = nil) {
-        healthStore.requestAuthorization(
-            toShare: [],
-            read: [stepType]
-        ) { success, _ in completion?(success) }
+        healthStore.requestAuthorization(toShare: [], read: [stepType]) { success, _ in
+            completion?(success)
+        }
     }
 
+    /// Triggers Motion & Fitness permission prompt (best-effort).
     func requestMotionPermission() {
         guard CMPedometer.isStepCountingAvailable() else { return }
         pedometer.queryPedometerData(
             from: Date().addingTimeInterval(-60),
             to: Date()
-        ) { _, _ in }
+        ) { _, _ in
+            // no-op; prompts permission if needed
+        }
     }
 
     // MARK: Live pedometer control
@@ -177,6 +184,7 @@ final class ActivityManager {
     private func ensureLivePedometerRunning() {
         guard enabled, livePedometerEnabled else { return }
         guard CMPedometer.isStepCountingAvailable() else { return }
+
         if !pedometerActive {
             startLivePedometer()
             debug(.openAPS, "Started CMPedometer live steps feed")
@@ -185,7 +193,10 @@ final class ActivityManager {
 
     func startLivePedometer() {
         guard enabled, livePedometerEnabled else { return }
-        guard CMPedometer.isStepCountingAvailable() else { return }
+        guard CMPedometer.isStepCountingAvailable() else {
+            debug(.openAPS, "CMPedometer step counting not available")
+            return
+        }
         guard !pedometerActive else { return }
 
         pedometerActive = true
@@ -194,11 +205,16 @@ final class ActivityManager {
             self.stepTimeline.removeAll(keepingCapacity: true)
         }
 
-        let start = Date().addingTimeInterval(-3600)
+        let start = Date().addingTimeInterval(-3600) // 1 hour history
 
         pedometer.startUpdates(from: start) { [weak self] data, error in
             guard let self = self else { return }
-            guard let data = data, error == nil else { return }
+
+            if let error = error {
+                debug(.openAPS, "CMPedometer error: \(error.localizedDescription)")
+                return
+            }
+            guard let data = data else { return }
 
             let now = Date()
             let cumulative = data.numberOfSteps.intValue
@@ -207,9 +223,7 @@ final class ActivityManager {
                 self.stepTimeline.append((now, cumulative))
 
                 let cutoff = now.addingTimeInterval(-self.timelineMaxAge)
-                while let first = self.stepTimeline.first,
-                      first.0 < cutoff
-                {
+                while let first = self.stepTimeline.first, first.0 < cutoff {
                     self.stepTimeline.removeFirst()
                 }
 
@@ -228,6 +242,7 @@ final class ActivityManager {
 
     // MARK: Refresh snapshot
 
+    /// Call once per loop cycle before AutoISF merge
     func refreshActivity(completion: ((ActivitySnapshot?) -> Void)? = nil) {
         guard enabled else {
             completion?(snapshot)
@@ -236,6 +251,7 @@ final class ActivityManager {
 
         ensureLivePedometerRunning()
 
+        // LIVE PEDOMETER path (preferred)
         if livePedometerEnabled, pedometerActive {
             // IMPORTANT: do this synchronously so snapshot/state/reduction are updated
             // before the caller continues (matches old HealthKit behavior).
@@ -246,15 +262,15 @@ final class ActivityManager {
                 }
             }
 
-            completion?(snapshot)
+            completion?(self.snapshot)
             return
         }
 
-        completion?(snapshot) // HK fallback retained elsewhere if needed
+        // If pedometer isn't active, keep returning last known snapshot (HK fallback elsewhere if needed)
+        completion?(snapshot)
     }
 
     // MARK: Timeline-based snapshot builder
-
     // ⚠️ Must ONLY be called from timelineQueue
 
     private func cumulativeAtOrBefore(_ t: Date) -> Int? {
@@ -273,17 +289,23 @@ final class ActivityManager {
             return max(0, endCum - startCum)
         }
 
+        let s5 = window(5)
+        let s10 = window(10)
+        let s15 = window(15)
+        let s30 = window(30)
+        let s60 = window(60)
+
         let snap = ActivitySnapshot(
-            steps5: window(5),
-            steps10: window(10),
-            steps15: window(15),
-            steps30: window(30),
-            steps60: window(60),
-            spm5: Double(window(5)) / 5.0,
-            spm10: Double(window(10)) / 10.0,
-            spm15: Double(window(15)) / 15.0,
-            spm30: Double(window(30)) / 30.0,
-            spm60: Double(window(60)) / 60.0,
+            steps5: s5,
+            steps10: s10,
+            steps15: s15,
+            steps30: s30,
+            steps60: s60,
+            spm5: Double(s5) / 5.0,
+            spm10: Double(s10) / 10.0,
+            spm15: Double(s15) / 15.0,
+            spm30: Double(s30) / 30.0,
+            spm60: Double(s60) / 60.0,
             lastUpdate: now
         )
 
@@ -294,13 +316,13 @@ final class ActivityManager {
         updateISFReduction(rawReduction: raw)
     }
 
-    // MARK: - ISF reduction hold / decay
+    // MARK: - ISF reduction hold / decay (edge-detect)
 
     func updateISFReduction(rawReduction: Double) {
         let isActiveNow = rawReduction > 0
 
         if isActiveNow {
-            // User is active → keep resetting hold
+            // Active → keep resetting hold
             cachedISFReduction = rawReduction
             originalReduction = rawReduction
             holdCounter = holdLoops
@@ -308,9 +330,9 @@ final class ActivityManager {
             return
         }
 
-        // We are inactive now
+        // Inactive now
         if wasActiveLastLoop {
-            // Activity JUST stopped → start hold countdown ONCE
+            // Activity JUST stopped → start hold countdown once
             holdCounter = holdLoops
             wasActiveLastLoop = false
         }
@@ -321,6 +343,8 @@ final class ActivityManager {
         } else {
             cachedISFReduction = 0.0
             originalReduction = 0.0
+            holdCounter = 0
+            state = .rest
         }
     }
 
@@ -329,15 +353,19 @@ final class ActivityManager {
         cachedISFReduction = 0.0
         originalReduction = 0.0
         holdCounter = 0
+        wasActiveLastLoop = false
         state = .rest
     }
 
     // MARK: Classification
 
     private func classify(snapshot: ActivitySnapshot) -> ActivityState {
+        // Gate
         if snapshot.steps15 < minStepsForAnyEffect { return .rest }
 
+        // Fast reaction uses 5-minute SPM
         let spm = snapshot.spm5
+
         if spm >= highSPMThreshold { return .high }
         if spm >= moderateSPMThreshold { return .moderate }
         if spm >= lightSPMThreshold { return .light }
@@ -346,6 +374,7 @@ final class ActivityManager {
 
     // MARK: AutoISF
 
+    /// Raw reduction delta (before hold/decay).
     private func autoISFReductionRaw() -> Double {
         guard let snap = snapshot else { return 0 }
         if snap.steps15 < minStepsForAnyEffect { return 0 }
@@ -372,6 +401,7 @@ final class ActivityManager {
             "30m: \(snap.steps30), " +
             "60m: \(snap.steps60), " +
             "State: \(state.rawValue), " +
-            "ISFΔ: \(String(format: "%.2f", cachedISFReduction))"
+            "ISFΔ: \(String(format: "%.2f", cachedISFReduction)), " +
+            "Hold: \(holdCounter)"
     }
 }

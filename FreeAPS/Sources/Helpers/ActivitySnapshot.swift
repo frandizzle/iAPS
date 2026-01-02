@@ -43,16 +43,12 @@ final class ActivityManager {
     private let healthStore = HKHealthStore()
     private let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
 
-    // Edge-detect for hold logic
-    private var wasActiveLastLoop: Bool = false
-
     // MARK: State
 
     private(set) var cachedISFReduction: Double = 0.0
     private(set) var snapshot: ActivitySnapshot?
     private(set) var state: ActivityState = .rest
     private var originalReduction: Double = 0.0
-    private var lastRawReduction: Double = 0.0
 
     // MARK: Settings-backed knobs
 
@@ -256,11 +252,15 @@ final class ActivityManager {
         if livePedometerEnabled, pedometerActive {
             timelineQueue.sync {
                 let now = Date()
+
                 if !self.stepTimeline.isEmpty {
                     self.refreshActivityFromTimeline(now: now)
                 }
-                // Apply hold ONCE per loop refresh
-                let raw = self.lastRawReduction
+
+                // ✅ compute raw fresh from the current snapshot/state
+                let raw = self.autoISFReductionRaw()
+
+                // ✅ apply hold logic ONCE per loop
                 self.updateISFReduction(rawReduction: raw)
             }
 
@@ -313,52 +313,31 @@ final class ActivityManager {
 
         snapshot = snap
         state = classify(snapshot: snap)
-
-        // Store raw reduction from current state/snapshot,
-        // but DO NOT consume hold here (this is called many times per minute).
-        lastRawReduction = autoISFReductionRaw()
     }
 
     // MARK: - ISF reduction hold / decay (edge-detect)
 
     func updateISFReduction(rawReduction: Double) {
-        let isActiveNow = rawReduction > 0
-
-        if isActiveNow {
+        if rawReduction > 0 {
+            // New or continued activity → reset hold
             cachedISFReduction = rawReduction
             originalReduction = rawReduction
             holdCounter = holdLoops
-            wasActiveLastLoop = true
-            return
-        }
-
-        // Transition: active -> inactive
-        if wasActiveLastLoop {
-            wasActiveLastLoop = false
-            // Start hold, but DON'T decrement yet this loop
-            holdCounter = holdLoops
+        } else if holdCounter > 0 {
+            // No new activity, but still holding
+            holdCounter -= 1
+            
+            // Keep full reduction value during hold period
             if holdCounter > 0 {
                 cachedISFReduction = originalReduction
             } else {
                 cachedISFReduction = 0.0
                 originalReduction = 0.0
-                state = .rest
-            }
-            return
-        }
-
-        // Still inactive: count down
-        if holdCounter > 0 {
-            holdCounter -= 1
-            cachedISFReduction = (holdCounter > 0) ? originalReduction : 0.0
-            if holdCounter == 0 {
-                originalReduction = 0.0
-                state = .rest
             }
         } else {
+            // Fully expired
             cachedISFReduction = 0.0
             originalReduction = 0.0
-            state = .rest
         }
     }
 
@@ -368,7 +347,6 @@ final class ActivityManager {
         cachedISFReduction = 0.0
         originalReduction = 0.0
         holdCounter = 0
-        wasActiveLastLoop = false
         state = .rest
     }
 

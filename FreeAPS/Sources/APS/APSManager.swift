@@ -380,7 +380,8 @@ final class BaseAPSManager: APSManager, Injectable {
             .flatMap { _ in
                 self.openAPS.determineBasal(currentTemp: temp, clock: now, temporary: temporary, override: self.override) }
             .map { suggestion -> Bool in
-                debug(.openAPS, "⏳ HOLD (no-advance) → \(ActivityManager.shared.holdLoopsRemaining)")
+                // ✅ Do NOT consume/decay hold here (this runs on "suggested")
+                debug(.openAPS, "⏳ HOLD (not consumed) → \(ActivityManager.shared.holdLoopsRemaining)")
                 if let suggestion = suggestion {
                     DispatchQueue.main.async { [self] in
                         broadcaster.notify(SuggestionObserver.self, on: .main) {

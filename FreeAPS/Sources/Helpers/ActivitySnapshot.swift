@@ -236,11 +236,33 @@ final class ActivityManager {
             self.stepTimeline.removeAll()
         }
     }
+    
+    /// Advance hold/decay exactly once based on the *current* snapshot/state.
+    /// Call this ONLY when a suggestion is successfully enacted.
+    func advanceHoldOnce() {
+        guard enabled else { return }
+
+        timelineQueue.sync {
+            // Ensure snapshot/state is up to date if timeline has data
+            let now = Date()
+            if !self.stepTimeline.isEmpty {
+                self.refreshActivityFromTimeline(now: now)
+            }
+
+            let raw = self.autoISFReductionRaw()
+            self.updateISFReduction(rawReduction: raw)
+
+            debug(.openAPS, "advanceHoldOnce: raw=\(raw) cached=\(self.cachedISFReduction) hold=\(self.holdLoopsRemaining)")
+        }
+    }
+
 
     // MARK: Refresh snapshot
 
     /// Call once per loop cycle before AutoISF merge
-    func refreshActivity(completion: ((ActivitySnapshot?) -> Void)? = nil) {
+    func refreshActivity(advanceHold: Bool = true,
+                         completion: ((ActivitySnapshot?) -> Void)? = nil)
+    {
         guard enabled else {
             completion?(snapshot)
             return
@@ -248,7 +270,6 @@ final class ActivityManager {
 
         ensureLivePedometerRunning()
 
-        // LIVE PEDOMETER path (preferred)
         if livePedometerEnabled, pedometerActive {
             timelineQueue.sync {
                 let now = Date()
@@ -257,20 +278,19 @@ final class ActivityManager {
                     self.refreshActivityFromTimeline(now: now)
                 }
 
-                // ✅ compute raw fresh from the current snapshot/state
-                let raw = self.autoISFReductionRaw()
-
-                // ✅ apply hold logic ONCE per loop
-                self.updateISFReduction(rawReduction: raw)
+                if advanceHold {
+                    let raw = self.autoISFReductionRaw()
+                    self.updateISFReduction(rawReduction: raw)
+                }
             }
 
             completion?(self.snapshot)
             return
         }
 
-        // If pedometer isn't active, keep returning last known snapshot (HK fallback elsewhere if needed)
         completion?(snapshot)
     }
+
 
     // MARK: Timeline-based snapshot builder
     // ⚠️ Must ONLY be called from timelineQueue

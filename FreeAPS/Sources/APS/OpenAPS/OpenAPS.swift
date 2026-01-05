@@ -137,7 +137,7 @@ if let s = settings {
                     } else {
                         debug(.openAPS, "Steps ENABLED → refreshing activity...")
 
-                        ActivityManager.shared.refreshActivity { snap in
+                        ActivityManager.shared.refreshActivity(advanceHold: false) { snap in
                             defer { semaphore.signal() }
 
                             if let snap = snap {

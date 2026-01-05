@@ -278,9 +278,14 @@ final class ActivityManager {
                     self.refreshActivityFromTimeline(now: now)
                 }
 
-                if advanceHold {
-                    let raw = self.autoISFReductionRaw()
+                let raw = self.autoISFReductionRaw()
+
+                if raw > 0 {
+                    // ✅ latch regardless of preview/enact
                     self.updateISFReduction(rawReduction: raw)
+                } else if advanceHold {
+                    // ✅ only decay on enact
+                    self.updateISFReduction(rawReduction: 0)
                 }
             }
 

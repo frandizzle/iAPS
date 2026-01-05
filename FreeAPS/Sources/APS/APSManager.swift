@@ -879,6 +879,16 @@ final class BaseAPSManager: APSManager, Injectable {
             // ✅ Only consume/advance the Steps hold when the suggestion was actually enacted
             if received {
                 ActivityManager.shared.advanceHoldOnce()
+                debug(.apsManager, "POST-ENACT hold=\(ActivityManager.shared.holdLoopsRemaining) cached=\(ActivityManager.shared.cachedISFReduction)")
+                // ✅ Option B: force UI to refresh tiles/reason by re-notifying the latest suggestion
+                // (This does NOT recompute insulin; it just refreshes what the UI displays.)
+                if let latestSuggested = storage.retrieve(OpenAPS.Enact.suggested, as: Suggestion.self) {
+                    DispatchQueue.main.async {
+                        self.broadcaster.notify(SuggestionObserver.self, on: .main) {
+                            $0.suggestionDidUpdate(latestSuggested)
+                        }
+                    }
+                }
             }
 
             debug(.apsManager, "Suggestion enacted. Received: \(received)")

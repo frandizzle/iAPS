@@ -114,7 +114,12 @@ final class OpenAPS {
 // Apply Steps settings from FreeAPSSettings (UI writes to this)
 // ────────────────────────────────────────────────
 if let s = settings {
+    debug(.openAPS, "⚙️ BEFORE applySettings: enabled=\(ActivityManager.shared.enabled), cached=\(ActivityManager.shared.cachedISFReduction), hold=\(ActivityManager.shared.holdLoopsRemaining)")
+
     ActivityManager.shared.applySettings(s)
+
+    debug(.openAPS, "⚙️ AFTER applySettings: enabled=\(ActivityManager.shared.enabled), cached=\(ActivityManager.shared.cachedISFReduction), hold=\(ActivityManager.shared.holdLoopsRemaining)")
+
     debug(.openAPS, "Steps UI toggle (stepsISFEnabled) = \(s.stepsISFEnabled)")
 } else {
     debug(.openAPS, "⚠️ FreeAPSSettings(from: data) returned nil — forcing steps OFF")
@@ -122,45 +127,40 @@ if let s = settings {
     ActivityManager.shared.clearReduction()
 }
 
-let semaphore = DispatchSemaphore(value: 0)
-var stepsReduction: Double = 0.0
+                    let semaphore = DispatchSemaphore(value: 0)
+                    var stepsReduction: Double = 0.0
 
-debug(
-    .openAPS,
-    "🔍 Before steps logic: enabled=\(ActivityManager.shared.enabled), cached=\(ActivityManager.shared.cachedISFReduction)"
-)
+                    if !ActivityManager.shared.enabled {
+                        ActivityManager.shared.clearReduction()
+                        stepsReduction = 0.0
+                        debug(.openAPS, "Steps DISABLED → cleared, stepsReduction = 0")
+                    } else {
+                        debug(.openAPS, "Steps ENABLED → refreshing activity...")
 
-if ActivityManager.shared.enabled == false {
-    // OFF means: clear everything and skip
-    ActivityManager.shared.clearReduction()
-    stepsReduction = 0.0
-    debug(.openAPS, "Steps DISABLED → cleared, stepsReduction = 0")
-} else {
-    debug(.openAPS, "Steps ENABLED → refreshing activity...")
+                        ActivityManager.shared.refreshActivity { snap in
+                            defer { semaphore.signal() }
 
-    ActivityManager.shared.refreshActivity { snap in
-        defer { semaphore.signal() }
+                            if let snap = snap {
+                                debug(
+                                    .openAPS,
+                                    "Activity refreshed: steps15=\(snap.steps15), state=\(ActivityManager.shared.state), cached(held)=\(ActivityManager.shared.cachedISFReduction), hold=\(ActivityManager.shared.holdLoopsRemaining)"
+                                )
+                            } else {
+                                debug(
+                                    .openAPS,
+                                    "Activity refreshed: snap=nil, cached(held)=\(ActivityManager.shared.cachedISFReduction), hold=\(ActivityManager.shared.holdLoopsRemaining)"
+                                )
+                            }
+                        }
 
-        if let snap = snap {
-            ActivityManager.shared.snapshot = snap
-            let raw = ActivityManager.shared.autoISFReductionRaw()
-            ActivityManager.shared.updateISFReduction(rawReduction: raw)
+                        let timeout = DispatchTime.now() + .seconds(5)
+                        if semaphore.wait(timeout: timeout) == .timedOut {
+                            debug(.openAPS, "Activity refresh timed out, using cached value")
+                        }
 
-            debug(.openAPS,
-                  "Activity refreshed at loop START: steps15=\(snap.steps15), state=\(ActivityManager.shared.state), raw=\(raw), cached(held)=\(ActivityManager.shared.cachedISFReduction)")
-        } else {
-            debug(.openAPS,
-                  "Activity refreshed at loop START: snap=nil, cached(held)=\(ActivityManager.shared.cachedISFReduction)")
-        }
-    }
+                        stepsReduction = ActivityManager.shared.cachedISFReduction
+                    }
 
-    let timeout = DispatchTime.now() + .seconds(5)
-    if semaphore.wait(timeout: timeout) == .timedOut {
-        debug(.openAPS, "Activity refresh timed out, using cached value")
-    }
-
-    stepsReduction = ActivityManager.shared.cachedISFReduction
-}
 
 debug(
     .openAPS,

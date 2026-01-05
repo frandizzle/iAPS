@@ -243,14 +243,20 @@ final class ActivityManager {
         guard enabled else { return }
 
         timelineQueue.sync {
-            // Ensure snapshot/state is up to date if timeline has data
             let now = Date()
             if !self.stepTimeline.isEmpty {
                 self.refreshActivityFromTimeline(now: now)
             }
 
             let raw = self.autoISFReductionRaw()
-            self.updateISFReduction(rawReduction: raw)
+
+            if raw == 0 {
+                // ✅ Consume one hold tick only when activity is not present
+                self.updateISFReduction(rawReduction: 0)
+            } else {
+                // ✅ Still active: don't re-arm/reset hold on enact
+                // (cached already reflects activity from preview refreshes)
+            }
 
             debug(.openAPS, "advanceHoldOnce: raw=\(raw) cached=\(self.cachedISFReduction) hold=\(self.holdLoopsRemaining)")
         }

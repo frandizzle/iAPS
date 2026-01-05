@@ -380,8 +380,7 @@ final class BaseAPSManager: APSManager, Injectable {
             .flatMap { _ in
                 self.openAPS.determineBasal(currentTemp: temp, clock: now, temporary: temporary, override: self.override) }
             .map { suggestion -> Bool in
-                ActivityManager.shared.updateISFReduction(rawReduction: 0)
-                debug(.openAPS, "⏳ HOLD LOOP → \(ActivityManager.shared.holdLoopsRemaining)")
+                debug(.openAPS, "⏳ HOLD (no-advance) → \(ActivityManager.shared.holdLoopsRemaining)")
                 if let suggestion = suggestion {
                     DispatchQueue.main.async { [self] in
                         broadcaster.notify(SuggestionObserver.self, on: .main) {
@@ -389,7 +388,6 @@ final class BaseAPSManager: APSManager, Injectable {
                         }
                     }
                 }
-
                 return suggestion != nil
             }
             .eraseToAnyPublisher()
@@ -858,7 +856,9 @@ final class BaseAPSManager: APSManager, Injectable {
     }
 
     private func reportEnacted(received: Bool) {
-        if let suggestion = storage.retrieve(OpenAPS.Enact.suggested, as: Suggestion.self), suggestion.deliverAt != nil {
+        if let suggestion = storage.retrieve(OpenAPS.Enact.suggested, as: Suggestion.self),
+           suggestion.deliverAt != nil
+        {
             var enacted = suggestion
             enacted.timestamp = Date()
             enacted.recieved = received
@@ -873,6 +873,11 @@ final class BaseAPSManager: APSManager, Injectable {
                 saveLastLoop.timestamp = received ? enacted.timestamp : CoreDataStorage().fetchLastLoop()?
                     .timestamp ?? .distantPast
                 try? self.coredataContext.save()
+            }
+
+            // ✅ Only consume/advance the Steps hold when the suggestion was actually enacted
+            if received {
+                ActivityManager.shared.advanceHoldOnce()
             }
 
             debug(.apsManager, "Suggestion enacted. Received: \(received)")

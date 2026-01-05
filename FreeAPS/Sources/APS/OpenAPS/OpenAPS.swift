@@ -110,76 +110,62 @@ final class OpenAPS {
                     var profile = storedProfile
                     print("Time for Loading files \(-1 * now.timeIntervalSinceNow) seconds")
 
-                    // ────────────────────────────────────────────────
-                    // Apply Steps settings from FreeAPSSettings (UI writes to this)
-                    // ────────────────────────────────────────────────
-                    if let s = settings {
-                        ActivityManager.shared.applySettings(s)
-                    } else {
-                        // If settings is nil, be safe: disable steps to avoid stale reduction
-                        ActivityManager.shared.enabled = false
-                        ActivityManager.shared.updateISFReduction(rawReduction: 0)
-                    }
+// ────────────────────────────────────────────────
+// Apply Steps settings from FreeAPSSettings (UI writes to this)
+// ────────────────────────────────────────────────
+if let s = settings {
+    ActivityManager.shared.applySettings(s)
+    debug(.openAPS, "Steps UI toggle (stepsISFEnabled) = \(s.stepsISFEnabled)")
+} else {
+    debug(.openAPS, "⚠️ FreeAPSSettings(from: data) returned nil — forcing steps OFF")
+    ActivityManager.shared.enabled = false
+    ActivityManager.shared.clearReduction()
+}
 
-                    // ────────────────────────────────────────────────
-                    // Apply Steps settings, then refresh activity + update hold/decay
-                    // ────────────────────────────────────────────────
+let semaphore = DispatchSemaphore(value: 0)
+var stepsReduction: Double = 0.0
 
-                    // ✅ THIS is what makes the UI toggle actually affect ActivityManager.enabled
-                    if let s = settings {
-                        ActivityManager.shared.applySettings(s)
-                        debug(.openAPS, "Steps UI toggle (stepsISFEnabled) = \(s.stepsISFEnabled)")
-                    } else {
-                        debug(.openAPS, "⚠️ FreeAPSSettings(from: data) returned nil — forcing steps OFF")
-                        ActivityManager.shared.enabled = false
-                        ActivityManager.shared.updateISFReduction(rawReduction: 0.0)
-                    }
+debug(
+    .openAPS,
+    "🔍 Before steps logic: enabled=\(ActivityManager.shared.enabled), cached=\(ActivityManager.shared.cachedISFReduction)"
+)
 
-                    let semaphore = DispatchSemaphore(value: 0)
-                    var rawReduction: Double = 0.0
-                    var stepsReduction: Double = 0.0
+if ActivityManager.shared.enabled == false {
+    // OFF means: clear everything and skip
+    ActivityManager.shared.clearReduction()
+    stepsReduction = 0.0
+    debug(.openAPS, "Steps DISABLED → cleared, stepsReduction = 0")
+} else {
+    debug(.openAPS, "Steps ENABLED → refreshing activity...")
 
-                    debug(
-                        .openAPS,
-                        "🔍 Before steps logic: enabled=\(ActivityManager.shared.enabled), cached=\(ActivityManager.shared.cachedISFReduction)"
-                    )
+    ActivityManager.shared.refreshActivity { snap in
+        defer { semaphore.signal() }
 
-                    if ActivityManager.shared.enabled == false {
-                        // OFF means: clear everything and skip
-                        ActivityManager.shared.clearReduction()
-                        stepsReduction = 0.0
-                        debug(.openAPS, "Steps DISABLED → cleared, stepsReduction = 0")
-                    } else {
-                        debug(.openAPS, "Steps ENABLED → refreshing activity...")
-                        ActivityManager.shared.refreshActivity { snap in
-                            if let snap = snap {
-                                debug(
-                                    .openAPS,
-                                    "Activity refreshed at loop START: steps15=\(snap.steps15), state=\(ActivityManager.shared.state)"
-                                )
-                            }
+        if let snap = snap {
+            ActivityManager.shared.snapshot = snap
+            let raw = ActivityManager.shared.autoISFReductionRaw()
+            ActivityManager.shared.updateISFReduction(rawReduction: raw)
 
-                            // 1️⃣ raw = instantaneous reduction from the freshly-updated snapshot/state
-                            rawReduction = ActivityManager.shared.cachedISFReduction
+            debug(.openAPS,
+                  "Activity refreshed at loop START: steps15=\(snap.steps15), state=\(ActivityManager.shared.state), raw=\(raw), cached(held)=\(ActivityManager.shared.cachedISFReduction)")
+        } else {
+            debug(.openAPS,
+                  "Activity refreshed at loop START: snap=nil, cached(held)=\(ActivityManager.shared.cachedISFReduction)")
+        }
+    }
 
-                            // 2️⃣ held/decayed
-                            ActivityManager.shared.updateISFReduction(rawReduction: rawReduction)
+    let timeout = DispatchTime.now() + .seconds(5)
+    if semaphore.wait(timeout: timeout) == .timedOut {
+        debug(.openAPS, "Activity refresh timed out, using cached value")
+    }
 
-                            semaphore.signal()
-                        }
+    stepsReduction = ActivityManager.shared.cachedISFReduction
+}
 
-                        let timeout = DispatchTime.now() + .seconds(5)
-                        if semaphore.wait(timeout: timeout) == .timedOut {
-                            debug(.openAPS, "Activity refresh timed out, using cached value")
-                        }
-
-                        stepsReduction = ActivityManager.shared.cachedISFReduction
-                    }
-
-                    debug(
-                        .openAPS,
-                        "🔍 After steps logic: enabled=\(ActivityManager.shared.enabled), stepsReduction=\(stepsReduction)"
-                    )
+debug(
+    .openAPS,
+    "🔍 After steps logic: enabled=\(ActivityManager.shared.enabled), stepsReduction=\(stepsReduction), cached=\(ActivityManager.shared.cachedISFReduction)"
+)
 
                     // ────────────────────────────────────────────────
                     // Inject / clear steps reduction into profile for JS

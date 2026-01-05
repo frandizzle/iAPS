@@ -251,16 +251,14 @@ final class ActivityManager {
             let raw = self.autoISFReductionRaw()
 
             if raw == 0 {
-                // ✅ Consume one hold tick only when activity is not present
+                // ✅ one tick per enact while inactive
                 self.updateISFReduction(rawReduction: 0)
-            } else {
-                // ✅ Still active: don't re-arm/reset hold on enact
-                // (cached already reflects activity from preview refreshes)
             }
 
             debug(.openAPS, "advanceHoldOnce: raw=\(raw) cached=\(self.cachedISFReduction) hold=\(self.holdLoopsRemaining)")
         }
     }
+
 
 
     // MARK: Refresh snapshot

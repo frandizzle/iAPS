@@ -44,7 +44,7 @@ final class ActivityManager {
     private let stepType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
 
     // MARK: State
-
+    private var holdPrimed: Bool = false
     private(set) var cachedISFReduction: Double = 0.0
     private(set) var snapshot: ActivitySnapshot?
     private(set) var state: ActivityState = .rest
@@ -354,7 +354,17 @@ final class ActivityManager {
             cachedISFReduction = raw
             originalReduction = raw
             holdCounter = holdLoops
-            debug(.openAPS, "RESET HOLD: raw=\(raw) -> hold=\(holdLoops)")
+            holdPrimed = true              // ✅ next inactive enact will NOT decrement
+            debug(.openAPS, "RESET HOLD: raw=\(raw) -> hold=\(holdCounter) primed=\(holdPrimed)")
+            return
+        }
+
+        // No activity (raw == 0)
+        if holdPrimed {
+            // ✅ first inactive enact after activity: keep holdCounter as-is (shows 3), then start decrementing next time
+            holdPrimed = false
+            cachedISFReduction = originalReduction
+            debug(.openAPS, "HOLD PRIMED: consume prime, hold=\(holdCounter)")
             return
         }
 
@@ -383,6 +393,7 @@ final class ActivityManager {
         cachedISFReduction = 0.0
         originalReduction = 0.0
         holdCounter = 0
+        holdPrimed = false     // ✅ add this
         state = .rest
     }
 

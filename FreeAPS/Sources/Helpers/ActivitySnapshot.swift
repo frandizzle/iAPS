@@ -129,7 +129,9 @@ final class ActivityManager {
         enabled = bool(s.stepsISFEnabled, enabled)
 
         if wasEnabled, !enabled {
-            clearReduction()
+            timelineQueue.sync {
+                self.clearReductionLocked()
+            }
             stopLivePedometer()
         }
 
@@ -252,13 +254,12 @@ final class ActivityManager {
 
             if raw == 0 {
                 // ✅ one tick per enact while inactive
-                self.updateISFReduction(rawReduction: 0)
+                self.updateISFReductionLocked(rawReduction: 0)
             }
 
             debug(.openAPS, "advanceHoldOnce: raw=\(raw) cached=\(self.cachedISFReduction) hold=\(self.holdLoopsRemaining)")
         }
     }
-
 
 
     // MARK: Refresh snapshot
@@ -286,10 +287,10 @@ final class ActivityManager {
 
                 if raw > 0 {
                     // ✅ latch regardless of preview/enact
-                    self.updateISFReduction(rawReduction: raw)
+                    self.updateISFReductionLocked(rawReduction: raw)
                 } else if advanceHold {
                     // ✅ only decay on enact
-                    self.updateISFReduction(rawReduction: 0)
+                    self.updateISFReductionLocked(rawReduction: 0)
                 }
             }
 
@@ -344,18 +345,19 @@ final class ActivityManager {
         state = classify(snapshot: snap)
     }
 
-    // MARK: - ISF reduction hold / decay (edge-detect)
+    // ⚠️ Must be called while already on timelineQueue
+    private func updateISFReductionLocked(rawReduction: Double) {
+        // Treat tiny noise as zero
+        let raw = rawReduction <= 0.0001 ? 0.0 : rawReduction
 
-    func updateISFReduction(rawReduction: Double) {
-        if rawReduction > 0 {
-            // Activity detected → reset hold
-            cachedISFReduction = rawReduction
-            originalReduction = rawReduction
+        if raw > 0 {
+            cachedISFReduction = raw
+            originalReduction = raw
             holdCounter = holdLoops
+            debug(.openAPS, "RESET HOLD: raw=\(raw) -> hold=\(holdLoops)")
             return
         }
 
-        // No activity
         if holdCounter > 0 {
             holdCounter -= 1
             cachedISFReduction = holdCounter > 0 ? originalReduction : 0.0
@@ -368,15 +370,29 @@ final class ActivityManager {
         }
     }
 
+    /// Public wrapper (safe to call from anywhere)
+    func updateISFReduction(rawReduction: Double) {
+        timelineQueue.sync {
+            self.updateISFReductionLocked(rawReduction: rawReduction)
+        }
+    }
 
 
-    /// Clear all cached reduction and reset state (used when feature is disabled)
-    func clearReduction() {
+    // ⚠️ Must be called while already on timelineQueue
+    private func clearReductionLocked() {
         cachedISFReduction = 0.0
         originalReduction = 0.0
         holdCounter = 0
         state = .rest
     }
+
+    /// Public wrapper
+    func clearReduction() {
+        timelineQueue.sync {
+            self.clearReductionLocked()
+        }
+    }
+
 
     // MARK: Classification
 
